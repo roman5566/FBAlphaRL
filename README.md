@@ -4,7 +4,11 @@ FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/ICON0_zps2c5f3318.png)
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/PIC1_small_zps511df5d7.png)
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/RetroArchPS3_3_zpse94767dd.png)
+<<<<<<< HEAD
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/RetroArchPS3_4_zps2b722e7d.png)
+=======
+![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/RetroArchPS3_2_zps1bcb8840.png)
+>>>>>>> 1217e7641d413e4908fd9e79c3e9181e72118078
 
 Information:
 ----------------------------------------------------

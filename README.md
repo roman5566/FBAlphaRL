@@ -138,10 +138,11 @@ Thanks to:
 Downloads:
 ----------------------------------------------------
 
-FB_Alpha_RL_1.00_[20130130].pkg [~8.5 MB]
--[mediafire] http://www.mediafire.com/?lqqdg1i317ucqiz
--[zippyshare] http://www34.zippyshare.com/v/51407224/file.html
--[mega] https://mega.co.nz/#!Ad92FRJA!M2fB1RgrV7ZSpoe7YURowD7xKyozuCJYcPW_KA1uuCk
+FB_Alpha_RL_1.00_[20130130].pkg [8.5 MB]
+
+- http://www.mediafire.com/?lqqdg1i317ucqiz
+- http://www34.zippyshare.com/v/51407224/file.html
+- https://mega.co.nz/#!Ad92FRJA!M2fB1RgrV7ZSpoe7YURowD7xKyozuCJYcPW_KA1uuCk
 
 Source Code:
 ----------------------------------------------------

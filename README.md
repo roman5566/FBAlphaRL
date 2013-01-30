@@ -1,6 +1,11 @@
 FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
 ----------------------------------------------------
 
+![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/ICON0_zps2c5f3318.png)
+![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/PIC1_small_zps511df5d7.png)
+![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/RetroArchPS3_3_zpse94767dd.png)
+![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/RetroArchPS3_4_zps2b722e7d.png)
+
 Information:
 ----------------------------------------------------
 
@@ -91,6 +96,7 @@ Usage:
 Features:
 ----------------------------------------------------
 
+- Auto configure screen Aspect Ratio on game load.
 - Quick ROM(s) scanning in extensive path locations.
 - Romset validation against FB Alpha v0.2.97.28 drivers library.
 - Checking for duplicate ROM(s).
@@ -128,3 +134,18 @@ Thanks to:
  Thanks to anyone else I forgot that in some way contributed
  to the PS3 scene and as a result I was able to do this 
  homebrew application.
+
+Downloads:
+----------------------------------------------------
+
+FB_Alpha_RL_1.00_[20130130].pkg [~8.5 MB]
+-[mediafire] http://www.mediafire.com/?lqqdg1i317ucqiz
+-[zippyshare] http://www34.zippyshare.com/v/51407224/file.html
+-[mega] https://mega.co.nz/#!Ad92FRJA!M2fB1RgrV7ZSpoe7YURowD7xKyozuCJYcPW_KA1uuCk
+
+Source Code:
+----------------------------------------------------
+
+-FB Alpha RL - https://github.com/CaptainCPS/FBAlphaRL
+-RetroArch (Modded for FB Alpha RL) - https://github.com/CaptainCPS/RetroArch (atm is just a fork of official RetroArch, but tonight I will commit my changes, so they are easier to track down :))
+-FB Alpha v0.2.97.28 (Modded to generate "burn_drivers.h")(Windows) - (coming soon, Im organizing it now)

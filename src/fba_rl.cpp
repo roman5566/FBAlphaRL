@@ -3,7 +3,48 @@
 // ---------------------------------------------------------------------
 /*
 
+Custom RETROARCH Recent Changes:
+
+- Implemented a static variable "g_bExtLaunchMM" to serve as "MODE_EXTLAUNCH_MULTIMAN" since
+it is being cleared at some unknown point creating problems when launching
+from external applications to load a game on the fly.
+
+- Changed custom RetroArch "EMULATOR_CONTENT_DIR" macro to "FBAL00123" (previously set to "SSNE10000"),
+this will allow this custom RetroArch to be independent from an existing RetroArch installation
+on the PS3.
+
+- Implemented extra agument checking support when launched externally
+
+Note: Arguments should be passed as follows (argv[])
+
+> Argument 1 :	This should have a ROM / ZIP valid path in case of loading a game. 
+Or could just be a dummy argument.
+
+> Argument 2 :	This should have the path of the external Application RELOAD.SELF
+!!! Must be set in this custom RetroArch build !!!
+
+> Argument 3 :  This should have a valid path of a Input Preset Configuration file.
+(Ex. "/dev_hdd0/.../neogeo.cfg")
+Or could just be a dummy argument.
+
+> Argument 4 : This should have the Aspect Ratio of the game (Ex. "4:3" as char string)
+Or could be just a dummy argument
+
+- Modified / Added menu items for in-game menu and main menu so RetroArch display the
+proper name if launched from FB Alpha RL. 
+
+- Source Files Affected:
+
+frontend/frontend_console.c
+frontend/menu/rmenu.c
+frontend/menu/rmenu.h
+frontend/platform/platform_ps3.c
+
+Makefile.ps3 (was edited with custom signing using scetool for Salamander / CORE)
+
 TODO: 
+
+*- Generate proper shaders and files to be packaged alongside custom RetroArch
 
 - Implement filtering by System type
 - Implement Configuration file module for FB Alpha RL
@@ -65,17 +106,17 @@ bool c_fbaRL::IsBurnDuplicate(char* szROM)
 
 void DlgCallbackFunction(int buttonType, void */*userData*/)
 {
-    switch( buttonType ) 
+	switch( buttonType ) 
 	{
-		case CELL_MSGDIALOG_BUTTON_YES:
-		case CELL_MSGDIALOG_BUTTON_NO:		
-		case CELL_MSGDIALOG_BUTTON_ESCAPE:
-		case CELL_MSGDIALOG_BUTTON_NONE:
-			break;
+	case CELL_MSGDIALOG_BUTTON_YES:
+	case CELL_MSGDIALOG_BUTTON_NO:		
+	case CELL_MSGDIALOG_BUTTON_ESCAPE:
+	case CELL_MSGDIALOG_BUTTON_NONE:
+		break;
 
-		default:
-			break;
-    }
+	default:
+		break;
+	}
 }
 
 // Initialize fbaRL module
@@ -94,11 +135,10 @@ void c_fbaRL::Frame()
 }
 
 #define COLOR_ORANGE	0xff1780f8
-#define COLOR_GREEN		COLOR_ORANGE //0xff00ff00
+#define COLOR_GREEN		0xff00ff00
 #define COLOR_YELLOW	0xff00ccff
 #define COLOR_RED		0xff0000ff
 #define COLOR_WHITE		0xffffffff
-
 
 void c_fbaRL::DisplayFrame()
 {
@@ -107,11 +147,11 @@ void c_fbaRL::DisplayFrame()
 	float yPosDiff	= 0.03f;	
 	float nFontSize = 0.55f;
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;	
 	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, _APP_TITLE);
 	yPos += yPosDiff;
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -(O)- TO EXIT AND RETURN TO XMB");
 	yPos += yPosDiff;
@@ -127,7 +167,7 @@ void c_fbaRL::DisplayFrame()
 	yPos += yPosDiff;
 #endif
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 
 	::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
@@ -135,7 +175,7 @@ void c_fbaRL::DisplayFrame()
 
 	yPos += yPosDiff;
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 
 	int nGameListMax = 9;
@@ -163,7 +203,7 @@ void c_fbaRL::DisplayFrame()
 	if(nGameListTop < 0) nGameListTop = 0;
 
 	int nGame = nGameListTop;
-	
+
 	while(nGame <= (nGameListTop + nGameListMax))
 	{
 		if(nGame == nTotalGames) break;
@@ -181,7 +221,7 @@ void c_fbaRL::DisplayFrame()
 		::cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "[%d] %s", 
 			nGame+1, 
 			gamelst[nGame].title
-		);
+			);
 		yPos += yPosDiff;
 
 		nGame++;
@@ -189,13 +229,13 @@ void c_fbaRL::DisplayFrame()
 
 	nFontSize = 0.55f;
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 
 	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "Game Info:" );
 	yPos += yPosDiff;
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 
 	if(nBurnSelected >= 0) {
@@ -228,17 +268,36 @@ void c_fbaRL::DisplayFrame()
 			"Game Resolution: %d x %d (%d:%d)", 
 			fba_drv[nBurnSelected].nWidth, fba_drv[nBurnSelected].nHeight,
 			fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY
-		);
+			);
 		yPos += yPosDiff;
 
 	}
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_GREEN, "+--------------------------------------------------------------------------------------------+" );
+	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 	yPos += yPosDiff;
 
 }
 
-#include <sys/process.h>
+void LaunchRetroArch(char* arg1, char* arg2, char* arg3, char* arg4) 
+{
+	// TODO: Add error checking for arguments...
+
+	char* argv[5] = { 0 };	
+	argv[0] = (char*)malloc( strlen(arg1) + 1); 
+	argv[1] = (char*)malloc( strlen(arg2) + 1); 
+	argv[2] = (char*)malloc( strlen(arg3) + 1); 
+	argv[3] = (char*)malloc( strlen(arg4) + 1);
+	
+
+	strcpy(argv[0], arg1);	// [ROM / ZIP path]			optional, can be dummy / filler argument
+	strcpy(argv[1], arg2);	// [FBARL RELOAD.SELF path] MUST be the valid external launcher path
+	strcpy(argv[2], arg3);	// [input preset cfg]		optional, can be dummy / filler argument
+	strcpy(argv[3], arg4);	// [aspect ratio]			optional, can be dummy / filler argument
+	argv[4] = NULL;
+
+	char fba_core_path[] = "/dev_hdd0/game/FBAL00123/USRDIR/cores/fb_alpha.SELF";
+	sys_game_process_exitspawn(fba_core_path, (const char**)argv, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+}
 
 void c_fbaRL::InputFrame()
 {
@@ -256,7 +315,7 @@ void c_fbaRL::InputFrame()
 		}
 		nSelInputFrame = 0;
 	} 
-	
+
 	if( !app.mIsDownPressed && app.downPressedNow)
 	{
 		if(nSelectedGame >= 0 && nSelectedGame < nTotalGames-1)
@@ -266,10 +325,10 @@ void c_fbaRL::InputFrame()
 		}
 		nSelInputFrame = 0;
 	}
-	
+
 	// ------------------------------------------------------
 	// Navigation UP/DOWN with delay
-	
+
 	if(((app.mFrame + nSelInputFrame) - app.mFrame) == 5)
 	{
 		if( app.mIsUpPressed && app.upPressedNow)
@@ -298,46 +357,33 @@ void c_fbaRL::InputFrame()
 
 	if(!app.mIsSquarePressed && app.squarePressedNow)
 	{
-
+		// ...
 	}
 
 	// ------------------------------------------------------
 	// (X) - CROSS
-	
+
 	if ( !app.mIsCrossPressed && app.crossPressedNow ) 
 	{
 		app.onShutdown();
 
-		char* argv[4] = { 0 };
+		char fba_rl_path[]		= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
+		char preset_cfg[]		= "DUMMY_ARG"; // todo: implement module to set this
+		char aspect_ratio[12]	= { 0 };
+		sprintf(aspect_ratio, "%d:%d", fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY);
 
-		char szfbaROM[1024] = { 0 };		
-		sprintf(szfbaROM, "%s", gamelst[nSelectedGame].path);
-
-		// ARG 1 [ROM]
-		argv[0] = (char*)malloc(strlen(szfbaROM) + 1);
-		strcpy(argv[0], szfbaROM);
-
-		// ARG 2 [EXT LAUNCHER PATH]
-		argv[1] = (char*)malloc( strlen("/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF") + 1);
-		strcpy(argv[1], "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF");
-
-		// ARG 3 [INPUT PRESET CONFIG]
-		//argv[2] = (char*)malloc( strlen("/dev_hdd0/game/SSNE10000/USRDIR/cores/presets/input/neogeo.cfg") + 1);
-		//strcpy(argv[2], "/dev_hdd0/game/SSNE10000/USRDIR/cores/presets/input/neogeo.cfg");
-
-		argv[2] = (char*)malloc( strlen("DUMMY_ARG") + 1);
-		strcpy(argv[2], "DUMMY_ARG");
-
-		// FB ALPHA [LIBRETRO CORE]
-		char path[] = "/dev_hdd0/game/FBAL00123/USRDIR/cores/fb_alpha.SELF";
-
-		sys_game_process_exitspawn(path, (const char**)argv, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+		LaunchRetroArch(
+			(char*)gamelst[nSelectedGame].path, 
+			(char*)fba_rl_path, 
+			(char*)preset_cfg,
+			(char*)aspect_ratio
+		);
 
 	}	
-	
+
 	// ------------------------------------------------------
 	// (O) - CIRCLE
-	
+
 	if (!app.mIsCirclePressed && app.circlePressedNow) 
 	{
 		app.onShutdown();
@@ -350,22 +396,18 @@ void c_fbaRL::InputFrame()
 	if(!app.mIsSelectPressed && app.selectPressedNow)
 	{
 		app.onShutdown();
-		
-		char path[] = "/dev_hdd0/game/FBAL00123/USRDIR/cores/fb_alpha.SELF";
-		
-		char* argv[4] = { 0 };
-		
-		argv[0] = (char*)malloc( strlen("DUMMY_ARG") + 1);
-		strcpy(argv[0], "DUMMY_ARG");
 
-		argv[1] = (char*)malloc( strlen("/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF") + 1);
-		strcpy(argv[1], "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF");
+		char fba_rl_path[]	= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
+		char rom_path[]		= "DUMMY_ARG";
+		char preset_cfg[]	= "DUMMY_ARG";
+		char aspect_ratio[]	= "DUMMY_ARG";
 
-		argv[2] = (char*)malloc( strlen("DUMMY_ARG") + 1);
-		strcpy(argv[2], "DUMMY_ARG");
-
-		sys_game_process_exitspawn(path, (const char**)argv, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
-
+		LaunchRetroArch(
+			(char*)rom_path, 
+			(char*)fba_rl_path, 
+			(char*)preset_cfg,
+			(char*)aspect_ratio
+		);
 	}
 
 	// ------------------------------------------------------
@@ -439,11 +481,11 @@ int c_fbaRL::ParseGameList()
 	for(unsigned int nDev = 0; nDev < (sizeof(szDevice) / 256); nDev++)
 	{
 		//int device;
-		
+
 		// device is mounted
 		//if(cellFsOpendir(szDevice[nDev], &device) == CELL_FS_SUCCEEDED) 
 		DIR* d = NULL;
-		
+
 		d = opendir(szDevice[nDev]);
 		if(d != NULL)
 		{
@@ -475,7 +517,7 @@ int c_fbaRL::ParseGameList()
 
 							char szDirectory[256] = { 0 };
 							sprintf(szDirectory, "%s/%s", szDevice[nDev], szDir[nDir]);
-							
+
 							d2 = opendir(szDirectory);
 
 							//if(cellFsOpendir(szDirectory, &d) == CELL_FS_SUCCEEDED)
@@ -498,9 +540,9 @@ int c_fbaRL::ParseGameList()
 										// DIRECTORY
 
 										// we're not looking for directories here...
-									
+
 									} else {
-				
+
 										if(dirEntry2->d_type != DT_REG) break;
 
 										// FILE
@@ -509,7 +551,7 @@ int c_fbaRL::ParseGameList()
 										if (nNameLen < 5) continue;
 
 										char* pszFilename = NULL;
-										
+
 										pszFilename = (char*)malloc(nNameLen+1);										
 										memcpy(pszFilename, dirEntry2->d_name, nNameLen);
 										pszFilename[nNameLen] = 0;
@@ -548,13 +590,13 @@ int c_fbaRL::ParseGameList()
 											}
 
 											sprintf(gamelst[nTotalGames].path, "%s/%s", szDirectory, dirEntry2->d_name);				
-											
+
 											// zip title
 											sprintf(gamelst[nTotalGames].zipname, "%s", dirEntry2->d_name);
 
 											// Size in bytes
 											gamelst[nTotalGames].nSize = GetFileSize(gamelst[nTotalGames].path);
-					
+
 											nTotalGames++;
 										}
 
@@ -587,6 +629,7 @@ int c_fbaRL::ParseGameList()
 
 void c_fbaRL::RefreshGameList()
 {
+	// TODO: Debug this loop (should edit frame modules to avoid conflict)
 	if(nTotalGames > 0) 
 	{
 		if(gamelst) {
@@ -596,12 +639,15 @@ void c_fbaRL::RefreshGameList()
 		nTotalGames = 0;
 	}
 
-	gamelst = (struct c_gamelist*)malloc(sizeof(struct c_gamelist) * 1000);
+	// Up to 15,000 listed games (LMAO! xD)
+	gamelst = (struct c_gamelist*)malloc(sizeof(struct c_gamelist) * 15000);
 
 	ParseGameList();
 
+	// Sort by Title
 	qsort(gamelst, nTotalGames, sizeof(struct c_gamelist), _FcCompareStruct);
 
+	// Update info module current driver selection
 	UpdateBurnSelected(gamelst[nSelectedGame].zipname);
 }
 
@@ -612,6 +658,6 @@ uint64_t c_fbaRL::GetFileSize(char* szFilePath)
 	memset(&sb, 0, sizeof(CellFsStat));
 
 	cellFsStat(szFilePath, &sb);
-	
+
 	return sb.st_size;
 }

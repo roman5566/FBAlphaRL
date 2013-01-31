@@ -148,5 +148,5 @@ Source Code:
 ----------------------------------------------------
 
 - FB Alpha RL - https://github.com/CaptainCPS/FBAlphaRL
-- RetroArch (Modded for FB Alpha RL) - https://github.com/CaptainCPS/RetroArch (atm is just a fork of official RetroArch, but tonight I will commit my changes, so they are easier to track down :))
+- RetroArch (Modded for FB Alpha RL) - https://github.com/CaptainCPS/RetroArch
 - FB Alpha v0.2.97.28 (Modded to generate "burn_drivers.h")(Windows) - (coming soon, Im organizing it now)

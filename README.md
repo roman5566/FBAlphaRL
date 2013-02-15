@@ -103,6 +103,7 @@ Features:
 - Detailed info about listed ROM(s).
 - Full game name display for easier navigation.
 - Direct loading of ROM(s).
+- Support for Screenshots (press (PS) and look in XMB photo column)
 - Simple GUI & nice application logos(LMAO xD).
 
 WIP / Coming on future releases:
@@ -114,6 +115,19 @@ WIP / Coming on future releases:
 
 Changelog:
 ----------------------------------------------------
+
+1.01 (February 3, 2013)
+
+- Incremented number of displayed games.
+- Added quick list navigation by pressing L2 / R2.
+- Added Analog Stick support to navigate lists.
+- Added Main menu with various useful items.
+- Added ZIP Info feature (press [ ] to view ZIP info).
+- Updated FB Alpha (libretro) core.
+- (FBA core) Fixed graphic problems in CPS-1 driver.
+- (FBA core) Fixed Diagnostic Menu Lock-up in some games.
+- Added Screenshot feature (press (PS) and look in Photo XMB column).
+- Improved application core overall.
 
 1.00 (January 30, 2013)
 

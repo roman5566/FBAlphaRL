@@ -9,8 +9,8 @@
 // Struct compare function for QSORT
 int _FcCompareStruct(const void *a, const void *b) 
 { 
-    struct c_gamelist *ia = (struct c_gamelist *)a;
-    struct c_gamelist *ib = (struct c_gamelist *)b;
+    class c_game *ia = (class c_game *)a;
+    class c_game *ib = (class c_game *)b;
 
 	return strcmp(toLowerCase(ia->title, 256), toLowerCase(ib->title, 256));
 }

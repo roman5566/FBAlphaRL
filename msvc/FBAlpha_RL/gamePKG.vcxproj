@@ -38,15 +38,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\usr\local\cell\target\ppu\include;C:\usr\local\cell\samples\fw\include;C:\usr\local\cell\target\spu\include;C:\usr\local\cell\target\common\include;C:\usr\local\cell\target\windows\include;..\..\include</IncludePath>
+    <IncludePath>C:\FBAlphaRL\;C:\usr\local\cell\samples\fw\include\psgl;C:\usr\local\cell\target\ppu\include;C:\usr\local\cell\samples\fw\include;C:\usr\local\cell\target\spu\include;C:\usr\local\cell\target\common\include;C:\usr\local\cell\target\windows\include;..\..\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <SourcePath>C:\usr\local\cell\samples\fw\src;C:\usr\local\cell\target\ppu\src;C:\usr\local\cell\target\spu\src;C:\usr\local\cell\target\reference\src;C:\usr\local\cell\target\windows\src</SourcePath>
+    <SourcePath>C:\usr\local\cell\samples\fw\src\psgl;C:\usr\local\cell\samples\fw\src;C:\usr\local\cell\target\ppu\src;C:\usr\local\cell\target\spu\src;C:\usr\local\cell\target\reference\src;C:\usr\local\cell\target\windows\src</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_C_LIB_DECL;PSGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -66,15 +67,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\include\miniz.c" />
     <ClCompile Include="..\..\src\fba_rl.cpp" />
+    <ClCompile Include="..\..\src\image.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\misc.cpp" />
+    <ClCompile Include="..\..\src\rpng.cpp" />
+    <ClCompile Include="..\..\src\rzlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\burn_drivers.h" />
+    <ClInclude Include="..\..\include\burn_rominfo.h" />
     <ClInclude Include="..\..\include\fba_rl.h" />
+    <ClInclude Include="..\..\include\hash.h" />
+    <ClInclude Include="..\..\include\image.h" />
     <ClInclude Include="..\..\include\main.h" />
     <ClInclude Include="..\..\include\misc.h" />
+    <ClInclude Include="..\..\include\rpng.h" />
+    <ClInclude Include="..\..\include\strl.h" />
+    <ClInclude Include="..\..\include\zlib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

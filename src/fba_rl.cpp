@@ -56,21 +56,138 @@ WIP:
 */
 
 // --------------------------------------------------------------------
-#define _APP_TITLE "FB Alpha Retro Loader v1.00 - by CaptainCPS-X [2013]"
+#define _APP_TITLE "\tFB ALPHA RETRO LOADER v1.01 - by CaptainCPS-X [2013]"
 // --------------------------------------------------------------------
 
-//#define FBARL_DEBUG
+#define FBARL_DEBUG
 
 #include "main.h"
 #include "misc.h"
 #include "fba_rl.h"
 #include "burn_drivers.h" // Driverlist Generated via custom FB Alpha build [ v0.2.97.28 ][ Windows ]
+//#include "burn_rominfo.h"
 
-int nBurnSelected = -1;
+#include <sys/stat.h>
+#include "miniz.c"
 
 c_fbaRL* fbaRL;
 
+int nBurnSelected = -1;
 // -------------------------------------------------------
+
+void c_fbaRL::InitMainMenu()
+{
+	main_menu = new c_Menu(9);
+
+	main_menu->AddItem((char*)"-[         GAME LIST          ]-");
+	main_menu->AddItem((char*)"-[          OPTIONS           ]-");
+	main_menu->AddItem((char*)"-[  LOAD \"FB Alpha Core\" MOD  ]-");
+	main_menu->AddItem((char*)"-[      LOAD \"RetroArch\"      ]-");
+	main_menu->AddItem((char*)"-[       LOAD \"multiMAN\"      ]-");
+	main_menu->AddItem((char*)"-[            EXIT            ]-");
+}
+
+void c_fbaRL::EndMainMenu()
+{
+	SAFE_DELETE(main_menu);
+}
+
+void c_fbaRL::InitGameList()
+{
+	nSelectedGame = 0;
+	nGameListTop = 0;
+	nTotalGames = 0;
+
+	ParseGameList();
+
+	// Sort by Title
+	//qsort(games, nTotalGames, sizeof(class c_game), _FcCompareStruct);
+
+	if(games[0]) UpdateBurnSelected(games[nSelectedGame]->zipname);
+}
+
+void c_fbaRL::EndGameList()
+{
+	for(int n = 0; n < nTotalGames; n++)
+	{
+		SAFE_DELETE(games[n]);
+	}
+	nSelectedGame = 0;
+	nGameListTop = 0;
+	nTotalGames = 0;
+}
+
+void c_fbaRL::InitOptionsMenu()
+{
+	options_menu = new c_Menu(9);
+}
+
+void c_fbaRL::EndOptionsMenu()
+{
+	SAFE_DELETE(options_menu);
+}
+
+void c_fbaRL::InitZipInfoMenu()
+{
+	zipinfo_menu = new c_Menu(34);
+
+	uint32_t		i;
+	mz_bool			bZipStatus;
+	//size_t			uncomp_size;
+	mz_zip_archive	zip_archive;
+
+	// Now try to open the archive.
+	memset(&zip_archive, 0, sizeof(zip_archive));
+	bZipStatus = mz_zip_reader_init_file(&zip_archive, games[nSelectedGame]->path, 0);
+	if (!bZipStatus)
+	{
+		FILE* fp = fopen("/dev_hdd0/game/FBAL00123/USRDIR/zip_error_log.txt", "w");
+		if(fp) {
+			fprintf(fp, "mz_zip_reader_init_file() failed!\n");
+			fclose(fp);
+			fp = NULL;
+		}
+
+		SAFE_DELETE(zipinfo_menu);
+
+		return;
+	}
+
+	// Get and print information about each file in the archive.
+	for (i = 0; i < mz_zip_reader_get_num_files(&zip_archive); i++)
+	{
+		mz_zip_archive_file_stat file_stat;
+		if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat))
+		{
+			FILE* fp = fopen("/dev_hdd0/game/FBAL00123/USRDIR/zip_error_log.txt", "w");
+			if(fp) {
+				fprintf(fp, "mz_zip_reader_file_stat() failed!\n");
+				fclose(fp);
+				fp = NULL;
+			}
+			mz_zip_reader_end(&zip_archive);
+
+			SAFE_DELETE(zipinfo_menu);
+
+			return;
+		}
+
+		char szTmp[1024] = { 0 };
+		sprintf(szTmp, "\t[ %s ] [SIZE: %u bytes] [CRC32: %08X] \n", 
+			file_stat.m_filename,
+			(uint32_t)file_stat.m_uncomp_size, 
+			//(uint32_t)file_stat.m_comp_size,
+			(uint32_t)file_stat.m_crc32
+		);
+
+		zipinfo_menu->AddItem((char*)szTmp);
+	}
+}
+
+void c_fbaRL::EndZipInfoMenu()
+{
+	SAFE_DELETE(zipinfo_menu);
+}
 
 uint32_t c_fbaRL::GetBurnDriverID(char* szRomzip)
 {
@@ -96,7 +213,7 @@ bool c_fbaRL::IsBurnDuplicate(char* szROM)
 {
 	for(int nGame = 0; nGame < nTotalGames; nGame++)
 	{
-		if(strcmp(gamelst[nGame].zipname, szROM) == 0)
+		if(strcmp(games[nGame]->zipname, szROM) == 0)
 		{
 			return true; // busted! duplicate! xD
 		}
@@ -119,14 +236,6 @@ void DlgCallbackFunction(int buttonType, void */*userData*/)
 	}
 }
 
-// Initialize fbaRL module
-c_fbaRL::c_fbaRL()
-{
-	nSelectedGame	= 0;
-	nGameListTop	= 0;
-	nTotalGames		= 0;
-}
-
 void c_fbaRL::Frame()
 {
 	DisplayFrame();
@@ -140,141 +249,271 @@ void c_fbaRL::Frame()
 #define COLOR_RED		0xff0000ff
 #define COLOR_WHITE		0xffffffff
 
-void c_fbaRL::DisplayFrame()
+//char* szZipInfoMsg[2048] = { 0 }; // TODO: put this properly in the class
+
+int c_Menu::UpdateTopItem()
 {
-	float xPos		= 0.04f;
-	float yPos		= 0.05f;
-	float yPosDiff	= 0.03f;	
-	float nFontSize = 0.55f;
-
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;	
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, _APP_TITLE);
-	yPos += yPosDiff;
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -(O)- TO EXIT AND RETURN TO XMB");
-	yPos += yPosDiff;
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -(X)- TO LOAD GAME");
-	yPos += yPosDiff;
-	//::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -(/\\)- TO VIEW GAME INFO");
-	//yPos += yPosDiff;
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -[SELECT]- TO LOAD \"RetroArch (FB Alpha Core)\"");
-	yPos += yPosDiff;
-
-#ifdef FBARL_DEBUG
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "PRESS -[START]- TO LOAD \"multiMAN\"");
-	yPos += yPosDiff;
-#endif
-
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
-
-	::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-		"Total Games found on all scanned directories: %d", nTotalGames);
-
-	yPos += yPosDiff;
-
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
-
-	int nGameListMax = 9;
-
-	if(nSelectedGame > nGameListMax || nGameListTop > 0)
+	if(nSelectedItem > nListMax || nTopItem > 0)
 	{
-		if(nGameListTop < (nSelectedGame - nGameListMax))
+		if(nTopItem < (nSelectedItem - nListMax))
 		{
-			nGameListTop = nSelectedGame - nGameListMax;
+			nTopItem = nSelectedItem - nListMax;
 		}
 
-		if(nGameListTop > 0) 
+		if(nTopItem > 0) 
 		{
-			if(nSelectedGame < nGameListTop)
+			if(nSelectedItem < nTopItem)
 			{
-				nGameListTop = nSelectedGame;
+				nTopItem = nSelectedItem;
 			}
 		} else {
-			nGameListTop = nSelectedGame - nGameListMax;
+			nTopItem = nSelectedItem - nListMax;
 		}
 	} else {
-		nGameListTop = nSelectedGame - nGameListMax;
+		nTopItem = nSelectedItem - nListMax;
 	}
 
-	if(nGameListTop < 0) nGameListTop = 0;
+	if(nTopItem < 0) nTopItem = 0;
 
-	int nGame = nGameListTop;
+	return nTopItem;
+}
 
-	while(nGame <= (nGameListTop + nGameListMax))
+void c_fbaRL::DisplayFrame()
+{
+	if(nSection == SECTION_GAMELIST) 
 	{
-		if(nGame == nTotalGames) break;
+		float xPos		= 0.0400f;
+		float yPos		= 0.0500f;
+		float yPosDiff	= 0.0200f;	
+		float nFontSize = 0.5500f;
 
-		uint32_t nColor	= COLOR_WHITE;		// white
-		nFontSize		= 0.6f;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;	
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, _APP_TITLE);
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
 
-		// GAME SELECTED
-		if(nGame == nSelectedGame) 
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tPRESS -(X)- TO LOAD GAME");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tPRESS -[ ]- TO VIEW ZIP INFO");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tPRESS -(/\\)- TO VIEW GAME INFO");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tPRESS -[L2 / R2]- FOR QUICK LIST NAVIGATION");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tPRESS -[SELECT]- TO RETURN TO MAIN MENU");
+		yPos += yPosDiff;
+
+		//cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tDEBUG-> LSX: %d LSY: %d RSX: %d RSY: %d ", app.mValLStickX, app.mValLStickY, app.mValRStickX, app.mValRStickY);
+		//yPos += yPosDiff;
+
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tTOTAL GAMES FOUND: %d", nTotalGames);
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+
+		int nGameListMax = 19;
+
+		if(games[0])
 		{
-			nColor		= COLOR_YELLOW;		// yellow
-			nFontSize	= 0.6f;
+			if(nSelectedGame > nGameListMax || nGameListTop > 0)
+			{
+				if(nGameListTop < (nSelectedGame - nGameListMax))
+				{
+					nGameListTop = nSelectedGame - nGameListMax;
+				}
+
+				if(nGameListTop > 0) 
+				{
+					if(nSelectedGame < nGameListTop)
+					{
+						nGameListTop = nSelectedGame;
+					}
+				} else {
+					nGameListTop = nSelectedGame - nGameListMax;
+				}
+			} else {
+				nGameListTop = nSelectedGame - nGameListMax;
+			}
+
+			if(nGameListTop < 0) nGameListTop = 0;
+
+			int nGame = nGameListTop;
+
+			while(nGame <= (nGameListTop + nGameListMax))
+			{
+				if(nGame == nTotalGames) break;
+
+				uint32_t nColor	= COLOR_WHITE;		// white
+				nFontSize = 0.5500f;
+
+				// GAME SELECTED
+				if(nGame == nSelectedGame) 
+				{
+					nColor		= COLOR_YELLOW;		// yellow
+					nFontSize	= 0.6500f;
+				}
+
+				cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\t[%d]\t%s", 
+					nGame+1, 
+					games[nGame]->title
+					);
+				yPos += yPosDiff;
+
+				nGame++;
+			}
+		
+			nFontSize = 0.5500f;
+		}
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tGAME INFORMATION:" );
+		yPos += yPosDiff;
+
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+
+		if(nBurnSelected >= 0) {
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tROMSET: %s", fba_drv[nBurnSelected].szName);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tPARENT: %s", fba_drv[nBurnSelected].szParent);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tCOMPANY: %s", fba_drv[nBurnSelected].szCompany);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tYEAR: %s", fba_drv[nBurnSelected].szYear);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tSYSTEM: %s", fba_drv[nBurnSelected].szSystem);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tMAX PLAYERS: %d", fba_drv[nBurnSelected].nMaxPlayers);
+			yPos += yPosDiff;
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
+				"\tRESOLUTION: %d x %d (%d:%d)", 
+				fba_drv[nBurnSelected].nWidth, fba_drv[nBurnSelected].nHeight,
+				fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY
+				);
+			yPos += yPosDiff;
+
 		}
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "[%d] %s", 
-			nGame+1, 
-			gamelst[nGame].title
-			);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 		yPos += yPosDiff;
-
-		nGame++;
 	}
 
-	nFontSize = 0.55f;
+	if(nSection == SECTION_ZIPINFO)
+	{
+		float xPos		= 0.0400f;
+		float yPos		= 0.0500f;
+		float yPosDiff	= 0.0200f;	
+		float nFontSize = 0.5500f;
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
-
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_WHITE, "Game Info:" );
-	yPos += yPosDiff;
-
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
-
-	if(nBurnSelected >= 0) {
-
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Romset: %s", fba_drv[nBurnSelected].szName);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;	
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE,  "\tFB ALPHA RETRO LOADER \\ ZIP INFORMATION \\ %s", games[nSelectedGame]->zipname);
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE,  "\tPRESS -[L2 / R2]- FOR QUICK LIST NAVIGATION");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE,  "\tPRESS -(O)- TO RETURN TO GAME LIST");
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, "\tTOTAL FILES FOUND: %d", zipinfo_menu->nTotalItem);
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
 		yPos += yPosDiff;
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Parent: %s", fba_drv[nBurnSelected].szParent);
-		yPos += yPosDiff;
+		int nMenuItem = zipinfo_menu->UpdateTopItem();
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Company: %s", fba_drv[nBurnSelected].szCompany);
-		yPos += yPosDiff;
+		while(nMenuItem <= (zipinfo_menu->nTopItem + zipinfo_menu->nListMax))
+		{
+			if(nMenuItem == zipinfo_menu->nTotalItem) break;
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Year: %s", fba_drv[nBurnSelected].szYear);
-		yPos += yPosDiff;
+			uint32_t nColor	= COLOR_WHITE;		// white
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"System: %s", fba_drv[nBurnSelected].szSystem);
-		yPos += yPosDiff;
+			// SELECTED
+			if(nMenuItem == zipinfo_menu->nSelectedItem) {
+				nColor		= COLOR_YELLOW;		// yellow
+			}
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Max Players: %d", fba_drv[nBurnSelected].nMaxPlayers);
-		yPos += yPosDiff;
+			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "[%d] %s", nMenuItem+1, zipinfo_menu->item[nMenuItem]->szMenuLabel);
+			yPos += yPosDiff;
 
-		::cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE, 
-			"Game Resolution: %d x %d (%d:%d)", 
-			fba_drv[nBurnSelected].nWidth, fba_drv[nBurnSelected].nHeight,
-			fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY
-			);
-		yPos += yPosDiff;
+			nMenuItem++;
+		}
 
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
+		yPos += yPosDiff;
 	}
 
-	::cellDbgFontPuts(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------------------------------+" );
-	yPos += yPosDiff;
+	if(nSection == SECTION_MAIN)
+	{
+		float xPos		= 0.0400f;
+		float yPos		= 0.0500f;
+		float yPosDiff	= 0.0400f;	
+		float nFontSize = 1.0500f;
+
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------+" );
+		yPos += yPosDiff;	
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE,  "                        FB ALPHA RETRO LOADER                        " );
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_WHITE,  "                                v1.01                                " );
+		yPos += yPosDiff;
+		cellDbgFontPrintf(xPos, yPos, nFontSize, COLOR_ORANGE, "+--------------------------------------------------------------------+" );
+		yPos += yPosDiff;
+
+		yPos += yPosDiff;
+
+		int nMenuItem = main_menu->UpdateTopItem();
+		
+		while(nMenuItem <= (main_menu->nTopItem + main_menu->nListMax))
+		{
+			if(nMenuItem == main_menu->nTotalItem) break;
+
+			uint32_t nColor	= COLOR_WHITE;		// white
+
+			// SELECTED
+			if(nMenuItem == main_menu->nSelectedItem) {
+				nColor		= COLOR_YELLOW;		// yellow
+			}
+
+			// This tricky code will center text properly...
+			int nLen			= strlen(main_menu->item[nMenuItem]->szMenuLabel);
+			int nMaxLineChars	= 69;
+			int nSpaces			= (nMaxLineChars - nLen) / 2;
+
+			char szFinalString[256] = "";
+
+			for(int n = 0; n < nSpaces; n++)
+			{
+				strcat(szFinalString, " ");
+			}
+			strcat(szFinalString, main_menu->item[nMenuItem]->szMenuLabel);
+
+			// Display centered text :)...
+			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "%s", szFinalString);
+			yPos += yPosDiff;
+
+			nMenuItem++;
+		}
+	}
 
 }
 
@@ -304,47 +543,77 @@ void c_fbaRL::InputFrame()
 	static int nSelInputFrame = 0;
 
 	// ------------------------------------------------------
-	// Navigation UP/DOWN with no delay
-
-	if( !app.mIsUpPressed && app.upPressedNow)
-	{
-		if(nSelectedGame > 0 && nSelectedGame <= nTotalGames) 
-		{
-			nSelectedGame--;
-			UpdateBurnSelected(gamelst[nSelectedGame].zipname);
-		}
-		nSelInputFrame = 0;
-	} 
-
-	if( !app.mIsDownPressed && app.downPressedNow)
-	{
-		if(nSelectedGame >= 0 && nSelectedGame < nTotalGames-1)
-		{
-			nSelectedGame++;
-			UpdateBurnSelected(gamelst[nSelectedGame].zipname);
-		}
-		nSelInputFrame = 0;
-	}
-
-	// ------------------------------------------------------
 	// Navigation UP/DOWN with delay
 
 	if(((app.mFrame + nSelInputFrame) - app.mFrame) == 5)
 	{
-		if( app.mIsUpPressed && app.upPressedNow)
+		// DPAD UP / LEFT ANALOG UP
+		if((app.mIsUpPressed && app.upPressedNow) || (app.mValLStickY < 50))
 		{
-			if(nSelectedGame > 0 && nSelectedGame <= nTotalGames) 
+			switch(nSection) 
 			{
-				nSelectedGame--;
-				UpdateBurnSelected(gamelst[nSelectedGame].zipname);
+				case SECTION_GAMELIST: 
+				{
+					if(nSelectedGame > 0 && nSelectedGame <= nTotalGames) 
+					{
+						nSelectedGame--;
+						if(games[0]) UpdateBurnSelected(games[nSelectedGame]->zipname);
+					}
+					break;
+				}
+
+				case SECTION_MAIN:
+				{
+					if(main_menu->nSelectedItem > 0 && main_menu->nSelectedItem <= main_menu->nTotalItem) 
+					{
+						main_menu->nSelectedItem--;
+					}
+					break;
+				}
+
+				case SECTION_ZIPINFO:
+				{
+					if(zipinfo_menu->nSelectedItem > 0 && zipinfo_menu->nSelectedItem <= zipinfo_menu->nTotalItem) 
+					{
+						zipinfo_menu->nSelectedItem--;
+					}
+					break;
+				}
 			}
 		}
-		if( app.mIsDownPressed && app.downPressedNow)
-		{		
-			if(nSelectedGame >= 0 && nSelectedGame < nTotalGames-1) 
+
+		// DPAD DOWN / LEFT ANALOG DOWN
+		if	( (app.mIsDownPressed && app.downPressedNow) ||	(app.mValLStickY > 200) )
+		{
+			switch(nSection)
 			{
-				nSelectedGame++;
-				UpdateBurnSelected(gamelst[nSelectedGame].zipname);
+				case SECTION_GAMELIST:
+				{
+					if(nSelectedGame >= 0 && nSelectedGame < nTotalGames-1) 
+					{
+						nSelectedGame++;
+						if(games[0]) UpdateBurnSelected(games[nSelectedGame]->zipname);
+					}
+					break;
+				}
+
+				case SECTION_MAIN:
+				{
+					if(main_menu->nSelectedItem >= 0 && main_menu->nSelectedItem < main_menu->nTotalItem-1) 
+					{
+						main_menu->nSelectedItem++;
+					}
+					break;
+				}
+
+				case SECTION_ZIPINFO:
+				{
+					if(zipinfo_menu->nSelectedItem >= 0 && zipinfo_menu->nSelectedItem < zipinfo_menu->nTotalItem-1) 
+					{
+						zipinfo_menu->nSelectedItem++;
+					}
+					break;
+				}
 			}
 		}
 		nSelInputFrame = 0;
@@ -353,11 +622,47 @@ void c_fbaRL::InputFrame()
 	nSelInputFrame++;
 
 	// ------------------------------------------------------
+	// [ANALOG STICKS]
+
+	// LEFT ANALOG [UP]
+	if(app.mValLStickY < 50){
+	}
+	// LEFT ANALOG [DOWN]
+	if(app.mValLStickY > 200){
+	}
+	// LEFT ANALOG [LEFT]
+	if(app.mValLStickX < 50){
+	}
+	// LEFT ANALOG [RIGHT]
+	if(app.mValLStickX > 200){
+	}
+	// RIGHT ANALOG [UP]
+	if(app.mValRStickY < 50){
+	}
+	// RIGHT ANALOG [DOWN]
+	if(app.mValRStickY > 200){
+	}
+	// RIGHT ANALOG [LEFT]
+	if(app.mValRStickX < 50){
+	}
+	// RIGHT ANALOG [RIGHT]
+	if(app.mValRStickX > 200){
+	}
+
+	// ------------------------------------------------------
 	// [ ] - SQUARE
 
 	if(!app.mIsSquarePressed && app.squarePressedNow)
 	{
-		// ...
+		switch(nSection)
+		{
+			case SECTION_GAMELIST:
+			{
+				InitZipInfoMenu();
+				nSection = SECTION_ZIPINFO;
+				break;
+			}
+		}
 	}
 
 	// ------------------------------------------------------
@@ -365,19 +670,105 @@ void c_fbaRL::InputFrame()
 
 	if ( !app.mIsCrossPressed && app.crossPressedNow ) 
 	{
-		app.onShutdown();
+		switch(nSection)
+		{ 
+			case SECTION_GAMELIST: 
+			{
+				app.onShutdown();
 
-		char fba_rl_path[]		= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
-		char preset_cfg[]		= "DUMMY_ARG"; // todo: implement module to set this
-		char aspect_ratio[12]	= { 0 };
-		sprintf(aspect_ratio, "%d:%d", fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY);
+				char fba_rl_path[]		= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
+				char preset_cfg[]		= "DUMMY_ARG"; // todo: implement module to set this
+				char aspect_ratio[12]	= { 0 };
+				extern int nBurnSelected;
+				sprintf(aspect_ratio, "%d:%d", fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY);
 
-		LaunchRetroArch(
-			(char*)gamelst[nSelectedGame].path, 
-			(char*)fba_rl_path, 
-			(char*)preset_cfg,
-			(char*)aspect_ratio
-		);
+				LaunchRetroArch(
+					(char*)games[nSelectedGame]->path, 
+					(char*)fba_rl_path, 
+					(char*)preset_cfg,
+					(char*)aspect_ratio
+				);
+
+				break;
+			}
+
+			case SECTION_MAIN:
+			{
+				int nMenuItem = main_menu->nSelectedItem;
+
+				// Gamelist
+				if(nMenuItem == 0)
+				{
+					InitGameList();
+					nSection = SECTION_GAMELIST;
+					EndMainMenu();
+					break;
+				}
+
+				// Options
+				if(nMenuItem == 1)
+				{
+					//nSection = SECTION_OPTIONS;
+					EndMainMenu();
+					break;
+				}
+
+				// Load RetroArch
+				if(nMenuItem == 2)
+				{
+					app.onShutdown();
+
+					char fba_rl_path[]	= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
+					char rom_path[]		= "DUMMY_ARG";
+					char preset_cfg[]	= "DUMMY_ARG";
+					char aspect_ratio[]	= "DUMMY_ARG";
+
+					LaunchRetroArch(
+						(char*)rom_path, 
+						(char*)fba_rl_path, 
+						(char*)preset_cfg,
+						(char*)aspect_ratio
+					);
+
+					EndMainMenu();
+					break;
+				}
+
+				// Load RetroArch
+				if(nMenuItem == 3)
+				{
+					app.onShutdown();
+
+					char fba_retroarch_path[]	= "/dev_hdd0/game/SSNE10000/USRDIR/cores/fb_alpha.SELF";
+					sys_game_process_exitspawn(fba_retroarch_path, NULL, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+
+					EndMainMenu();
+					break;
+				}
+
+				// Load multiMAN
+				if(nMenuItem == 4)
+				{
+					app.onShutdown();
+					char path[] = "/dev_hdd0/game/BLES80608/USRDIR/RELOAD.SELF";
+					sys_game_process_exitspawn(path, NULL, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+
+					EndMainMenu();
+					break;
+				}
+
+				// Exit
+				if(nMenuItem == 5)
+				{
+					app.onShutdown();
+					exit(0);
+
+					EndMainMenu();
+					break;
+				}
+				break;
+			}
+		}
 
 	}	
 
@@ -386,8 +777,109 @@ void c_fbaRL::InputFrame()
 
 	if (!app.mIsCirclePressed && app.circlePressedNow) 
 	{
-		app.onShutdown();
-		exit(0);
+		switch(nSection) 
+		{
+			case SECTION_ZIPINFO:
+			{
+				EndZipInfoMenu();
+				// no need to init GameList here...
+				nSection = SECTION_GAMELIST;
+				break;
+			}
+		}
+	}
+
+	// ------------------------------------------------------
+	// (/\) - TRIANGLE
+
+	if( !app.mIsTrianglePressed && app.trianglePressedNow)
+	{
+		// ...
+	}
+
+	// ------------------------------------------------------
+	// [L1]
+
+	if( !app.mIsL1Pressed && app.l1PressedNow)
+	{
+		// ...
+	}
+
+	// ------------------------------------------------------
+	// [R1]
+
+	if( !app.mIsR1Pressed && app.r1PressedNow)
+	{
+		switch(nSection) 
+		{
+			case SECTION_GAMELIST:
+				// ...
+				break;
+
+			case SECTION_OPTIONS:
+				// ...
+				break;
+		}
+	}
+
+	// ------------------------------------------------------
+	// [L2]
+
+	if(((app.mFrame + nSelInputFrame) - app.mFrame) == 5)
+	{
+		if(app.mIsL2Pressed && app.l2PressedNow)
+		{
+			switch(nSection)
+			{
+				case SECTION_GAMELIST:
+				{
+					nSelectedGame -= 19;
+
+					if(nSelectedGame < 0) {
+						nSelectedGame = 0;
+					}
+					break;
+				}
+
+				case SECTION_ZIPINFO:
+				{
+					zipinfo_menu->nSelectedItem -= zipinfo_menu->nListMax;
+
+					if(zipinfo_menu->nSelectedItem < 0) {
+						zipinfo_menu->nSelectedItem = 0;
+					}
+					break;
+				}
+			}
+		}
+
+		// ------------------------------------------------------
+		// [R2]
+
+		if(app.mIsR2Pressed && app.r2PressedNow)
+		{
+			switch(nSection)
+			{
+				case SECTION_GAMELIST:
+				{
+					nSelectedGame += 19;
+					if(nSelectedGame > nTotalGames-1) {
+						nSelectedGame = nTotalGames-1;
+					}
+					break;
+				}
+
+				case SECTION_ZIPINFO:
+				{
+					zipinfo_menu->nSelectedItem += zipinfo_menu->nListMax;
+
+					if(zipinfo_menu->nSelectedItem > zipinfo_menu->nTotalItem-1) {
+						zipinfo_menu->nSelectedItem = zipinfo_menu->nTotalItem-1;
+					}
+					break;
+				}
+			}
+		}
 	}
 
 	// ------------------------------------------------------
@@ -395,35 +887,54 @@ void c_fbaRL::InputFrame()
 
 	if(!app.mIsSelectPressed && app.selectPressedNow)
 	{
-		app.onShutdown();
-
-		char fba_rl_path[]	= "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF";
-		char rom_path[]		= "DUMMY_ARG";
-		char preset_cfg[]	= "DUMMY_ARG";
-		char aspect_ratio[]	= "DUMMY_ARG";
-
-		LaunchRetroArch(
-			(char*)rom_path, 
-			(char*)fba_rl_path, 
-			(char*)preset_cfg,
-			(char*)aspect_ratio
-		);
+		switch(nSection)
+		{
+			case SECTION_GAMELIST: 
+			{
+				EndGameList();
+				InitMainMenu();
+				nSection = SECTION_MAIN;
+				break;
+			}
+		}
 	}
 
 	// ------------------------------------------------------
 	// [START]
 
-#ifdef FBARL_DEBUG
+
 	if(!app.mIsStartPressed && app.startPressedNow)
 	{
-		app.onShutdown();
-		char path[] = "/dev_hdd0/game/BLES80608/USRDIR/RELOAD.SELF";
-		sys_game_process_exitspawn(path, NULL, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+		switch(nSection) 
+		{
+			case SECTION_GAMELIST: 
+			{
+				// Refresh gamelist
+				RefreshGameList();
+			}
+		}
 	}
-#endif
+
+
+	// ------------------------------------------------------
+	// [L3]
+
+	if( !app.mIsL3Pressed && app.l3PressedNow)
+	{
+
+	}
+
+	// ------------------------------------------------------
+	// [R3]
+	
+	if( !app.mIsR3Pressed && app.r3PressedNow)
+	{
+
+	}
 
 }
 
+// Todo: Remove this...
 void c_fbaRL::DlgDisplayFrame()
 {
 	// ...
@@ -480,26 +991,25 @@ int c_fbaRL::ParseGameList()
 	// Scan each device for directories...
 	for(unsigned int nDev = 0; nDev < (sizeof(szDevice) / 256); nDev++)
 	{
-		//int device;
+		int d = 0;
 
 		// device is mounted
-		//if(cellFsOpendir(szDevice[nDev], &device) == CELL_FS_SUCCEEDED) 
-		DIR* d = NULL;
-
-		d = opendir(szDevice[nDev]);
-		if(d != NULL)
+		//DIR* d = opendir(szDevice[nDev]);
+		//if(d != NULL)
+		if(cellFsOpendir(szDevice[nDev], &d) == CELL_FS_SUCCEEDED) 
 		{
-			//CellFsDirent dirEntry;
-			dirent* dirEntry = NULL;
+			CellFsDirent* dirEntry = (CellFsDirent*)malloc(sizeof(CellFsDirent));
+			memset(dirEntry, 0, sizeof(CellFsDirent));
+			//dirent* dirEntry = NULL;
 			//memset(dirEntry, 0, sizeof(dirent));
 
-			//uint64_t nread = 0;
+			uint64_t nread = 0;
 
 			// start scanning for directories...
-			//while(cellFsReaddir(device, &dirEntry, &nread) == CELL_FS_SUCCEEDED)	
-			while((dirEntry = readdir(d)) != NULL)  
+			//while((dirEntry = readdir(d)) != NULL) 
+			while(cellFsReaddir(d, dirEntry, &nread) == CELL_FS_SUCCEEDED)			 
 			{
-				//if(nread == 0) break;
+				if(nread == 0) break;
 
 				// found a directory...
 				if (dirEntry->d_type == DT_DIR)
@@ -511,36 +1021,31 @@ int c_fbaRL::ParseGameList()
 						if(strcmp(dirEntry->d_name, szDir[nDir]) == 0)
 						{
 							// ---
-							//int d;
-
-							DIR* d2 = NULL;
-
 							char szDirectory[256] = { 0 };
 							sprintf(szDirectory, "%s/%s", szDevice[nDev], szDir[nDir]);
+							
+							//DIR* d2 = NULL;
+							//d2 = opendir(szDirectory);
+							//if(d2 != NULL)
 
-							d2 = opendir(szDirectory);
-
-							//if(cellFsOpendir(szDirectory, &d) == CELL_FS_SUCCEEDED)
-							if(d2 != NULL)
+							int d2 = 0;
+							if(cellFsOpendir(szDirectory, &d) == CELL_FS_SUCCEEDED)							
 							{
-								//CellFsDirent dirEntry2;
-								//memset(&dirEntry2, 0, sizeof(CellFsDirent));
+								CellFsDirent* dirEntry2 = (CellFsDirent*)malloc(sizeof(CellFsDirent));
+								memset(dirEntry2, 0, sizeof(CellFsDirent));
 
-								dirent* dirEntry2 = NULL;
+								//dirent* dirEntry2 = NULL;
 								//memset(dirEntry2, 0, sizeof(dirent));
 
-
-								//uint64_t nread2 = 0;
-
-								//while(cellFsReaddir(d, &dirEntry2, &nread2) == CELL_FS_SUCCEEDED)	
-								while((dirEntry2 = readdir(d2)) != NULL)  
+								uint64_t nread2 = 0;
+								
+								//while((dirEntry2 = readdir(d2)) != NULL)  
+								while(cellFsReaddir(d, dirEntry2, &nread2) == CELL_FS_SUCCEEDED)								
 								{
 									if (dirEntry2->d_type == DT_DIR)
 									{
 										// DIRECTORY
-
 										// we're not looking for directories here...
-
 									} else {
 
 										if(dirEntry2->d_type != DT_REG) break;
@@ -560,26 +1065,29 @@ int c_fbaRL::ParseGameList()
 										if(NULL != strstr(toLowerCase(pszFilename, strlen(pszFilename)), ".zip")) 
 										{											
 											UpdateBurnSelected(toLowerCase(pszFilename, strlen(pszFilename)));											
-
-											// Validate FBA ROM (no CRC32 checking for now, just ZIP name)
-											if(nBurnSelected >= 0) 
-											{
-												if(IsBurnDuplicate(toLowerCase(pszFilename, strlen(pszFilename))))
-												{
-													continue; // keep going we already have this game added...
-												} else {
-													sprintf(gamelst[nTotalGames].title, "%s", fba_drv[nBurnSelected].szTitle);
-												}
-											} else {
-												// not a FBA ROM, continue...
-												continue;
-											}
-
+											
 											// Discard listing of BIOS ROM(s)
 											if( strncmp(toLowerCase(pszFilename, strlen(pszFilename)), "neogeo"	, strlen("neogeo")) == 0 ||
 												strncmp(toLowerCase(pszFilename, strlen(pszFilename)), "pgm"	, strlen("pgm"))	== 0 ||
 												strncmp(toLowerCase(pszFilename, strlen(pszFilename)), "neocdz"	, strlen("neocdz")) == 0   )
 											{
+												continue;
+											}
+
+											// Validate FBA ROM (no CRC32 checking for now, just ZIP name)
+											if(nBurnSelected >= 0) 
+											{
+												if((games[0]) && IsBurnDuplicate(toLowerCase(pszFilename, strlen(pszFilename))))
+												{
+													continue; // keep going we already have this game added...
+												} else {
+
+													// check if zip has all files 
+													games[nTotalGames] = new c_game;
+													sprintf(games[nTotalGames]->title, "%s", fba_drv[nBurnSelected].szTitle);
+												}
+											} else {
+												// not a FBA ROM, continue...
 												continue;
 											}
 
@@ -589,26 +1097,23 @@ int c_fbaRL::ParseGameList()
 												szDirectory[strlen(szDirectory)-1] = 0;
 											}
 
-											sprintf(gamelst[nTotalGames].path, "%s/%s", szDirectory, dirEntry2->d_name);				
+											sprintf(games[nTotalGames]->path, "%s/%s", szDirectory, dirEntry2->d_name);				
 
 											// zip title
-											sprintf(gamelst[nTotalGames].zipname, "%s", dirEntry2->d_name);
+											sprintf(games[nTotalGames]->zipname, "%s", dirEntry2->d_name);
 
 											// Size in bytes
-											gamelst[nTotalGames].nSize = GetFileSize(gamelst[nTotalGames].path);
+											games[nTotalGames]->nSize = GetFileSize(games[nTotalGames]->path);
 
 											nTotalGames++;
 										}
 
-										if(pszFilename) {
-											free(pszFilename);
-											pszFilename = NULL;
-										}
+										SAFE_FREE(pszFilename);
 									}
 								}
-								//cellFsClosedir(d);
-								closedir(d2);
-								d2 = NULL;
+								cellFsClosedir(d2);
+								//closedir(d2);
+								//d2 = NULL;
 							}
 							// ---
 						}
@@ -618,10 +1123,10 @@ int c_fbaRL::ParseGameList()
 					// FILE
 				}
 			}
-			//cellFsClosedir(device);
-			//device = NULL;
-			closedir(d);
+			cellFsClosedir(d);
 			d = NULL;
+			//closedir(d);
+			//d = NULL;
 		}
 	}
 	return 1;
@@ -629,26 +1134,10 @@ int c_fbaRL::ParseGameList()
 
 void c_fbaRL::RefreshGameList()
 {
-	// TODO: Debug this loop (should edit frame modules to avoid conflict)
-	if(nTotalGames > 0) 
-	{
-		if(gamelst) {
-			free(gamelst);
-			gamelst = NULL;
-		}
-		nTotalGames = 0;
-	}
-
-	// Up to 15,000 listed games (LMAO! xD)
-	gamelst = (struct c_gamelist*)malloc(sizeof(struct c_gamelist) * 15000);
-
-	ParseGameList();
-
-	// Sort by Title
-	qsort(gamelst, nTotalGames, sizeof(struct c_gamelist), _FcCompareStruct);
-
+	EndGameList();
+	InitGameList();
 	// Update info module current driver selection
-	UpdateBurnSelected(gamelst[nSelectedGame].zipname);
+	UpdateBurnSelected(games[nSelectedGame]->zipname);
 }
 
 

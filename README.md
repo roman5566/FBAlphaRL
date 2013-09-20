@@ -1,5 +1,5 @@
 FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
-==================================================
+----------------------------------------------------
 
 FB Alpha Retro Loader Core: v1.02a
 RetroArch Core: v0.9.9.6

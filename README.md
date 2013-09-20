@@ -1,11 +1,14 @@
-FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
-----------------------------------------------------
+#### FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
+
+---
 
 FB Alpha Retro Loader Core: v1.02a
+
 RetroArch Core: v0.9.9.6
+
 FB Alpha Core: v0.2.97.30
 
-----------------------------------------------------
+---
 
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/ICON0_zps2c5f3318.png)
 ![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/PIC1_small_zps511df5d7.png)
@@ -18,8 +21,9 @@ FB Alpha Core: v0.2.97.30
 ![Image Alt](http://imageshack.us/a/img96/1619/fbalpharlbycaptaincpsx6.png)
 ![Image Alt](http://imageshack.us/a/img844/8631/fbalpharlbycaptaincpsx7.png)
 
-What is FB Alpha?:
-----------------------------------------------------
+### What is FB Alpha?:
+
+---
 
 FB Alpha is an arcade emulator supporting the following platforms;
 
@@ -47,8 +51,9 @@ and also PC-Engine/TurboGrafx 16/SuperGrafx.
 
 FB Alpha (for Windows), can currently be obtained from http://www.barryharris.me.uk.
 
-What is FB Alpha Retro Loader ?
-----------------------------------------------------
+### What is FB Alpha Retro Loader ?
+
+---
 
 FB Alpha RL is a PS3 homebrew application coded from scratch,
 and not based in any other public source code by other 
@@ -64,8 +69,9 @@ I did had to make a modified RetroArch core to be included
 along my application, so it could process the arguments
 or new commands that FB Alpha RL will be sending to it.
 
-Objective of FB Alpha RL (Retro Loader):
-----------------------------------------------------
+### Objective of FB Alpha RL (Retro Loader):
+
+---
 
 As a dev from the official FB Alpha Team, 
 FB Alpha RL was made with a objective in mind, to
@@ -74,8 +80,9 @@ FB Alpha (for Windows OS) on the PS3 system.
 
 Please, read the technical info for more details.
 
-Technical Info:
-----------------------------------------------------
+### Technical Info:
+
+---
 
 Signed for CFW 3.4X / 4.XX (should work for everyone).
 
@@ -110,8 +117,9 @@ this already has my own modified build incorporated
 into FB Alpha RL installation directory. So you can safely
 install the official RetroArch and it won't interfere.
 
-Usage (Game List Specific):
-----------------------------------------------------
+### Usage (Game List Specific):
+
+---
 
 - Use UP / DOWN to navigate Game List.
 - Use Left Analog UP / DOWN to navigate Game List.
@@ -123,8 +131,9 @@ Usage (Game List Specific):
 - Press (O) to return to Main Menu.
 - Press [START] to Rescan ROM(s).
 
-Main Features:
-----------------------------------------------------
+### Main Features:
+
+---
 
 - Neo-Geo UNI-BIOS support (must be present in neogeo.zip)
 - FTP support
@@ -150,23 +159,27 @@ Main Features:
 - GUI based on OpenGL / PSGL textures (Thanks to Squarepusher / Twinaphex for the tips).
 - more...(read the change logs for more features)
 
-WIP / Coming on future releases:
-----------------------------------------------------
+### WIP / Coming on future releases:
+
+---
 
 - Custom Themes
 - Display Extended ROM information by pressing (/\).
 - MAME history DAT parsing support.
 - Title / Flyers image display feature.
 
-Changelog:
-----------------------------------------------------
+### Changelog:
 
-1.02a (September xx, 2013)
+---
 
-- Signed for CFW 3.4X / 4.XX and tested on: 
- > Rebug 4.46 REX / CEX
- > MiraLaTijera 4.40 (3.2.0)
+1.02a (September 20, 2013)
 
+- Signed for CFW 3.4X / 4.XX and tested on
+```
+ - Rebug 4.46 REX / CEX
+ 
+ - MiraLaTijera 4.40 (3.2.0)
+```
 - Ported my custom mods to the latest RetroArch Core v0.9.9.6.
 
 - (O) is the new "Game List" button to return to "Main Menu".
@@ -285,8 +298,11 @@ until compatibility is better(Megadrive, PCE, SNES).
 
 - Initial Release
 
-Thanks to:
-----------------------------------------------------
+
+### Thanks to:
+
+---
+
  - My buddies Treble Winner (Barry) / Kev / IQ_132 from the original FB Alpha Team <3.
  - Thanks to Sturn and JacKc for the preview images @ NeoSource (http://neosource.1emu.net/)
  - PS3 Scene websites (in no order) such as: PS3HAX / PSX-Scene / PS3Crunch / Etc, for you support 
@@ -303,8 +319,9 @@ Thanks to:
  homebrew application.
 
 
-FB Alpha Retro Loader v1.02 (BASE) Downloads:
-----------------------------------------------------
+### FB Alpha Retro Loader v1.02 (BASE) Downloads:
+
+---
 
 [CEX 3.40 / 4.XX] [Zippyshare] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
 
@@ -324,8 +341,9 @@ https://mega.co.nz/#!LVtmyR4S!Qn2TaSUZqAs5NMhFr_hNXm1Mb0ESWA43FqzQkMY5_Wg
 
 http://rapidshare.com/share/C039EDE51256A1AA304122A41A9BDD72
 
-Source Code:
-----------------------------------------------------
+### Source Code:
+
+---
 
 - FB Alpha RL - https://github.com/CaptainCPS/FBAlphaRL
 - RetroArch v0.9.9.6 (Modded for FB Alpha RL) - https://github.com/CaptainCPS/RetroArch

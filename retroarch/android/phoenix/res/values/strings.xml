@@ -1,0 +1,14 @@
+<resources>
+
+    <string name="app_name">RetroArch</string>
+    <string name="input_method">Input Method</string>
+    <string name="file_type_icon">File type icon</string>
+    <string name="key_bind_title">Select the button to use</string>
+    <string name="key_bind_clear">Unbind</string>
+    <string name="report_ime">Report IME</string>
+    <string name="report_refreshrate">Report Refresh Rate</string>
+    <string name="key_bind_detect">Detect</string>
+    <string name="optimal_settings_device">Optimal device settings</string>
+    <string name="extracting_assets_please_wait_">Extracting assets, please wait ...</string>
+
+</resources>

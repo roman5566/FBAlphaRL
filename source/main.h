@@ -11,6 +11,9 @@
 #include <dirent.h>
 #include <inttypes.h>
 //
+#include <netex/libnetctl.h>
+#include <netex/net.h>
+//
 #include <PSGL/psgl.h>
 #include <PSGL/psglu.h>
 //
@@ -41,6 +44,7 @@
 #define COLOR_YELLOW	0xff00ccff
 #define COLOR_RED		0xff0000ff
 #define COLOR_WHITE		0xffffffff
+#define COLOR_BLACK		0xff000000
 
 //
 #define TEX_MAIN_MENU	0
@@ -49,11 +53,6 @@
 #define TEX_OPTIONS		3
 #define TEX_FILEBROWSER	4
 #define TEX_PREVIEW		5
-
-#include "image.h"
-#include "misc.h"
-#include "ini.h"
-#include "fba_rl.h"
 
 // Button organized by values ( ex. (1<<0), (1<<1), etc... )
 #define BT_SELECT	0 
@@ -72,6 +71,19 @@
 #define BT_CIRCLE	13
 #define BT_CROSS	14
 #define BT_SQUARE	15
+
+#include "image.h"
+#include "misc.h"
+#include "ini.h"
+#include "fba_rl.h"
+#include "ftp.h"
+#include "miniz.h"
+
+extern "C" 
+{
+	extern bool		mm_shutdown;
+	extern uint8_t	ftp_clients;
+}
 
 class c_tex
 {
@@ -93,21 +105,47 @@ class CapApp
 {
 public:	
 	CapApp();
-	~CapApp() {
+	~CapApp() { }
+
+	bool bRun;
+
+	int						nTextures;
+	c_tex**					textures;
+	GLfloat					normals[12];
+	GLfloat					squareVertices[8];
+	GLfloat					texCoords[8];
+
+	struct PSGLdevice*		device;
+	struct PSGLcontext*		context;
+	GLuint					renderWidth, renderHeight;
+	unsigned int			deviceWidth, deviceHeight;
+	
+	void initGraphics();
+
+	bool ftp_service;
+
+	void ftp_on() {
+		if(ftp_service) { return; }
+		ftp_service = 1;
+		ftp_clients = 0;
+		main_ftp(0);
 	}
 
-	int nTextures;
-	c_tex** textures;
-	void initGraphics(PSGLdevice *device);
+	void ftp_off() {
+		if(!ftp_service) { return; }
+		ftp_service = 0;
+		ftp_clients = 0;
+		main_ftp(1);
+	}
 
-	bool onInit(int argc, char **argv);
-	void onRender();
-	void onShutdown();
-	bool onUpdate();
+	bool		onInit(int argc, char **argv);
+	void		onRender();
+	void		onShutdown();
+	bool		onUpdate();
 	
-	void dbgFontInit();
-	void dbgFontDraw();
-	void dbgFontExit();
+	void		dbgFontInit();
+	void		dbgFontDraw();
+	void		dbgFontExit();
 
 	uint64_t	mFrame;
 

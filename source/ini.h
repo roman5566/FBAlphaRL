@@ -21,6 +21,7 @@ extern bool g_opt_bCustomSysFilter[MASKCUSTOM+1];
 extern bool g_opt_bUseAltMenuKeyCombo;
 extern bool g_opt_bDisplayMissingGames;
 extern unsigned int g_opt_nActiveSysFilter;
+extern bool g_opt_bUseUNIBIOS;
 
 int iniWrite();
 int iniRead();

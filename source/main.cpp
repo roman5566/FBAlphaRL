@@ -10,230 +10,8 @@ FUTURE TODO:
 - Configuration backup maker (save in /dev_hdd0/fba_cfg_bkp or /dev_usb00x/...)
 */
 
-struct PSGLdevice	*device;
-struct PSGLcontext	*context;
-bool bRun = true;
 
-GLuint			renderWidth = 0, renderHeight = 0;
-unsigned int	deviceWidth = 0, deviceHeight = 0;
-
-void c_tex::Render(GLuint x, GLuint y, GLsizei w, GLsizei h)
-{
-	if(!bTextureOK) return;	
-
-	if(w == 0|| h == 0)
-	{
-		w = renderWidth;
-		h = renderHeight;
-	}
-
-	glViewport(x, y, w, h);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, nTexId[0]);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	const GLfloat normals[] = {
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0,
-		0.0, 0.0, 1.0
-	};
-	const GLfloat squareVertices[] = {
-		-1.0f, -1.0f,
-		1.0f, -1.0f,
-		-1.0f,  1.0f,
-		1.0f,  1.0f,
-	};
-	const GLfloat texCoords[] = {
-		0.0, 1.0,
-		1.0, 1.0,
-		0.0, 0.0,
-		1.0, 0.0
-	};
-
-	glVertexPointer(2, GL_FLOAT, 0, squareVertices);
-	glNormalPointer(GL_FLOAT, 0, normals);
-	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); 
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-}
-
-int c_tex::BindTexture(char* pszPath)
-{
-	bTextureOK = false;
-
-	glGenTextures(1, &nTexId[0]);
-
-	if(fbaRL->FileExist(pszPath))
-	{
-		if(!texture_image_load(pszPath, &_texture))
-		{
-			glDeleteTextures(1, &nTexId[0]);			
-			return 0;
-		} else {
-			bTextureOK = true;
-
-			glEnable(GL_VSYNC_SCE);
-			glEnable(GL_TEXTURE_2D);
-			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_BLEND);
-
-			glBindTexture(GL_TEXTURE_2D, nTexId[0]);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				0, 
-				GL_ARGB_SCE,
-				_texture.width, 
-				_texture.height, 
-				0,
-				GL_BGRA, 
-				GL_UNSIGNED_INT_8_8_8_8_REV, 
-				_texture.pixels
-			);
-
-			glBindTexture(GL_TEXTURE_2D, nTexId[0]);
-
-			SAFE_FREE(_texture.pixels)			
-			return 1;
-		}
-	}
-	return 0;
-}
-
-c_tex::c_tex(uint32_t _nTexture, char* szPath) 
-{
-	nTexture = _nTexture;
-
-	pszTexPath = (char*)malloc(2048);
-	memset(pszTexPath, 0, 2048);
-
-	strcpy(pszTexPath, szPath);
-	
-	BindTexture(pszTexPath);
-}
-
-c_tex::~c_tex()
-{
-	if(bTextureOK) 
-	{
-		glDeleteTextures(1, &nTexId[0]);
-		*&nTexId[0] = NULL;
-		*&bTextureOK = NULL;
-	}
-	SAFE_FREE(pszTexPath)
-}
-
-void RenderBackground()
-{
-	if(fbaRL->nSection == SECTION_MAIN) {
-		app.textures[TEX_MAIN_MENU]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_GAMELIST) 
-	{
-		app.textures[TEX_GAME_LIST]->Render(0,0,0,0);
-
-		if(!fbaRL->bProcessingGames) 
-		{
-			// ------------------------------------------------------
-			// PROPER ASPECT RATIO CALCULATIONS 
-
-			float w = (float)app.textures[TEX_PREVIEW]->_texture.width * 4.0f;
-			float h = (float)app.textures[TEX_PREVIEW]->_texture.height * 4.0f;
-
-			float maxw = (27.604f / 100.0f) * (float)renderWidth;		// 530 @ 1920 x 1080 res
-			float maxh = (31.481f / 100.0f) * (float)renderHeight;		// 340 @ 1920 x 1080 res
-
-			if( app.textures[TEX_PREVIEW]->_texture.width > app.textures[TEX_PREVIEW]->_texture.height || 
-				app.textures[TEX_PREVIEW]->_texture.width == app.textures[TEX_PREVIEW]->_texture.height )
-			{
-				maxw = (27.604f / 100.0f) * (float)renderWidth;  // 530 @ 1920 x 1080 res
-				maxh = (31.481f / 100.0f) * (float)renderHeight; // 340 @ 1920 x 1080 res
-			} else {
-				maxw = (31.481f / 100.0f) * (float)renderWidth;  // 340 @ 1920 x 1080 res
-				maxh = (45.370f / 100.0f) * (float)renderHeight; // 490 @ 1920 x 1080 res
-			}
-
-			// max WIDTH
-			if(w > maxw) {
-				float nh = maxw * (float)(h / w);
-				float nw = maxw;
-
-				// max HEIGHT
-				if(nh > maxh) {
-					nw = maxh * (float)(nw / nh);
-					nh = maxh;
-				}
-
-				w = nw;
-				h = nh;
-			}
-
-			// max HEIGHT
-			if(h > maxh) {
-				float nw = maxh * (float)(w / h);
-				float nh = maxh;
-
-				// max WIDTH
-				if(nw > maxw) {
-					nh = maxw * (float)(nh / nw);
-					nw = maxw;
-				}
-
-				w = nw;
-				h = nh;
-			}
-			// ------------------------------------------------------
-
-			// Proper centering of preview
-			float xdiff = ((maxw - w) / 2.0f);
-			float ydiff = ((maxh - h) / 2.0f);
-
-			if( app.textures[TEX_PREVIEW]->_texture.width > app.textures[TEX_PREVIEW]->_texture.height || 
-				app.textures[TEX_PREVIEW]->_texture.width == app.textures[TEX_PREVIEW]->_texture.height )
-			{
-				float x = renderWidth - (renderWidth / 3) + (GLuint)xdiff;
-				float y = renderHeight - (renderHeight / 2) + (GLuint)ydiff;
-
-				app.textures[TEX_PREVIEW]->Render((GLuint)x, (GLuint)y, (GLsizei)w, (GLsizei)h);
-			} else {
-				// x - 70
-				// y - 75
-				float xadjust = (3.645833f / 100.0f) * (float)renderWidth;
-				float yadjust = (6.944444f / 100.0f) * (float)renderHeight;
-
-				float x = (((float)renderWidth - ((float)renderWidth / 4.0f)) - (xadjust * 2.80f)) + xdiff;
-				float y = (((float)renderHeight - ((float)renderHeight / 2.0f)) - yadjust) + ydiff;
-
-				app.textures[TEX_PREVIEW]->Render((GLuint)x, (GLuint)y, (GLsizei)w, (GLsizei)h);
-			}
-		}
-	}
-	if(fbaRL->nSection == SECTION_ZIPINFO) {
-		app.textures[TEX_ZIP_INFO]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_OPTIONS) {
-		app.textures[TEX_OPTIONS]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_FILEBROWSER) {
-		app.textures[TEX_FILEBROWSER]->Render(0,0,0,0);
-	}
-}
-
-void CapApp::initGraphics(PSGLdevice */*device*/)
+void CapApp::initGraphics()
 {
 	textures[TEX_MAIN_MENU]		= new c_tex(nTextures, g_opt_szTextures[TEX_MAIN_MENU]);
 	nTextures++;
@@ -252,6 +30,7 @@ void CapApp::initGraphics(PSGLdevice */*device*/)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	psglSwap();
+
 }
 
 static int chooseBestResolution(const uint32_t *resolutions, uint32_t numResolutions)
@@ -316,8 +95,8 @@ static void callback_sysutil_exit(uint64_t status, uint64_t param, void *userdat
 	(void)param;
 	(void)userdata;
 
-	if(bRun && status == CELL_SYSUTIL_REQUEST_EXITGAME) {
-		bRun = false;
+	if(app.bRun && status == CELL_SYSUTIL_REQUEST_EXITGAME) {
+		app.bRun = false;
 	}
 }
 
@@ -331,6 +110,30 @@ int main(int argc, char* argv[])
 
 CapApp::CapApp()
 {
+	bRun = true;
+
+	ftp_service = 0;
+
+	renderWidth = 0;
+	renderHeight = 0;
+	deviceWidth = 0;
+	deviceHeight = 0;
+
+	normals[0] = 0.0f; normals[1] = 0.0f;	normals[2] = 1.0f;
+	normals[3] = 0.0f; normals[4] = 0.0f;	normals[5] = 1.0f;
+	normals[6] = 0.0f; normals[7] = 0.0f;	normals[8] = 1.0f;
+	normals[9] = 0.0f; normals[10] = 0.0f;	normals[11] = 1.0f;
+
+	squareVertices[0] = -1.0f;	squareVertices[1] = -1.0f;
+	squareVertices[2] = 1.0f;	squareVertices[3] = -1.0f;
+	squareVertices[4] = -1.0f;	squareVertices[5] = 1.0f;
+	squareVertices[6] = 1.0f;	squareVertices[7] = 1.0f;
+
+	texCoords[0] = 0.0f;	texCoords[1] = 1.0f;
+	texCoords[2] = 1.0f;	texCoords[3] = 1.0f;
+	texCoords[4] = 0.0f;	texCoords[5] = 0.0f;
+	texCoords[6] = 1.0f;	texCoords[7] = 0.0f;
+
 	textures = (c_tex**)malloc(sizeof(c_tex) * 10);
 	memset(textures, 0, sizeof(c_tex) * 10);
 
@@ -348,6 +151,14 @@ bool CapApp::onInit(int argc, char* argv[])
 {
 	(void)argc;
 	(void)argv;
+
+	// ----------------------------------------------
+	// FTP	
+	cellSysmoduleLoadModule(CELL_SYSMODULE_NET);
+	cellNetCtlInit();
+	cellSysmoduleLoadModule(CELL_SYSMODULE_HTTP);
+	sys_net_initialize_network();
+	ftp_on();
 
 	// Load settings...
 	if(!iniRead()) {
@@ -420,7 +231,7 @@ bool CapApp::onInit(int argc, char* argv[])
 		psglMakeCurrent(context, device);
 		psglResetCurrentContext();
 
-		initGraphics(device);
+		initGraphics();
 
 		if( cellSysutilRegisterCallback( 0, callback_sysutil_exit, NULL ) < 0 ) {
 			//...
@@ -441,6 +252,8 @@ bool CapApp::onInit(int argc, char* argv[])
 		// resolution error...
 	}
 
+	ftp_off();
+
 	onShutdown();
 
 	return false;
@@ -448,18 +261,19 @@ bool CapApp::onInit(int argc, char* argv[])
 
 void CapApp::onRender()
 {
-	if(fbaRL) fbaRL->DlgDisplayFrame();
+	if(fbaRL) { fbaRL->DlgDisplayFrame(); }
 
 	// get render target buffer dimensions and set viewport	
-	psglGetRenderBufferDimensions(device,&renderWidth,&renderHeight);
+	psglGetRenderBufferDimensions(device,&app.renderWidth,&app.renderHeight);
 
-	glViewport(0, 0, renderWidth, renderHeight);
+	glViewport(0, 0, app.renderWidth, app.renderHeight);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	RenderBackground();
-	if(fbaRL) fbaRL->DisplayFrame();
+	if(fbaRL) { fbaRL->RenderBackground(); }
+	if(fbaRL) { fbaRL->nFrameStep = 0; fbaRL->DisplayFrame(); }
+	if(fbaRL) { fbaRL->nFrameStep = 1; fbaRL->DisplayFrame(); }
 	dbgFontDraw();
 
 	psglSwap();

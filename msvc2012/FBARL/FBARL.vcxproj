@@ -11,11 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\burn_drivers.cpp" />
     <ClCompile Include="..\..\source\fba_rl.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_burndrv.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_dialogs.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_filebrowser.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_gamelist_filter.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_gamelist_parse.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_input.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_menu.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_render.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_section.cpp" />
+    <ClCompile Include="..\..\source\fba_rl_utility.cpp" />
+    <ClCompile Include="..\..\source\ftp\ftp.cpp" />
+    <ClCompile Include="..\..\source\ftp\ftpcmd.cpp" />
+    <ClCompile Include="..\..\source\ftp\functions.cpp" />
     <ClCompile Include="..\..\source\ini.cpp" />
     <ClCompile Include="..\..\source\input.cpp" />
     <ClCompile Include="..\..\source\main.cpp" />
-    <ClCompile Include="..\..\source\miniz.c" />
+    <ClCompile Include="..\..\source\miniz\miniz.cpp" />
     <ClCompile Include="..\..\source\misc.cpp" />
     <ClCompile Include="..\..\source\rarch\image.cpp" />
     <ClCompile Include="..\..\source\rarch\rpng.cpp" />
@@ -36,11 +50,17 @@
     <ClCompile Include="..\..\source\zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\burn_drivers.h" />
-    <ClInclude Include="..\..\source\burn_rominfo.h" />
     <ClInclude Include="..\..\source\fba_rl.h" />
+    <ClInclude Include="..\..\source\ftp\common_ftp.h" />
+    <ClInclude Include="..\..\source\ftp\ftp.h" />
+    <ClInclude Include="..\..\source\ftp\ftpcmd.h" />
+    <ClInclude Include="..\..\source\ftp\ftp_filesystem.h" />
+    <ClInclude Include="..\..\source\ftp\functions.h" />
+    <ClInclude Include="..\..\source\ftp\lv2.h" />
+    <ClInclude Include="..\..\source\ftp\mm_types.h" />
     <ClInclude Include="..\..\source\ini.h" />
     <ClInclude Include="..\..\source\main.h" />
+    <ClInclude Include="..\..\source\miniz\miniz.h" />
     <ClInclude Include="..\..\source\misc.h" />
     <ClInclude Include="..\..\source\rarch\hash.h" />
     <ClInclude Include="..\..\source\rarch\image.h" />
@@ -57,6 +77,9 @@
     <ClInclude Include="..\..\source\zlib\zconf.h" />
     <ClInclude Include="..\..\source\zlib\zlib.h" />
     <ClInclude Include="..\..\source\zlib\zutil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D4F014F9-A289-4FCF-8C0E-35A1D1E40730}</ProjectGuid>

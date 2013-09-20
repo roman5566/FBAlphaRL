@@ -25,11 +25,23 @@
     <Filter Include="Source Files\rarch">
       <UniqueIdentifier>{0ee19b1f-62da-469a-bad6-8694b60b8432}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ftp">
+      <UniqueIdentifier>{a6e74c83-1b4f-427b-badd-cd0382c78195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ftp">
+      <UniqueIdentifier>{d1d7c0c4-433e-4b5f-b6be-b8ac8f4e66b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fbarl">
+      <UniqueIdentifier>{5b0fc629-e700-4017-bf35-2cf33b076974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\miniz">
+      <UniqueIdentifier>{75ed7c61-8c71-40ae-a860-3ea64f9c859e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\miniz">
+      <UniqueIdentifier>{4db61bce-93c6-4a71-9ce9-f2ed234013c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\miniz.c">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\rarch\image.cpp">
       <Filter>Source Files\rarch</Filter>
     </ClCompile>
@@ -81,9 +93,6 @@
     <ClCompile Include="..\..\source\zlib\zutil.c">
       <Filter>Source Files\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\fba_rl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\ini.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,14 +105,56 @@
     <ClCompile Include="..\..\source\misc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\ftp\ftp.cpp">
+      <Filter>Source Files\ftp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ftp\ftpcmd.cpp">
+      <Filter>Source Files\ftp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ftp\functions.cpp">
+      <Filter>Source Files\ftp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_burndrv.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_dialogs.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_filebrowser.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_gamelist_filter.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_gamelist_parse.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_input.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_menu.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_render.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_section.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl_utility.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\fba_rl.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\burn_drivers.cpp">
+      <Filter>Source Files\fbarl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\miniz\miniz.cpp">
+      <Filter>Source Files\miniz</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\burn_drivers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\burn_rominfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\fba_rl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -161,5 +212,32 @@
     <ClInclude Include="..\..\source\zlib\zutil.h">
       <Filter>Header Files\zlib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\ftp\common_ftp.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\ftp.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\ftp_filesystem.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\ftpcmd.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\functions.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\lv2.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ftp\mm_types.h">
+      <Filter>Header Files\ftp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\miniz\miniz.h">
+      <Filter>Header Files\miniz</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" />
   </ItemGroup>
 </Project>

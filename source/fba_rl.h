@@ -8,54 +8,33 @@
 #include <iostream>
 #include <string>
 
-#define SAFE_FREE(x)	\
-	if(x) {	free(x); *&x = NULL; }
+// --------------------------------------------------------------------
+#define _APP_VER "1.02a"
+#define _APP_TITLE "\tFB ALPHA RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013]"
+// --------------------------------------------------------------------
 
-#define SAFE_DELETE(x)	\
-	if(x) { delete x; *&x = NULL; }
-
-class c_game
-{
-public:
-	uint32_t	nGame;
-	char*		path;		// ROM Path
-	char*		zipname;	// ZIP name
-	char*		title;		// Title, if found
-	char*		sysmask;	// System Mask / Filter
-	uint64_t	nSize;		// size in bytes
-	bool		bAvailable; // 
-
-	c_game(uint32_t _nGame)
-	{
-
-		path	= (char*)malloc(1024);
-		memset(path, 0, 1024);
-		
-		zipname = (char*)malloc(1024);
-		memset(zipname, 0, 1024);
-		
-		title	= (char*)malloc(1024);
-		memset(title, 0, 1024);
-		
-		sysmask = (char*)malloc(1024);
-		memset(sysmask, 0, 1024);
-
-		nGame	= _nGame;
-		nSize	= 0;
-		bAvailable = false;
-	}
-
-	~c_game()
-	{
-		SAFE_FREE(path)
-		SAFE_FREE(zipname)
-		SAFE_FREE(title)
-		SAFE_FREE(sysmask)
-		*&nGame = NULL;
-		*&nSize = NULL;
-		*&bAvailable = NULL;
-	}
+struct FBA_DRV 
+{ 
+	uint32_t nDrv; 
+	char szName[32]; 
+	char szParent[32];
+	char szBoardROM[32];
+	char szTitle[256];
+	char szYear[8];
+	char szCompany[256];
+	char szSystem[256];
+	uint32_t nMaxPlayers;
+	uint32_t nWidth; 
+	uint32_t nHeight;
+	uint32_t nAspectX;
+	uint32_t nAspectY;
+	char szSystemFilter[32];
 };
+
+extern FBA_DRV fba_drv[3183];
+
+extern unsigned char	example_cfg[20570];		// For creating basic input presets
+void _ScanROMs(uint64_t);
 
 #define STATUS_NORMAL			0
 #define STATUS_SHOW_ZIPINFO		1
@@ -67,6 +46,8 @@ public:
 #define STATUS_EXIT_MMAN		7
 
 #define STATUS_ROMSCAN_DLG		20
+#define STATUS_MISSING_GAME_DLG 21
+#define STATUS_CORRUPT_APP_DLG	22
 
 #define STATUS_ROMSCAN_START	30
 #define STATUS_ROMSCAN_END		31
@@ -115,9 +96,57 @@ public:
 #define MENU_OPT_AUTO_AR		0
 #define MENU_OPT_AUTO_CFG		1
 #define MENU_OPT_ALT_MKEY		2
-#define MENU_OPT_DISP_MISS_GMS	3
+#define MENU_OPT_USE_UNIBIOS	3
+#define MENU_OPT_DISP_MISS_GMS	4
 #define MENU_OPT_FILTER_START	(MENU_OPT_DISP_MISS_GMS+1)
 
+#define SAFE_FREE(x)	if(x) {	free(x); *&x = NULL; }
+#define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
+
+#define MAX_GAMES	10000 // <-- should be enough xD
+
+class c_game
+{
+public:
+	
+	char*		path;		// ROM Path
+	char*		zipname;	// ZIP name
+	char*		title;		// Title, if found
+	char*		sysmask;	// System Mask / Filter
+
+	uint32_t	nGame;
+	uint64_t	nSize;		// size in bytes
+	bool		bAvailable; // 
+
+	c_game(uint32_t _nGame)
+	{
+
+		path	= (char*)malloc(1024);
+		zipname = (char*)malloc(1024);
+		title	= (char*)malloc(1024);		
+		sysmask = (char*)malloc(1024);
+		
+		memset(path, 0, 1024);
+		memset(zipname, 0, 1024);
+		memset(title, 0, 1024);
+		memset(sysmask, 0, 1024);
+
+		nGame		= _nGame;
+		nSize		= 0;
+		bAvailable	= false;
+	}
+
+	~c_game()
+	{
+		SAFE_FREE(path)
+		SAFE_FREE(zipname)
+		SAFE_FREE(title)
+		SAFE_FREE(sysmask)
+		*&nGame = NULL;
+		*&nSize = NULL;
+		*&bAvailable = NULL;
+	}
+};
 class c_MenuItem 
 {
 public:	
@@ -175,7 +204,26 @@ public:
 		nTotalItem++;
 	}
 
-	int UpdateTopItem();
+	int UpdateTopItem()
+	{
+		if(nSelectedItem > nListMax || nTopItem > 0)
+		{
+			if(nTopItem < (nSelectedItem - nListMax)) {
+				nTopItem = nSelectedItem - nListMax;
+			}
+			if(nTopItem > 0 && nSelectedItem < nTopItem) {
+				nTopItem = nSelectedItem;
+			} else {
+				nTopItem = nSelectedItem - nListMax;
+			}
+		} else {
+			nTopItem = nSelectedItem - nListMax;
+		}
+		if(nTopItem < 0) {
+			nTopItem = 0;
+		}
+		return nTopItem;
+	}
 };
 
 class c_FilebrowserItem 
@@ -189,9 +237,9 @@ public:
 	c_FilebrowserItem(int nId) 
 	{
 		szMenuLabel = (char*)malloc(2048);
-		memset(szMenuLabel, 0, 2048);
-
 		szPath = (char*)malloc(2048);
+
+		memset(szMenuLabel, 0, 2048);		
 		memset(szPath, 0, 2048);
 
 		nIndex		= nId;
@@ -367,9 +415,9 @@ public:
 
 	c_fbaRL();
 
-	c_Menu		*main_menu;
-	c_Menu		*zipinfo_menu;
-	c_Menu		*options_menu;
+	c_Menu*		main_menu;
+	c_Menu*		zipinfo_menu;
+	c_Menu*		options_menu;
 
 	c_Filebrowser* filebrowser;
 	int			nFileBrowserType;
@@ -384,13 +432,20 @@ public:
 
 	int			nTotalGames;
 	int			nMissingGames;
-	c_game		**games;
+	c_game**	games;
 
 	int			nSelectedGame;
 	int			nGameListTop;
 	int			nFilteredGames;
-	c_game		**fgames;
+	c_game**	fgames;
 
+	int			nStatus;
+	int			nSection;
+
+	int			nBurnSelected;
+
+	void		LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char* arg5 );
+	
 	int			SaveGameListCache();
 	int			ParseGameListCache();
 
@@ -399,11 +454,11 @@ public:
 	void		NextSysFilter();
 	void		PrevSysFilter();
 	bool		FilterGame(char* szMask);
-	//
-
-	int			nStatus;
-	int			nSection;
 	
+	int			GetSystemMaskId(char* szMask);
+	char*		GetSystemFilter(int nFilter);
+
+	void		RenderBackground();
 	void		ResetPreviewImage();
 	void		UpdatePreviewImage();
 
@@ -432,13 +487,19 @@ public:
 	uint64_t	GetFileSize(char* szFilePath);
 	int			ParseGameList();
 
-	// ...
 	void		ParseDirectory();
 	void		FileBrowserFrame();
-	// ...
 
 	//void		Frame();
+	int			nFrameStep;
 	void		DisplayFrame();
+
+	void		MainMenu_Frame();
+	void		GameList_Frame();
+	void		Options_Frame();
+	void		FileBrowser_Frame();
+	void		ZipInfo_Frame();
+
 	void		InputFrame();
 	void		DlgDisplayFrame();
 

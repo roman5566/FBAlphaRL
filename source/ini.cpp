@@ -69,6 +69,8 @@ bool g_opt_bCustomSysFilter[MASKCUSTOM+1] =
 	true,true // <--- fillers
 };
 
+bool g_opt_bUseUNIBIOS = false;
+
 int iniWrite()
 {
 	FILE* fp = NULL;
@@ -130,6 +132,12 @@ int iniWrite()
 		fprintf(fp, "// Active System Filter \n");
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
 		fprintf(fp, "filter_active:\"%d\"\n"		, g_opt_nActiveSysFilter);
+		fprintf(fp, "\n");
+
+		fprintf(fp, "// --------------------------------------------------------------------------\n");
+		fprintf(fp, "// Enable / Disable Neo-Geo UNI-BIOS \n");
+		fprintf(fp, "// --------------------------------------------------------------------------\n");
+		fprintf(fp, "use_ng_unibios:\"%s\"\n"		, g_opt_bUseUNIBIOS ? "yes" : "no");
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -457,6 +465,12 @@ int iniRead()
 		if(!getBoolOption(fp, "filter_toaplan:\""		, &g_opt_bCustomSysFilter[18])) {return 0;}
 		if(!getBoolOption(fp, "filter_misc_pre90:\""	, &g_opt_bCustomSysFilter[19])) {return 0;}
 		if(!getBoolOption(fp, "filter_misc_post90:\""	, &g_opt_bCustomSysFilter[20])) {return 0;}
+
+		// -----------------------------------------------------------------------------------------
+		// Enable / Disable Neo-Geo UNI-BIOS
+		// -----------------------------------------------------------------------------------------
+		if(!getBoolOption(fp, "use_ng_unibios:\"", &g_opt_bUseUNIBIOS)) {return 0;}
+		
 
 		// -----------------------------------------------------------------------------------------
 		// Active System Filter

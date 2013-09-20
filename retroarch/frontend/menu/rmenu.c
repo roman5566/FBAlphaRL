@@ -794,9 +794,45 @@ do_exit:
    return true;
 }
 
+#ifdef _FBARL_
+static wchar_t* c2wc(const char* text)
+{
+    size_t size = strlen(text) + 1;
+    wchar_t* wa = NULL;
+	wa = (wchar_t*)malloc(size * sizeof(wchar_t));
+    mbstowcs(wa,text,size);
+    return wa;
+}
+#endif
+
 static bool osk_callback_enter_filename_init(void *data)
 {
+#ifdef _FBARL_
+	if(strstr(g_extern.input_config_path, ".cfg") != NULL)
+	{
+		// remove .cfg from path
+		int nLen = 0;
+		nLen = strlen(g_extern.input_config_path);
+		char szCfgFile[512] = { 0 };
+		strncpy(szCfgFile, g_extern.input_config_path, nLen-4);
+
+		// get last '/' location
+		char *pch = NULL;
+		pch = strrchr(szCfgFile,'/');	
+		uint32_t nSlash = pch-szCfgFile+1;
+
+		// remove path from filename and convert to 'wchat_t'
+		wchar_t wszCfgFile[512] = { 0 };
+		wcscpy(wszCfgFile, c2wc(szCfgFile + nSlash));
+
+		// happy birthday! xD
+		oskutil_write_initial_message(&rgui->oskutil_handle, wszCfgFile);
+	} else {
+		oskutil_write_initial_message(&rgui->oskutil_handle, L"example");
+	}
+#else
    oskutil_write_initial_message(&rgui->oskutil_handle, L"example");
+#endif
    oskutil_write_message(&rgui->oskutil_handle, L"Enter filename for preset");
    oskutil_start(&rgui->oskutil_handle);
 
@@ -1430,6 +1466,7 @@ static int set_setting_action(uint8_t menu_type, unsigned switchvalue, uint64_t 
             return -1;
          }
          break;
+#ifndef _FBARL_
       case INGAME_MENU_CHANGE_LIBRETRO_CORE:
          if (input & (1ULL << DEVICE_NAV_B))
          {
@@ -1437,6 +1474,7 @@ static int set_setting_action(uint8_t menu_type, unsigned switchvalue, uint64_t 
             filebrowser_set_root_and_ext(rgui->browser, EXT_EXECUTABLES, default_paths.core_dir);
          }
          break;
+#endif
 #ifdef HAVE_MULTIMAN
       case INGAME_MENU_RETURN_TO_MULTIMAN:
          if (input & (1ULL << DEVICE_NAV_B))
@@ -2073,16 +2111,23 @@ static int select_setting(void *data, uint64_t input)
             strlcpy(setting_text, "...", sizeof(setting_text));
             strlcpy(comment, "Select a game to be loaded.", sizeof(comment));
             break;
+#ifndef _FBARL_
          case INGAME_MENU_CHANGE_LIBRETRO_CORE:
             strlcpy(text, "Core", sizeof(text));
             strlcpy(setting_text, "...", sizeof(setting_text));
             strlcpy(comment, "Choose another libretro core.", sizeof(comment));
             break;
+#endif
 #ifdef HAVE_MULTIMAN
          case INGAME_MENU_RETURN_TO_MULTIMAN:
+#ifdef _FBARL_
+            strlcpy(text, "Return to FB Alpha RL", sizeof(text));
+            strlcpy(comment, "Quit RetroArch and return to FB Alpha RL.", sizeof(comment));
+#else
             strlcpy(text, "Return to multiMAN", sizeof(text));
-            strlcpy(setting_text, "", sizeof(setting_text));
             strlcpy(comment, "Quit RetroArch and return to multiMAN.", sizeof(comment));
+#endif
+			strlcpy(setting_text, "", sizeof(setting_text));
             break;
 #endif
          case INGAME_MENU_QUIT_RETROARCH:

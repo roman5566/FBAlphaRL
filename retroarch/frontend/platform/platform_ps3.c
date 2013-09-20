@@ -24,7 +24,12 @@
 #include "../../general.h"
 #include "../../file.h"
 
+#ifdef _FBARL_
+#define EMULATOR_CONTENT_DIR "FBAL00123"
+bool g_bUseAltMenuKeyCombo = true;
+#else
 #define EMULATOR_CONTENT_DIR "SSNE10000"
+#endif
 
 #ifndef __PSL1GHT__
 #define NP_POOL_SIZE (128*1024)
@@ -39,7 +44,11 @@ SYS_PROCESS_PARAM(1001, 0x200000)
 #endif
    
 #ifdef HAVE_MULTIMAN
+#ifdef _FBARL_
+#define MULTIMAN_SELF_FILE "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF"
+#else
 #define MULTIMAN_SELF_FILE "/dev_hdd0/game/BLES80608/USRDIR/RELOAD.SELF"
+#endif
 #endif
 
 #ifdef IS_SALAMANDER
@@ -91,8 +100,11 @@ static void salamander_init_settings(void)
 
       //try to find CORE executable
       char core_executable[1024];
+#ifdef _FBARL_
+	  snprintf(core_executable, sizeof(core_executable), "%s/fb_alpha.SELF", default_paths.core_dir);
+#else
       snprintf(core_executable, sizeof(core_executable), "%s/CORE.SELF", default_paths.core_dir);
-
+#endif
       if(path_file_exists(core_executable))
       {
          //Start CORE executable
@@ -184,6 +196,13 @@ static void callback_sysutil_exit(uint64_t status, uint64_t param, void *userdat
 }
 #endif
 
+#ifdef _FBARL_
+#define		FBARL_PATH "/dev_hdd0/game/FBAL00123/USRDIR/RELOAD.SELF"
+float		g_fAspectRatio = 0.0f;
+int			g_nAspectRatio = 0;
+#define		GET_MACRO_NAME(TYPE) #TYPE
+#endif
+
 static void get_environment_settings(int argc, char *argv[], void *args)
 {
    (void)args;
@@ -205,6 +224,93 @@ static void get_environment_settings(int argc, char *argv[], void *args)
    char contentInfoPath[PATH_MAX];
 
 #ifdef HAVE_MULTIMAN
+
+#ifdef _FBARL_
+   if(argc > 1 )
+   {
+	   //strcpy(g_settings.libretro, "/dev_hdd0/game/FBAL00123/USRDIR/cores/fb_alpha.SELF");
+
+	   // Check if launched from FB Alpha RL...
+	   if(argc > 2)
+	   {
+		   if(strcmp(argv[2], FBARL_PATH) == 0) {
+			   //strlcpy(default_paths.multiman_self_file, FBARL_PATH, sizeof(default_paths.multiman_self_file));
+		   }
+
+		   // 3rd argument used to load Game Input Preset on the fly
+		   if(argc > 3) {
+			   if(strstr(argv[3], ".cfg") != NULL) { 
+				   FILE* fp = fopen(argv[3], "r");
+				   if(fp) {
+					   fclose(fp); fp = NULL;
+					   strlcpy(g_extern.input_config_path, argv[3], sizeof(g_extern.input_config_path));
+				   }
+			   }
+		   }
+
+		   // 4th argument used to specify proper game Aspect Ratio (Ex. "4:3" would be 4:3)
+		   if(argc > 4) 
+		   {
+			   //FILE* fp = fopen("/dev_hdd0/game/FBAL00123/USRDIR/cores/debug.txt","w");
+			   
+			   int x, y;
+			   sscanf(argv[4], "%d:%d", &x, &y);
+
+			   char ar_game[256] = { 0 };
+			   sprintf(ar_game, "ASPECT_RATIO_%d_%d", x, y); 
+
+			   char ar_macro[19][256] = { 
+				   GET_MACRO_NAME(ASPECT_RATIO_1_1),
+				   GET_MACRO_NAME(ASPECT_RATIO_2_1),
+				   GET_MACRO_NAME(ASPECT_RATIO_3_2),
+				   GET_MACRO_NAME(ASPECT_RATIO_3_4),
+				   GET_MACRO_NAME(ASPECT_RATIO_4_1),
+				   GET_MACRO_NAME(ASPECT_RATIO_4_3),
+				   GET_MACRO_NAME(ASPECT_RATIO_4_4),
+				   GET_MACRO_NAME(ASPECT_RATIO_5_4),
+				   GET_MACRO_NAME(ASPECT_RATIO_6_5),
+				   GET_MACRO_NAME(ASPECT_RATIO_7_9),
+				   GET_MACRO_NAME(ASPECT_RATIO_8_3),
+				   GET_MACRO_NAME(ASPECT_RATIO_8_7),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_9),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_10),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_15),
+				   GET_MACRO_NAME(ASPECT_RATIO_19_12),
+				   GET_MACRO_NAME(ASPECT_RATIO_19_14),
+				   GET_MACRO_NAME(ASPECT_RATIO_30_17),
+				   GET_MACRO_NAME(ASPECT_RATIO_32_9)
+			   };
+
+			   for(int x = 0; x < 19; x++) {
+				   //if(fp) fprintf(fp, "checking...%s for %s \n", ar_macro[x], ar_game);
+				   if(strcmp(ar_game, ar_macro[x]) == 0) 
+				   {
+					   //if(fp) fprintf(fp, "got it...%s", ar_macro[x]);
+					   // x value is according to "enum aspect_ratio" in "rarch_console_video.h"
+					   g_nAspectRatio = x;
+					   g_fAspectRatio = (float)x / (float) y;					   
+					   break;
+				   }
+			   }
+			   //if(fp) fclose(fp); fp = NULL;
+		   }
+
+		   // 5th argument used for Alternate RetroArch menu key combo
+		   if(argc > 5) 
+		   {
+			   if(strstr(argv[5], "yes") != NULL) { 
+				   g_bUseAltMenuKeyCombo = true;
+			   } else {
+				   g_bUseAltMenuKeyCombo = false;
+			   }
+		   }
+	   }
+      
+	  g_extern.lifecycle_mode_state |= (1ULL << MODE_EXTLAUNCH_MULTIMAN);
+      RARCH_LOG("Started from multiMAN, auto-game start enabled.\n");
+
+   }
+#else
    /* not launched from external launcher, set default path */
    // second param is multiMAN SELF file
    if(path_file_exists(argv[2]) && argc > 1 && (strcmp(argv[2], EMULATOR_CONTENT_DIR) == 0))
@@ -212,6 +318,7 @@ static void get_environment_settings(int argc, char *argv[], void *args)
       g_extern.lifecycle_mode_state |= (1ULL << MODE_EXTLAUNCH_MULTIMAN);
       RARCH_LOG("Started from multiMAN, auto-game start enabled.\n");
    }
+#endif
    else
 #endif
 #ifndef IS_SALAMANDER
@@ -356,6 +463,20 @@ static void system_init(void)
 #endif
 #endif
 #endif
+
+// FBARL
+#ifdef _FBARL_
+#ifdef HAVE_MULTIMAN
+   config_read_keybinds(g_extern.input_config_path);
+   g_settings.video.aspect_ratio_idx = g_nAspectRatio;
+   //g_extern.system.av_info.geometry.aspect_ratio = g_fAspectRatio;
+   g_settings.video.aspect_ratio = g_fAspectRatio;
+   //driver.video_poke->set_aspect_ratio(driver.video_data, g_settings.video.aspect_ratio_idx);
+#endif
+#endif
+
+// FBARL
+
 }
 
 static int system_process_args(int argc, char *argv[], void *args)
@@ -365,6 +486,11 @@ static int system_process_args(int argc, char *argv[], void *args)
    {
       RARCH_LOG("Auto-start game %s.\n", argv[1]);
       strlcpy(g_extern.fullpath, argv[1], sizeof(g_extern.fullpath));
+#ifdef _FBARL_
+	  g_extern.lifecycle_mode_state &= ~(1ULL << MODE_GAME);
+	  g_extern.lifecycle_mode_state |= (1ULL << MODE_EXITSPAWN);
+	  g_extern.lifecycle_mode_state |= (1ULL << MODE_EXITSPAWN_START_GAME);
+#endif
       return 1;
    }
 #endif

@@ -216,8 +216,19 @@ static void ps3_input_poll(void *data)
          *lifecycle_state |= (1ULL << RARCH_REWIND);
    }
 
+#ifdef _FBARL_
+   extern bool g_bUseAltMenuKeyCombo;
+   if(g_bUseAltMenuKeyCombo) {   
+	   if ((*state_p1 & (1ULL << RETRO_DEVICE_ID_JOYPAD_SELECT)) && (*state_p1 & (1ULL << RETRO_DEVICE_ID_JOYPAD_Y))) {
+		  *lifecycle_state |= (1ULL << RARCH_MENU_TOGGLE);
+	   }
+   } else {
+#endif
    if ((*state_p1 & (1ULL << RETRO_DEVICE_ID_JOYPAD_L3)) && (*state_p1 & (1ULL << RETRO_DEVICE_ID_JOYPAD_R3)))
       *lifecycle_state |= (1ULL << RARCH_MENU_TOGGLE);
+#ifdef _FBARL_
+   }
+#endif
 
    cellPadGetInfo2(&pad_info);
    pads_connected = pad_info.now_connect; 

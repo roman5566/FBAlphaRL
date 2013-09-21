@@ -180,6 +180,21 @@ install the official RetroArch and it won't interfere.
  
  - MiraLaTijera 4.40 (3.2.0)
 ```
+
+- Incorporated RetroArch and FBA libretro source code into
+FB Alpha RL Git, and with just one makefile everything is 
+built.
+
+To build:
+```
+make fbarl
+```
+
+To clean (all cores):
+```
+make _cleanup
+```
+
 - Ported my custom mods to the latest RetroArch Core v0.9.9.6.
 
 - (O) is the new "Game List" button to return to "Main Menu".
@@ -341,10 +356,3 @@ https://mega.co.nz/#!LVtmyR4S!Qn2TaSUZqAs5NMhFr_hNXm1Mb0ESWA43FqzQkMY5_Wg
 
 http://rapidshare.com/share/C039EDE51256A1AA304122A41A9BDD72
 
-### Source Code:
-
----
-
-- FB Alpha RL - https://github.com/CaptainCPS/FBAlphaRL
-- RetroArch v0.9.9.6 (Modded for FB Alpha RL) - https://github.com/CaptainCPS/RetroArch
-- FB Alpha v0.2.97.30 (Modded to generate "burn_drivers.cpp")(Windows) - (message me)

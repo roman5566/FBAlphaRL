@@ -48,8 +48,14 @@ Custom RETROARCH changes for FB Alpha RL (v1.XX):
 
 c_fbaRL* fbaRL;
 
+char ipaddress[256] = "255.255.255.255"; //ipv4
+
 c_fbaRL::c_fbaRL() 
 {
+	CellNetCtlInfo info;
+	cellNetCtlGetInfo(CELL_NET_CTL_INFO_IP_ADDRESS, &info);
+	strcpy(ipaddress, info.ip_address);
+
 	nFrameStep = 0; // for text shadow
 
 	nBurnSelected = -1;

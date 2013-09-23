@@ -11,7 +11,7 @@ MAKE_PACKAGE_NPDRM 	?= $(CELL_SDK)/host-win32/bin/make_package_npdrm.exe
 PSN_PKG_NPDRM 		?= $(CURDIR)/bin/psn_package_npdrm
 
 APP_NAME			?=	FB_ALPHA_RL
-APP_VER				?=	1.02a
+APP_VER				?=	1.03
 DATE 				?=	$(shell date +"%Y%m%d")
 
 RARCH_PATH			=	retroarch

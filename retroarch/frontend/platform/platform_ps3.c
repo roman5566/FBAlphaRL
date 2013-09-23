@@ -251,7 +251,7 @@ static void get_environment_settings(int argc, char *argv[], void *args)
 		   // 4th argument used to specify proper game Aspect Ratio (Ex. "4:3" would be 4:3)
 		   if(argc > 4) 
 		   {
-			   //FILE* fp = fopen("/dev_hdd0/game/FBAL00123/USRDIR/cores/debug.txt","w");
+			   //FILE* fp = fopen("/dev_hdd0/game/FBAL00123/USRDIR/debug_ar.txt","w");
 			   
 			   int x, y;
 			   sscanf(argv[4], "%d:%d", &x, &y);
@@ -260,38 +260,42 @@ static void get_environment_settings(int argc, char *argv[], void *args)
 			   sprintf(ar_game, "ASPECT_RATIO_%d_%d", x, y); 
 
 			   char ar_macro[19][256] = { 
+				   GET_MACRO_NAME(ASPECT_RATIO_4_3),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_9),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_10),
+				   GET_MACRO_NAME(ASPECT_RATIO_16_15),
 				   GET_MACRO_NAME(ASPECT_RATIO_1_1),
 				   GET_MACRO_NAME(ASPECT_RATIO_2_1),
 				   GET_MACRO_NAME(ASPECT_RATIO_3_2),
 				   GET_MACRO_NAME(ASPECT_RATIO_3_4),
 				   GET_MACRO_NAME(ASPECT_RATIO_4_1),
-				   GET_MACRO_NAME(ASPECT_RATIO_4_3),
 				   GET_MACRO_NAME(ASPECT_RATIO_4_4),
 				   GET_MACRO_NAME(ASPECT_RATIO_5_4),
 				   GET_MACRO_NAME(ASPECT_RATIO_6_5),
 				   GET_MACRO_NAME(ASPECT_RATIO_7_9),
 				   GET_MACRO_NAME(ASPECT_RATIO_8_3),
 				   GET_MACRO_NAME(ASPECT_RATIO_8_7),
-				   GET_MACRO_NAME(ASPECT_RATIO_16_9),
-				   GET_MACRO_NAME(ASPECT_RATIO_16_10),
-				   GET_MACRO_NAME(ASPECT_RATIO_16_15),
 				   GET_MACRO_NAME(ASPECT_RATIO_19_12),
 				   GET_MACRO_NAME(ASPECT_RATIO_19_14),
 				   GET_MACRO_NAME(ASPECT_RATIO_30_17),
 				   GET_MACRO_NAME(ASPECT_RATIO_32_9)
 			   };
 
-			   for(int x = 0; x < 19; x++) {
-				   //if(fp) fprintf(fp, "checking...%s for %s \n", ar_macro[x], ar_game);
-				   if(strcmp(ar_game, ar_macro[x]) == 0) 
+			   for(int i = 0; i < 19; i++) 
+			   {
+				   //if(fp) fprintf(fp, "checking...%s for %s (%d)\n", ar_macro[i], ar_game, i);
+				   
+				   if(strcmp(ar_game, ar_macro[i]) == 0) 
 				   {
-					   //if(fp) fprintf(fp, "got it...%s", ar_macro[x]);
-					   // x value is according to "enum aspect_ratio" in "rarch_console_video.h"
-					   g_nAspectRatio = x;
-					   g_fAspectRatio = (float)x / (float) y;					   
+					   //if(fp) fprintf(fp, "got it...%s", ar_macro[i]);
+					   
+					   // i value is according to "enum aspect_ratio" in "rarch_console_video.h"
+					   g_nAspectRatio = i;
+					   g_fAspectRatio = (float)x / (float) y;
 					   break;
 				   }
 			   }
+			  
 			   //if(fp) fclose(fp); fp = NULL;
 		   }
 
@@ -410,6 +414,11 @@ static void get_environment_settings(int argc, char *argv[], void *args)
 
 static void system_init(void)
 {
+// FBARL
+#ifdef _FBARL_
+   config_read_keybinds(g_extern.input_config_path);
+#endif
+
 #ifdef HAVE_SYSUTILS
    RARCH_LOG("Registering system utility callback...\n");
    cellSysutilRegisterCallback(0, callback_sysutil_exit, NULL);
@@ -464,16 +473,7 @@ static void system_init(void)
 #endif
 #endif
 
-// FBARL
-#ifdef _FBARL_
-#ifdef HAVE_MULTIMAN
-   config_read_keybinds(g_extern.input_config_path);
-   g_settings.video.aspect_ratio_idx = g_nAspectRatio;
-   //g_extern.system.av_info.geometry.aspect_ratio = g_fAspectRatio;
-   g_settings.video.aspect_ratio = g_fAspectRatio;
-   //driver.video_poke->set_aspect_ratio(driver.video_data, g_settings.video.aspect_ratio_idx);
-#endif
-#endif
+
 
 // FBARL
 

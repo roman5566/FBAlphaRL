@@ -9,7 +9,7 @@
 #include <string>
 
 // --------------------------------------------------------------------
-#define _APP_VER "1.02a"
+#define _APP_VER "1.03"
 #define _APP_TITLE "\tFB ALPHA RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013]"
 // --------------------------------------------------------------------
 
@@ -44,6 +44,7 @@ void _ScanROMs(uint64_t);
 #define STATUS_EXIT_FBARL_RA	5
 #define STATUS_EXIT_RA			6
 #define STATUS_EXIT_MMAN		7
+#define STATUS_EXIT_IMANAGER	8
 
 #define STATUS_ROMSCAN_DLG		20
 #define STATUS_MISSING_GAME_DLG 21
@@ -63,9 +64,9 @@ void _ScanROMs(uint64_t);
 #define MENU_MAIN_GAMELIST		0
 #define MENU_MAIN_OPTIONS		1
 #define MENU_MAIN_FBARL_RA		2
-//#define MENU_MAIN_RA			3
-#define MENU_MAIN_MMAN			3
-#define MENU_MAIN_EXIT			4
+#define MENU_MAIN_IMANAGER		3
+#define MENU_MAIN_MMAN			4
+#define MENU_MAIN_EXIT			5
 
 // Filter system
 #define MASKCAPMISC		0

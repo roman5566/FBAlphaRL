@@ -133,9 +133,17 @@ void c_fbaRL::RenderBackground()
 				maxh = (45.370f / 100.0f) * (float)app.renderHeight; // 490 @ 1920 x 1080 res
 			}
 
+			float ax = (float)fba_drv[nBurnSelected].nAspectX; 
+			float ay = (float)fba_drv[nBurnSelected].nAspectY;
+
+			bool bNoPreview = false;
+			if(strcmp(app.textures[TEX_PREVIEW]->pszTexPath, g_opt_szTextures[TEX_PREVIEW]) == 0) {
+				bNoPreview = true;
+			}
+
 			// max WIDTH
 			if(w > maxw) {
-				float nh = maxw * (float)(h / w);
+				float nh = maxw * (float)(bNoPreview ? (h / w) : (ay / ax));
 				float nw = maxw;
 
 				// max HEIGHT
@@ -150,7 +158,7 @@ void c_fbaRL::RenderBackground()
 
 			// max HEIGHT
 			if(h > maxh) {
-				float nw = maxh * (float)(w / h);
+				float nw = maxh * (float)(bNoPreview ? (w / h) : (ax / ay));
 				float nh = maxh;
 
 				// max WIDTH

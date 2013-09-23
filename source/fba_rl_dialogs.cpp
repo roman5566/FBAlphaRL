@@ -56,6 +56,23 @@ void ExitDlgCallbackFunction(int buttonType, void *userData)
 				break;
 			}
 
+			if(nDialog == STATUS_EXIT_IMANAGER)
+			{
+				cellMsgDialogAbort();
+
+				iniWrite(); // save settings
+
+				app.onShutdown();
+
+				char path[] = "/dev_hdd0/game/IMANAGER4/USRDIR/iris_manager.self";
+				if(fbaRL->FileExist(path)) 
+				{ 
+					sys_game_process_exitspawn(path, NULL, NULL, NULL, 0, 1000, SYS_PROCESS_PRIMARY_STACK_SIZE_1M);
+				}
+				fbaRL->EndMainMenu();
+				break;
+			}
+
 			if(nDialog == STATUS_EXIT_FBARL_RA)
 			{
 				cellMsgDialogAbort();
@@ -191,6 +208,17 @@ void c_fbaRL::DlgDisplayFrame()
 				CELL_MSGDIALOG_TYPE_DEFAULT_CURSOR_NO, 
 				"Do you want to exit and load \"multiMAN\" ?",
 				ExitDlgCallbackFunction, (void*)STATUS_EXIT_MMAN, NULL
+			);
+			break;
+		}
+
+		case STATUS_EXIT_IMANAGER:
+		{
+			::cellMsgDialogOpen2(				
+				CELL_MSGDIALOG_TYPE_BUTTON_TYPE_YESNO|
+				CELL_MSGDIALOG_TYPE_DEFAULT_CURSOR_NO, 
+				"Do you want to exit and load \"Iris Manager\" ?",
+				ExitDlgCallbackFunction, (void*)STATUS_EXIT_IMANAGER, NULL
 			);
 			break;
 		}

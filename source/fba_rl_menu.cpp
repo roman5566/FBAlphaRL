@@ -10,7 +10,7 @@ void c_fbaRL::InitMainMenu()
 	main_menu->AddItem((char*)"GAME LIST");
 	main_menu->AddItem((char*)"OPTIONS");
 	main_menu->AddItem((char*)"LOAD \"FB Alpha Core\" MOD");
-	//main_menu->AddItem((char*)"LOAD \"RetroArch\"");
+	main_menu->AddItem((char*)"LOAD \"Iris Manager\"");
 	main_menu->AddItem((char*)"LOAD \"multiMAN\"");
 	main_menu->AddItem((char*)"EXIT");
 }
@@ -144,7 +144,7 @@ void c_fbaRL::InitZipInfoMenu()
 		pszTmp = (char*)malloc(1024);
 		memset(pszTmp, 0, 1024);
 
-		sprintf(pszTmp, "\t[ %s ] [SIZE: %u bytes] [CRC32: %08X] \n", 
+		sprintf(pszTmp, " [ %s ] [SIZE: %u bytes] [CRC32: %08X] \n", 
 			file_stat.m_filename,
 			(uint32_t)file_stat.m_uncomp_size, 
 			//(uint32_t)file_stat.m_comp_size,

@@ -39,15 +39,21 @@ void c_fbaRL::MainMenu_Frame()
 	float yPos		= 0.0485f;
 	float yPosDiff	= 0.0400f;	
 	float nFontSize = 1.0500f; // big text
+	uint32_t nColor = nTextColor;
 
-	if(nFrameStep == 0) { yPos += nShadowXYpos; xPos +=nShadowXYpos; }
+	if(nFrameStep == 0) { yPos += nShadowXYpos2; xPos += nShadowXYpos2; }
+	if(nFrameStep == 0) { nColor = nShadowColor; } // Shadow color
+
+	extern char ipaddress[256];
+	cellDbgFontPrintf(xPos + 0.0300f + (0.0600f * 2), yPos + 0.0100f + (yPosDiff * 2), nSmallSize, nColor, "ver: "_APP_VER" (ip: %s)", ipaddress);	
+
+	if(nFrameStep == 0) { yPos -= nShadowXYpos2; xPos -= nShadowXYpos2; } // reset shadow xy pos
+	if(nFrameStep == 0) { yPos += nShadowXYpos; xPos += nShadowXYpos; }
 
 	yPos += (yPosDiff * 4);		
 	yPosDiff = 0.0800f;
 
-	int nMenuItem = main_menu->UpdateTopItem();
-
-	uint32_t nColor = nTextColor;
+	int nMenuItem = main_menu->UpdateTopItem();	
 
 	while(nMenuItem <= (main_menu->nTopItem + main_menu->nListMax))
 	{
@@ -73,8 +79,8 @@ void c_fbaRL::MainMenu_Frame()
 void c_fbaRL::GameList_Frame()
 {
 	float xPos		= 0.0585f;
-	float yPos		= 0.0500f;
-	float yPosDiff	= 0.0185f;	
+	float yPos		= 0.0450f;
+	float yPosDiff	= 0.0200f;
 	float nFontSize = nSmallSize; // small text
 
 	if(nFrameStep == 0) { yPos += nShadowXYpos2; xPos += nShadowXYpos2; }
@@ -132,7 +138,7 @@ void c_fbaRL::GameList_Frame()
 			memset(pszFinalText, 0, 65);
 			memcpy(pszFinalText, fgames[nGame]->title, 64);
 
-			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\t[%d]\t%s",
+			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " [%d] %s",
 				nGame+1, 
 				pszFinalText
 			);
@@ -160,8 +166,9 @@ void c_fbaRL::GameList_Frame()
 		nFilteredGames
 	);
 
+	xPos = 0.0585f;
 	yPos = 0.7900f;
-	xPos = 0.0550f;
+	
 	if(nFrameStep == 0) { yPos += nShadowXYpos2; xPos += nShadowXYpos2; }
 	
 	nFontSize = nSmallSize; // small text
@@ -175,30 +182,35 @@ void c_fbaRL::GameList_Frame()
 		memset(pszTitle, 0, 65);
 		memcpy(pszTitle, fba_drv[nBurnSelected].szTitle, 64);
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tTITLE: %s", pszTitle);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " TITLE:       %s", pszTitle);
 		yPos += yPosDiff;
 
 		SAFE_FREE(pszTitle)
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tROMSET: %s", fba_drv[nBurnSelected].szName);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " ROMSET:      %s", fba_drv[nBurnSelected].szName);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tPARENT: %s", fba_drv[nBurnSelected].szParent);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " PARENT:      %s", fba_drv[nBurnSelected].szParent);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tCOMPANY: %s", fba_drv[nBurnSelected].szCompany);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " COMPANY:     %s", fba_drv[nBurnSelected].szCompany);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tYEAR: %s", fba_drv[nBurnSelected].szYear);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " YEAR:        %s", fba_drv[nBurnSelected].szYear);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tSYSTEM: %s", fba_drv[nBurnSelected].szSystem);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " SYSTEM:      %s", fba_drv[nBurnSelected].szSystem);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tMAX PLAYERS: %d", fba_drv[nBurnSelected].nMaxPlayers);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " MAX PLAYERS: %d", fba_drv[nBurnSelected].nMaxPlayers);
 		yPos += yPosDiff;
 
-		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "\tRESOLUTION: %d x %d (%d:%d)", fba_drv[nBurnSelected].nWidth, fba_drv[nBurnSelected].nHeight, fba_drv[nBurnSelected].nAspectX, fba_drv[nBurnSelected].nAspectY);
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, " RESOLUTION:  %d x %d (%d:%d)", 
+			fba_drv[nBurnSelected].nWidth, 
+			fba_drv[nBurnSelected].nHeight, 
+			fba_drv[nBurnSelected].nAspectX, 
+			fba_drv[nBurnSelected].nAspectY
+		);
 		yPos += yPosDiff;
 	}
 }
@@ -342,7 +354,7 @@ void c_fbaRL::Options_Frame()
 
 void c_fbaRL::FileBrowser_Frame()
 {
-	float xPos		= 0.0585f;
+	float xPos		= 0.0750f;
 	float yPos		= 0.0500f;
 	float yPosDiff	= 0.0200f;	
 	float nFontSize = nSmallSize2; // small text
@@ -363,9 +375,6 @@ void c_fbaRL::FileBrowser_Frame()
 	if(filebrowser->nTotalItem >= 1)
 	{			
 		yPos += yPosDiff;
-		xPos = 0.0700f;
-
-		if(nFrameStep == 0) { xPos +=nShadowXYpos2; }
 
 		int nMenuItem = filebrowser->UpdateTopItem();
 
@@ -394,7 +403,7 @@ void c_fbaRL::FileBrowser_Frame()
 void c_fbaRL::ZipInfo_Frame()
 {
 	float xPos		= 0.0400f;
-	float yPos		= 0.0500f;
+	float yPos		= 0.0440f;
 	float yPosDiff	= 0.0200f;	
 	float nFontSize = nSmallSize; // small text
 
@@ -417,7 +426,7 @@ void c_fbaRL::ZipInfo_Frame()
 
 		SAFE_FREE(pszZipName)
 
-			xPos = 0.0650f;
+		xPos = 0.0650f;
 		if(nFrameStep == 0) { xPos +=nShadowXYpos2; }
 
 		yPos += (yPosDiff * 3);

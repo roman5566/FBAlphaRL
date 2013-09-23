@@ -346,6 +346,12 @@ void c_fbaRL::InputFrame()
 					break;
 				}
 
+				if(nMenuItem == MENU_MAIN_IMANAGER)
+				{
+					nStatus = STATUS_EXIT_IMANAGER;
+					break;
+				}
+
 				// Exit
 				if(nMenuItem == MENU_MAIN_EXIT)
 				{

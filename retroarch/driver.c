@@ -916,6 +916,14 @@ void init_video_input(void)
    if (g_extern.filter.active)
       scale = g_extern.filter.scale;
 
+#ifdef _FBARL_
+   extern float g_fAspectRatio;
+   extern int g_nAspectRatio;
+   g_settings.video.aspect_ratio_idx = g_nAspectRatio;
+   g_settings.video.aspect_ratio = g_fAspectRatio;
+   g_extern.system.aspect_ratio = g_fAspectRatio;
+#endif
+
    g_extern.system.aspect_ratio = g_settings.video.aspect_ratio;
 
    if (g_extern.system.aspect_ratio < 0.0f)

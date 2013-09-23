@@ -2,7 +2,7 @@
 
 ---
 
-FB Alpha Retro Loader Core: v1.02a
+FB Alpha Retro Loader Core: v1.03
 
 RetroArch Core: v0.9.9.6
 
@@ -10,16 +10,14 @@ FB Alpha Core: v0.2.97.30
 
 ---
 
-![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/ICON0_zps2c5f3318.png)
-![Image Alt](http://i1341.photobucket.com/albums/o751/CaptainCPS-X/PIC1_small_zps511df5d7.png)
-![Image Alt](http://imageshack.us/a/img59/3016/fbalpharlbycaptaincpsx.png)
-![Image Alt](http://imageshack.us/a/img89/53/fbalpharlbycaptaincpsx1.png)
-![Image Alt](http://imageshack.us/a/img29/416/fbalpharlbycaptaincpsx2.png)
-![Image Alt](http://imageshack.us/a/img842/5853/fbalpharlbycaptaincpsx3.png)
-![Image Alt](http://imageshack.us/a/img831/2316/fbalpharlbycaptaincpsx4.png)
-![Image Alt](http://imageshack.us/a/img838/3436/fbalpharlbycaptaincpsx5.png)
-![Image Alt](http://imageshack.us/a/img96/1619/fbalpharlbycaptaincpsx6.png)
-![Image Alt](http://imageshack.us/a/img844/8631/fbalpharlbycaptaincpsx7.png)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2p8hB63UZpwO2HhixLFTTAYUukjSwOLCxTUMpAQ-UmqjeIf7o1T4J9CTse3eFWB0WL1WEfH78PA9cIklVaZSVVUtqHJqg2kEZqKwb7UWj_UxA/image_01.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2phSPVOiA9Oq3-lU2wrA8Ro6v3Rz5uZkXOfsOvWQc33R87enNrt5eHCxlHNVUiLalEWDRPo77Qx-knYq3SVKMw91-SC-eus0ZPwJnOaBF8WII/PIC1.PNG?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2ppllJNiBUizxc9vjgRmvidwPh1eAVSwuOI2U6PjVApjLCOjr_Cn5YT3geD0-i55NOY6x9fo_fUHhQrCYXYE2S-yuCpHxZe7iHsOE68mMABv0/RetroArch%20PS3_4.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2pS7wL8ldRoU16JG0JM9rJDUDDnwc3mX4a7NdZava1xnC2fIUIKzXGTxvJXXCogrRAhbOXgYskEyoFtPxGvUD8UeYHJWFb4Dcal8kPmV9etx8/RetroArch%20PS3_1.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2p6_yyQX1X5I7zgjqbWJHPWZQ_MaXTj6Hrx3g7FVp46zoET3rXssNLwuUCzpjDLXFFumD_AVtHecy1pq6e_jcnsmrJKn9ZKAk0iid6a7YSpe0/RetroArch%20PS3_5.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2pcMiV46tTXq2iOmLFMFT8NnCIX4GfmYq_MqE6vi5JHhgqG4r6QiVb72bXWzlJyydSIDR6XLXTh_IroSfT1pWYFODywx1hDnOvIlRzTrB63F4/RetroArch%20PS3_7.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2p4ZnxCo3Shu4O-0BBNGOUsQYfQtb88Jrygyxc3hCl2dqvV8iNfDqwOtFudPBurLZxp1xyuVdeoIcyagCSwaBZ9s-aNP2spJ7FgWZLEVGelok/RetroArch%20PS3_9.png?psid=1)
+![Image Alt](https://oab7sa.blu.livefilestore.com/y2pT199NUc7cHOLMIHY2SL3B4CQEwyHcLoN04BqhT5ZHaSsVaTFoj4_9I1BudavJGjfeb1KhRGf4IUad_gmgc8ZMErR9EfclR8MQcc57fUSM88/RetroArch%20PS3_8.png?psid=1)
 
 ### What is FB Alpha?:
 
@@ -172,7 +170,7 @@ install the official RetroArch and it won't interfere.
 
 ---
 
-1.02a (September 20, 2013)
+1.03 (September 22, 2013)
 
 - Signed for CFW 3.4X / 4.XX and tested on
 ```
@@ -180,6 +178,14 @@ install the official RetroArch and it won't interfere.
  
  - MiraLaTijera 4.40 (3.2.0)
 ```
+
+- Added version and IP address display on the Main Menu.
+
+- Whole new theme for this release of FB Alpha.
+
+- Added Iris Manager (official) to the Main Menu load options.
+
+- Added proper "Preview" image aspect ratio calculation.
 
 - Incorporated RetroArch and FBA libretro source code into
 FB Alpha RL Git, and with just one makefile everything is 
@@ -334,25 +340,10 @@ until compatibility is better(Megadrive, PCE, SNES).
  homebrew application.
 
 
-### FB Alpha Retro Loader v1.02 (BASE) Downloads:
+### FB Alpha Retro Loader v1.03 (BASE) Downloads:
 
 ---
 
-[CEX 3.40 / 4.XX] [Zippyshare] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
+[CEX 3.40 / 4.XX] [SkyDrive] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
 
-http://www21.zippyshare.com/v/94710861/file.html
-
-Thanks to @LoboGuara for these mirrors
-
-[CEX 3.40 / 4.XX] [Mediafire] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
-
-http://www.mediafire.com/download/t8464fjrc37x8t2/FB_ALPHA_RL_1.02_%5B20130915%5D_%5BCEX_340_4XX%5D_%5BBASE%5D.rar
-
-[CEX 3.40 / 4.XX] [MEGA] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
-
-https://mega.co.nz/#!LVtmyR4S!Qn2TaSUZqAs5NMhFr_hNXm1Mb0ESWA43FqzQkMY5_Wg
-
-[CEX 3.40 / 4.XX] [Rapidshare] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
-
-http://rapidshare.com/share/C039EDE51256A1AA304122A41A9BDD72
-
+https://skydrive.live.com/?cid=595F514B8B494F70&id=595F514B8B494F70!1780#cid=595F514B8B494F70&id=595F514B8B494F70!1807

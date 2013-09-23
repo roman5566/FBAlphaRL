@@ -344,6 +344,6 @@ until compatibility is better(Megadrive, PCE, SNES).
 
 ---
 
-[CEX 3.40 / 4.XX] [SkyDrive] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [57 MB]
+[CEX 3.40 / 4.XX] [SkyDrive] FB_ALPHA_RL_1.02_[20130915]_[CEX_340_4XX]_[BASE].rar [81.2 MB]
 
 https://skydrive.live.com/?cid=595F514B8B494F70&id=595F514B8B494F70!1780#cid=595F514B8B494F70&id=595F514B8B494F70!1807

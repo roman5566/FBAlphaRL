@@ -1,4 +1,4 @@
-// Driverlist Generated via custom FB Alpha [ v0.2.97.30 ][ Windows ]
+// Driverlist Generated via custom FB Alpha [ v0.2.97.30 ][Windows][by CaptainCPS-X]
 #include <stdio.h>
 #include <stdint.h>
 
@@ -20,7 +20,7 @@ struct FBA_DRV
 	char szSystemFilter[32];
 };
 
-FBA_DRV fba_drv[3183] = 
+FBA_DRV fba_drv[] = 
 { 
 	{ 0, "8ballact", " ", " ", "Eight Ball Action (DK conversion)", "1984", "Seatongrove Ltd (Magic Eletronics USA licence)", "Miscellaneous", 2, 256, 224, 4, 3, "MASKMISCPRE90S" }, 
 	{ 1, "bagman", " ", " ", "Bagman", "1982", "Valadon Automation", "Miscellaneous", 2, 224, 256, 3, 4, "MASKMISCPRE90S" }, 

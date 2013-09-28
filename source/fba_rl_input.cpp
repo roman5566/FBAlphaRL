@@ -68,6 +68,15 @@ void c_fbaRL::InputFrame()
 					}
 					break;
 				}
+
+				case SECTION_ROMINFO:
+				{
+					if(rominfo_menu->nSelectedItem > 0 && rominfo_menu->nSelectedItem <= rominfo_menu->nTotalItem) 
+					{
+						rominfo_menu->nSelectedItem--;
+					}
+					break;
+				}
 			}
 		}
 
@@ -122,6 +131,15 @@ void c_fbaRL::InputFrame()
 					if(zipinfo_menu->nSelectedItem >= 0 && zipinfo_menu->nSelectedItem < zipinfo_menu->nTotalItem-1) 
 					{
 						zipinfo_menu->nSelectedItem++;
+					}
+					break;
+				}
+
+				case SECTION_ROMINFO:
+				{
+					if(rominfo_menu->nSelectedItem >= 0 && rominfo_menu->nSelectedItem < rominfo_menu->nTotalItem-1) 
+					{
+						rominfo_menu->nSelectedItem++;
 					}
 					break;
 				}
@@ -366,7 +384,7 @@ void c_fbaRL::InputFrame()
 
 	// ------------------------------------------------------
 	// (O) - CIRCLE
-
+	
 	if (!app.mIsButtPressed[BT_CIRCLE] && app.buttPressedNow[BT_CIRCLE]) 
 	{
 		switch(nSection) 
@@ -395,6 +413,14 @@ void c_fbaRL::InputFrame()
 				break;
 			}
 
+			case SECTION_ROMINFO:
+			{
+				EndRomInfoMenu();
+				// no need to init GameList here...
+				nSection = SECTION_GAMELIST;
+				break;
+			}
+
 			case SECTION_OPTIONS:
 			{
 				iniWrite(); // save settings
@@ -412,15 +438,19 @@ void c_fbaRL::InputFrame()
 
 	if(!app.mIsButtPressed[BT_TRIANGLE] && app.buttPressedNow[BT_TRIANGLE])
 	{
-		switch(nSection) 
+		switch(nSection)
 		{
 			case SECTION_GAMELIST:
 			{
 				if(nFilteredGames < 1) break;
+				//if(!fgames[nSelectedGame]->bAvailable) break;
 
-				if(!fgames[nSelectedGame]->bAvailable) break;
+				InitRomInfoMenu();
+				nSection = SECTION_ROMINFO;
+				break;
 			}
 		}
+		
 	}
 
 	// ------------------------------------------------------
@@ -502,6 +532,16 @@ void c_fbaRL::InputFrame()
 					break;
 				}
 
+				case SECTION_ROMINFO:
+				{
+					rominfo_menu->nSelectedItem -= rominfo_menu->nListMax;
+
+					if(rominfo_menu->nSelectedItem < 0) {
+						rominfo_menu->nSelectedItem = 0;
+					}
+					break;
+				}
+
 				case SECTION_FILEBROWSER:
 				{
 					filebrowser->nSelectedItem -= filebrowser->nListMax;
@@ -556,6 +596,16 @@ void c_fbaRL::InputFrame()
 					}
 					break;
 				}
+
+				case SECTION_ROMINFO:
+				{
+					rominfo_menu->nSelectedItem += rominfo_menu->nListMax;
+
+					if(rominfo_menu->nSelectedItem > rominfo_menu->nTotalItem-1) {
+						rominfo_menu->nSelectedItem = rominfo_menu->nTotalItem-1;
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -572,16 +622,6 @@ void c_fbaRL::InputFrame()
 				nSection = SECTION_OPTIONS;
 				EndFileBrowser();
 				break;
-			}
-
-			case SECTION_GAMELIST: 
-			{
-				//iniWrite(); // save settings
-				//
-				//InitMainMenu();
-				//nSection = SECTION_MAIN;
-				//EndGameList();
-				//break;
 			}
 		}
 	}

@@ -199,6 +199,9 @@ void c_fbaRL::RenderBackground()
 	if(fbaRL->nSection == SECTION_ZIPINFO) {
 		app.textures[TEX_ZIP_INFO]->Render(0,0,0,0);
 	}
+	if(fbaRL->nSection == SECTION_ROMINFO) {
+		app.textures[TEX_ROM_INFO]->Render(0,0,0,0);
+	}
 	if(fbaRL->nSection == SECTION_OPTIONS) {
 		app.textures[TEX_OPTIONS]->Render(0,0,0,0);
 	}

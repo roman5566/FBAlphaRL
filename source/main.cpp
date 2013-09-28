@@ -19,6 +19,8 @@ void CapApp::initGraphics()
 	nTextures++;
 	textures[TEX_ZIP_INFO]		= new c_tex(nTextures, g_opt_szTextures[TEX_ZIP_INFO]);
 	nTextures++;
+	textures[TEX_ROM_INFO]		= new c_tex(nTextures, g_opt_szTextures[TEX_ROM_INFO]);
+	nTextures++;
 	textures[TEX_OPTIONS]		= new c_tex(nTextures, g_opt_szTextures[TEX_OPTIONS]);
 	nTextures++;
 	textures[TEX_FILEBROWSER]	= new c_tex(nTextures, g_opt_szTextures[TEX_FILEBROWSER]);

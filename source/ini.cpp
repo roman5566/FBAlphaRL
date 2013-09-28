@@ -46,6 +46,7 @@ char g_opt_szTextures[][2048] = {
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/MAIN_MENU.PNG",
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/GAME_LIST.PNG",
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/ZIP_INFO.PNG",
+	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/ROM_INFO.PNG",
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/OPTIONS_MENU.PNG",
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/FILE_BROWSER.PNG",
 	"/dev_hdd0/game/FBAL00123/USRDIR/cores/borders/default/PREVIEW.PNG"
@@ -195,12 +196,13 @@ int iniWrite()
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
 		fprintf(fp, "// Custom GUI Textures (PNG) paths \n");
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
-		fprintf(fp, "texture_main_menu:\"%s\"\n"	, g_opt_szTextures[0]);
-		fprintf(fp, "texture_gamelist:\"%s\"\n"		, g_opt_szTextures[1]);
-		fprintf(fp, "texture_zipinfo:\"%s\"\n"		, g_opt_szTextures[2]);
-		fprintf(fp, "texture_options:\"%s\"\n"		, g_opt_szTextures[3]);
-		fprintf(fp, "texture_filebrowser:\"%s\"\n"	, g_opt_szTextures[4]);
-		fprintf(fp, "texture_preview:\"%s\"\n"		, g_opt_szTextures[5]);
+		fprintf(fp, "texture_main_menu:\"%s\"\n"	, g_opt_szTextures[TEX_MAIN_MENU]);
+		fprintf(fp, "texture_gamelist:\"%s\"\n"		, g_opt_szTextures[TEX_GAME_LIST]);
+		fprintf(fp, "texture_zipinfo:\"%s\"\n"		, g_opt_szTextures[TEX_ZIP_INFO]);
+		fprintf(fp, "texture_rominfo:\"%s\"\n"		, g_opt_szTextures[TEX_ROM_INFO]);
+		fprintf(fp, "texture_options:\"%s\"\n"		, g_opt_szTextures[TEX_OPTIONS]);
+		fprintf(fp, "texture_filebrowser:\"%s\"\n"	, g_opt_szTextures[TEX_FILEBROWSER]);
+		fprintf(fp, "texture_preview:\"%s\"\n"		, g_opt_szTextures[TEX_PREVIEW]);
 		fprintf(fp, "\n");
 
 		fclose(fp);
@@ -589,27 +591,31 @@ int iniRead()
 		// -----------------------------------------------------------------------------------------
 		pszStrOption = getStrOption(fp, "texture_main_menu:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[0], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_MAIN_MENU], pszStrOption);
 
 		pszStrOption = getStrOption(fp, "texture_gamelist:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[1], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_GAME_LIST], pszStrOption);
 
 		pszStrOption = getStrOption(fp, "texture_zipinfo:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[2], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_ZIP_INFO], pszStrOption);
+
+		pszStrOption = getStrOption(fp, "texture_rominfo:\"");
+		if(pszStrOption == NULL) {return 0;}
+		strcpy(g_opt_szTextures[TEX_ROM_INFO], pszStrOption);
 
 		pszStrOption = getStrOption(fp, "texture_options:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[3], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_OPTIONS], pszStrOption);
 
 		pszStrOption = getStrOption(fp, "texture_filebrowser:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[4], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_FILEBROWSER], pszStrOption);
 
 		pszStrOption = getStrOption(fp, "texture_preview:\"");
 		if(pszStrOption == NULL) {return 0;}
-		strcpy(g_opt_szTextures[5], pszStrOption);
+		strcpy(g_opt_szTextures[TEX_PREVIEW], pszStrOption);
 
 		// -----------------------------------------------------------------------------------------
 

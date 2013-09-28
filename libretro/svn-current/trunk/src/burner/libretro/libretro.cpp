@@ -21,7 +21,7 @@ static bool g_opt_bUseUNIBIOS = false;
 #ifdef _FBARL_
 //#define _FBARL_DEBUG_		// comment this line to disable debug output
 
-#define FBARL_PATH			"/dev_hdd0/game/FBAL00123/USRDIR/FBA_RL.ini"
+#define FBARL_PATH			"/dev_hdd0/game/FBAL00123/USRDIR"
 #define FBARL_INI			FBARL_PATH"/FBA_RL.ini"
 #define FBARL_DBG_FILE		FBARL_PATH"/fbarl_debug.txt"
 

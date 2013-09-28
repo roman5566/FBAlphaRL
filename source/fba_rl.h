@@ -57,9 +57,10 @@ void _ScanROMs(uint64_t);
 #define SECTION_MAIN			0
 #define SECTION_GAMELIST		1
 #define SECTION_ZIPINFO			2
-#define SECTION_HELP			3
-#define SECTION_OPTIONS			4
-#define SECTION_FILEBROWSER		5
+#define SECTION_ROMINFO			3
+#define SECTION_HELP			4
+#define SECTION_OPTIONS			5
+#define SECTION_FILEBROWSER		6
 
 #define MENU_MAIN_GAMELIST		0
 #define MENU_MAIN_OPTIONS		1
@@ -500,6 +501,11 @@ public:
 	void		Options_Frame();
 	void		FileBrowser_Frame();
 	void		ZipInfo_Frame();
+
+	c_Menu*		rominfo_menu;
+	void		InitRomInfoMenu();
+	void		EndRomInfoMenu();
+	void		RomInfo_Frame();
 
 	void		InputFrame();
 	void		DlgDisplayFrame();

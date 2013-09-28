@@ -28,6 +28,9 @@ void c_fbaRL::DisplayFrame()
 	if(nSection == SECTION_ZIPINFO)	{
 		ZipInfo_Frame();
 	}
+	if(nSection == SECTION_ROMINFO)	{
+		RomInfo_Frame();
+	}
 	if(nSection == SECTION_MAIN) {
 		MainMenu_Frame();
 	}
@@ -448,6 +451,61 @@ void c_fbaRL::ZipInfo_Frame()
 			if(nFrameStep == 0) { nColor = nShadowColor; } // Shadow color
 
 			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "[%d] %s", nMenuItem+1, zipinfo_menu->item[nMenuItem]->szMenuLabel);
+			yPos += yPosDiff;
+
+			nMenuItem++;
+		}
+	}
+}
+
+void c_fbaRL::RomInfo_Frame()
+{
+	float xPos		= 0.0400f;
+	float yPos		= 0.0440f;
+	float yPosDiff	= 0.0200f;	
+	float nFontSize = nSmallSize; // small text
+
+	if(nFrameStep == 0) { yPos += nShadowXYpos2; xPos +=nShadowXYpos2; }
+
+	// normal
+	uint32_t nColor	= nTextColor;
+
+	if(nFrameStep == 0) { nColor = nShadowColor; } // Shadow color
+
+	if(nFilteredGames >= 1)
+	{		
+		char* pszZipName = NULL;
+		pszZipName = (char*)malloc(33);
+		memset(pszZipName, 0, 33);
+		memcpy(pszZipName, fgames[nSelectedGame]->zipname, 32);
+
+		cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "ROMSET: %s / TOTAL ROMS: %d", pszZipName, rominfo_menu->nTotalItem);
+		yPos += yPosDiff;
+
+		SAFE_FREE(pszZipName)
+
+		xPos = 0.0650f;
+		if(nFrameStep == 0) { xPos +=nShadowXYpos2; }
+
+		yPos += (yPosDiff * 3);
+
+		int nMenuItem = rominfo_menu->UpdateTopItem();
+
+		while(nMenuItem <= (rominfo_menu->nTopItem + rominfo_menu->nListMax))
+		{
+			if(nMenuItem == rominfo_menu->nTotalItem) break;
+
+			// normal
+			nColor = nTextColor;
+
+			// selected
+			if(nMenuItem == rominfo_menu->nSelectedItem) {
+				nColor = nSelectColor;
+			}
+
+			if(nFrameStep == 0) { nColor = nShadowColor; } // Shadow color
+
+			cellDbgFontPrintf(xPos, yPos, nFontSize, nColor, "[%d] %s", nMenuItem+1, rominfo_menu->item[nMenuItem]->szMenuLabel);
 			yPos += yPosDiff;
 
 			nMenuItem++;

@@ -50,9 +50,10 @@
 #define TEX_MAIN_MENU	0
 #define TEX_GAME_LIST	1
 #define TEX_ZIP_INFO	2
-#define TEX_OPTIONS		3
-#define TEX_FILEBROWSER	4
-#define TEX_PREVIEW		5
+#define TEX_ROM_INFO	3
+#define TEX_OPTIONS		4
+#define TEX_FILEBROWSER	5
+#define TEX_PREVIEW		6
 
 // Button organized by values ( ex. (1<<0), (1<<1), etc... )
 #define BT_SELECT	0 

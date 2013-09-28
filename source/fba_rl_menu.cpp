@@ -161,3 +161,354 @@ void c_fbaRL::EndZipInfoMenu()
 {
 	SAFE_DELETE(zipinfo_menu)
 }
+
+// TEMP
+#define ROMINFO_DB	"/dev_hdd0/game/FBAL00123/USRDIR/fbarl-rominfo.txt"
+
+#define _getBasicInfo(out)				\
+	pch = strchr(pszLine, ';');			\
+	if(pch) {							\
+		int sep	= (int)(pch-pszLine);	\
+		memset(&out, 0, sizeof(out));	\
+		strncpy(out, pszLine, sep);		\
+	}
+
+#define _getline()						\
+	memset(pszLine, 0, 2048+1);			\
+	fgets(pszLine, 2048, fp);			
+
+struct BurnRomInfo {
+	char szName[64];
+	uint32_t nLen;
+	uint32_t nCrc;
+	char szType[128];
+};
+
+struct BurnSampleInfo {
+	char szName[64];
+	uint32_t nFlags;
+};
+
+struct FBA_ROMINFO {
+	unsigned int nDrv;
+	char szName[32];
+	char szBoardrom[32];
+	
+	BurnRomInfo roms[100];
+	unsigned int nRoms;
+	
+	BurnRomInfo board_roms[100];
+	unsigned int nBoardRoms;
+	
+	BurnSampleInfo samples_info[100];
+	unsigned int nSamples;
+};
+
+int getRominfo(FILE* fp, char* szRomset, FBA_ROMINFO *rinfo)
+{
+	if(!fp) return NULL;
+
+	rewind(fp);
+
+	char* pszLine = NULL;
+	pszLine = (char*)malloc(2048+1);
+	memset(pszLine, 0, 2048+1);
+	
+	FBA_ROMINFO rominfo;
+	memset(&rominfo, 0, sizeof(FBA_ROMINFO));
+
+	while (!feof(fp)) 
+	{
+		_getline();
+
+		// end of database
+		if(strncmp("<//EOF>", pszLine, 7) == 0) { break; }
+
+		// ignore comments
+		if(strncmp("//", pszLine, 2) == 0) { continue; }
+		
+		// rominfo segment end
+		if(strncmp("<//>", pszLine, 4) == 0) { rominfo.nDrv++; continue; }
+
+		// rominfo segment start
+		if(strncmp("<--->", pszLine, strlen("<--->")) == 0) 
+		{
+			char* pch = NULL;
+
+			_getline();
+			char szTmp[16] = { 0 };
+			_getBasicInfo(szTmp);
+			sscanf(szTmp, "%d", &rominfo.nDrv);
+
+			_getline();
+			_getBasicInfo(rominfo.szName);
+
+			if(strcmp(rominfo.szName, szRomset) == 0) 
+			{
+				_getline();
+				_getBasicInfo(rominfo.szBoardrom);
+
+				_getline(); // <--- this line is a comment
+				_getline();
+
+				if(pszLine[0] == '{')
+				{
+					rominfo.nRoms = 0;
+
+					while (pszLine[0] != '}')
+					{
+						_getline();
+						if(pszLine[0] == '}') break;
+
+						int nField = 0;
+
+						pch = strtok(pszLine, "/");
+						while (pch != NULL) 
+						{
+							if(pch[0] == '\n') break;
+
+							switch(nField)
+							{
+								// rom name
+								case 0:
+								{
+									strcpy(rominfo.roms[rominfo.nRoms].szName, pch);
+									break;
+								}
+								// rom size (bytes)
+								case 1:
+								{
+									char szTmp[32] = { 0 };
+									strcpy(szTmp, pch);
+									sscanf(szTmp, "%d", &rominfo.roms[rominfo.nRoms].nLen);
+									break;
+								}
+								// crc32 (hex)
+								case 2:
+								{
+									char szTmp[32] = { 0 };
+									strcpy(szTmp, pch);
+									sscanf(szTmp, "%X", &rominfo.roms[rominfo.nRoms].nCrc);
+									break;
+								}
+								// ROM Type
+								case 3:
+								{
+									strcpy(rominfo.roms[rominfo.nRoms].szType, pch);
+									break;
+								}
+							} // switch
+
+							pch = strtok(NULL, "/");
+							nField++;
+						} // while
+						rominfo.nRoms++;
+					} // while
+				} // if
+
+				_getline(); // <--- this line is a comment
+				_getline();
+
+				if(pszLine[0] == '{')
+				{
+
+					rominfo.nBoardRoms = 0;
+					while (pszLine[0] != '}')
+					{
+						_getline();
+						if(pszLine[0] == '}') break;
+						if(strncmp(pszLine, "NULL/", strlen("NULL/"))==0) break;
+
+						int nField = 0;
+
+						pch = strtok(pszLine, "/");
+						while (pch != NULL) 
+						{
+							if(pch[0] == '\n') break;
+
+							switch(nField)
+							{
+								// rom name
+								case 0:
+								{
+									strcpy(rominfo.board_roms[rominfo.nBoardRoms].szName, pch);
+									break;
+								}
+								// rom size (bytes)
+								case 1:
+								{
+									char szTmp[32] = { 0 };
+									strcpy(szTmp, pch);
+									sscanf(szTmp, "%d", &rominfo.board_roms[rominfo.nBoardRoms].nLen);
+									break;
+								}
+								// crc32 (hex)
+								case 2:
+								{
+									char szTmp[32] = { 0 };
+									strcpy(szTmp, pch);
+									sscanf(szTmp, "%X", &rominfo.board_roms[rominfo.nBoardRoms].nCrc);
+									break;
+								}
+								// ROM Type
+								case 3:
+								{
+									strcpy(rominfo.board_roms[rominfo.nBoardRoms].szType, pch);
+									break;
+								}
+							} // switch
+							pch = strtok(NULL, "/");
+							nField++;
+						} // while
+						rominfo.nBoardRoms++;
+					} // while
+				} // if
+
+				_getline(); // <--- this line is a comment
+				_getline();
+
+				if(pszLine[0] == '{')
+				{
+					rominfo.nSamples = 0;
+					while (pszLine[0] != '}')
+					{
+						_getline();
+						if(pszLine[0] == '}') break;
+						if(strncmp(pszLine, "NULL/", strlen("NULL/"))==0) break;
+
+						int nField = 0;
+
+						pch = strtok(pszLine, "/");
+						while (pch != NULL) 
+						{
+							if(pch[0] == '\n') break;
+
+							switch(nField)
+							{
+								// sample name
+								case 0:
+								{
+									strcpy(rominfo.samples_info[rominfo.nSamples].szName, pch);
+									break;
+								}
+								// sample flags
+								case 1:
+								{
+									char szTmp[32] = { 0 };
+									strcpy(szTmp, pch);
+									sscanf(szTmp, "%d", &rominfo.samples_info[rominfo.nSamples].nFlags);
+									break;
+								}
+							} // switch
+							pch = strtok(NULL, "/");
+							nField++;
+						} // while
+						rominfo.nSamples++;
+					} // while
+				} // if
+				
+				memcpy(rinfo, &rominfo, sizeof(FBA_ROMINFO));
+				return 1;				
+			} // if	
+		} // if
+	} // while
+	return 0;
+}
+
+void c_fbaRL::InitRomInfoMenu()
+{
+	if(nFilteredGames < 1) return;
+
+	rominfo_menu = new c_Menu(34);
+
+// ---
+
+	FILE* fp = NULL;
+	fp = fopen(ROMINFO_DB, "r");
+
+	if(fp) 
+	{
+		FBA_ROMINFO *rominfo = NULL;
+		rominfo = (FBA_ROMINFO*) malloc(sizeof(FBA_ROMINFO));
+		memset(rominfo, 0, sizeof(FBA_ROMINFO)); 
+
+		int nLen = strlen(fgames[nSelectedGame]->zipname);
+		char szRomset[32] = {0};
+		strncpy(szRomset, fgames[nSelectedGame]->zipname, nLen-4); // without ".zip"
+		if(!getRominfo(fp, szRomset, rominfo)) {
+			//printf("ROM info not found on database...\n"); 
+		} else {
+			// ---------------------------
+			// DEBUG OUTPUT
+			// ---------------------------
+
+			//printf("-- driver basic info --\n");
+
+			/*printf(
+				"nDrv: %d\n"
+				"Name: %s\n"
+				"Boardrom: %s\n", 
+				rominfo->nDrv, 
+				rominfo->szName, 
+				rominfo->szBoardrom
+				);
+				*/
+			//printf("-- roms --\n");
+
+			for(unsigned int n = 0; n < rominfo->nRoms; n++)
+			{
+				char* pszTmp = NULL;
+				pszTmp = (char*)malloc(1024);
+				memset(pszTmp, 0, 1024);
+		
+				sprintf(pszTmp,
+					"[ %s ][SIZE: %d bytes][CRC32: %X]", 
+					rominfo->roms[n].szName, 
+					rominfo->roms[n].nLen, 
+					rominfo->roms[n].nCrc
+				);
+
+				rominfo_menu->AddItem((char*)pszTmp);
+				SAFE_FREE(pszTmp)
+			}
+
+			//printf("-- board roms --\n");
+
+			for(unsigned int n = 0; n < rominfo->nBoardRoms; n++)
+			{
+				char* pszTmp = NULL;
+				pszTmp = (char*)malloc(1024);
+				memset(pszTmp, 0, 1024);
+
+				sprintf(pszTmp,
+					"[ %s ][SIZE: %d bytes][CRC32: %X]",
+					rominfo->board_roms[n].szName, 
+					rominfo->board_roms[n].nLen, 
+					rominfo->board_roms[n].nCrc
+				);
+
+				rominfo_menu->AddItem((char*)pszTmp);
+				SAFE_FREE(pszTmp)
+			}
+
+			//printf("-- samples --\n");
+			/*
+			for(int n = 0; n < rominfo->nSamples; n++){
+				printf(
+					"[ %s ][ %d ]", 
+					rominfo->samples_info[n].szName, 
+					rominfo->samples_info[n].nFlags
+				);
+			}
+			*/
+		}
+
+		fclose(fp);
+		fp = NULL;
+	}
+}
+
+void c_fbaRL::EndRomInfoMenu()
+{
+	SAFE_DELETE(rominfo_menu)
+}

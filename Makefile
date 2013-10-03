@@ -1,18 +1,30 @@
 # -----------------------------------------------------------------
 # FB Alpha Retro Loader Makefile (CaptainCPS-X, 2013)
 # -----------------------------------------------------------------
+
+# Change this line with your specific Python installation path
+PYTHON_PATH			= /c/Python27
+
+# If you have other tool paths put them here
+MY_BIN_TOOLS		= $(CURDIR)/bin
+
+# Update PATH environment variable with required changes
+export PATH 		:= $(PATH):$(PYTHON_PATH):$(MY_BIN_TOOLS)
+
 SDK_VERSION			?=	3_4_0
 CELL_SDK			?=	/usr/local/cell
 CELL_MK_DIR 		?= $(CELL_SDK)/samples/mk
 
-MAKE_FSELF 			?= $(CELL_SDK)/host-win32/bin/make_fself.exe
-MAKE_FSELF_NPDRM 	?= $(CELL_SDK)/host-win32/bin/make_fself_npdrm.exe
-MAKE_PACKAGE_NPDRM 	?= $(CELL_SDK)/host-win32/bin/make_package_npdrm.exe
-PSN_PKG_NPDRM 		?= $(CURDIR)/bin/psn_package_npdrm
+# This will create PKGs properly
+# "psn_package_npdrm" only add specific files and directories,
+# but for example, will not add "MANUAL" directory if present.
+PKG			 		?= pkg.py
 
 APP_NAME			?=	FB_ALPHA_RL
-APP_VER				?=	1.03
+APP_VER				?=	1.04
 DATE 				?=	$(shell date +"%Y%m%d")
+
+CONTENTID			?= FBARAL-FBAL00123_00-0000000000000000
 
 RARCH_PATH			=	retroarch
 FBARL_PATH			=	$(CURDIR)
@@ -33,7 +45,7 @@ MAKE_SELF_NPDRM	= scetool.exe \
 --self-type=NPDRM \
 --self-fw-version=0003004000000000 \
 --np-license-type=FREE \
---np-content-id=FBARAL-FBAL00123_00-0000000000000000 \
+--np-content-id=$(CONTENTID) \
 --np-app-type=EXEC \
 --np-real-fname="EBOOT.BIN" \
 --np-klicensee=72F990788F9CFF745725F08E4C128387 \
@@ -216,7 +228,7 @@ pkg:
 	@echo "Preparing BASE PKG..."
 	@echo "---------------------------------------------------------------------------"
 	@echo "|"
-	@$(PSN_PKG_NPDRM) release/package.conf release/PS3_GAME/ >nul 2>&1
+	$(PKG) --contentid $(CONTENTID) $(CURDIR)/release/PS3_GAME/ $(CURDIR)/$(CONTENTID).pkg
 	@mv *.pkg release/$(APP_NAME)_$(APP_VER)_[$(DATE)]_[CEX_34X_4XX]_[BASE].pkg
 	@echo "Done!"
 
@@ -226,7 +238,19 @@ pkg_upd:
 	@echo "Preparing PKG..."
 	@echo "---------------------------------------------------------------------------"
 	@echo "|"
-	@$(PSN_PKG_NPDRM) release_upd/package.conf release_upd/PS3_GAME/ >nul 2>&1
+	$(PKG) --contentid $(CONTENTID) $(CURDIR)/release_upd/PS3_GAME/ $(CURDIR)/$(CONTENTID).pkg
 	@mv *.pkg release_upd/$(APP_NAME)_$(APP_VER)_[$(DATE)]_[CEX_34X_4XX]_[UPD].pkg
+	@echo "Done!"
+	
+SM_RELEASE = SOFTWARE_MANUAL_R1
+
+pkg_manual:
+	@echo "|"
+	@echo "---------------------------------------------------------------------------"
+	@echo "Preparing SOFTWARE MANUAL PKG..."
+	@echo "---------------------------------------------------------------------------"
+	@echo "|"
+	$(PKG) --contentid $(CONTENTID) $(CURDIR)/manual_pkg/PS3_GAME/ $(CURDIR)/$(SM_RELEASE).pkg
+	@mv *.pkg manual_pkg/$(APP_NAME)_$(SM_RELEASE).pkg
 	@echo "Done!"
 

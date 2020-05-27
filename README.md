@@ -1,4 +1,4 @@
-#### Final Burn Neo Retro Loader Plus [by CrystalCT, 2020 and CaptainCPS-X, 2013]
+# Final Burn Neo Retro Loader Plus [by CrystalCT, 2020 and CaptainCPS-X, 2013]
 
 ---
 
@@ -6,10 +6,11 @@ FB Neo Retro Loader Plus Core: v2.00
 
 RetroArch Core: v1.8.5
 
-FB Neo Core: v0.2.97.44 (e9fdba2d1); 
-Genesis Plus GX Core: v1.7.4 (5055106); 
-Snes9x Core v1.60 (0a89725); 
-Mame 0.125 for PS3 by Ole;
+FB Neo Core: v0.2.97.44 (e9fdba2d1);<br/> 
+Genesis Plus GX Core: v1.7.4 (5055106);<br/> 
+Snes9x Core v1.60 (0a89725);<br/>  
+Mame 0.125 for PS3 by Ole;<br/>
+.
 
 ---
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/ICON0.PNG)

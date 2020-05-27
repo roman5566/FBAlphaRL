@@ -29,13 +29,13 @@ Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 * List of games and data (descriptions, trivial, etc etc) in a SQLite DB;
 * New games list page;
 * Added titles of each game, in addition to the snaps preview;
-* Background music in MP3 format, 4 tracks already present, but editable by the user, by inserting and/or deleting MP3s in the "/dev_hdd0/game/FBNE00123/USRDIR/soundtracks" folder - change tracks using :but l3: and :but r3:;
+* Background music in MP3 format, 4 tracks already present, but editable by the user, by inserting and/or deleting MP3s in the "/dev_hdd0/game/FBNE00123/USRDIR/soundtracks" folder - change tracks using [L3] and [R3];
 * Added background music ON/OFF option in the options list;
-* Re-written the page of Rom info ( :but tri: button) with various info and trivial;
+* Re-written the page of Rom info ( /\ button) with various info and trivial;
 * Cheats enabled for MAME125 core;
 * Ultra fast search/scan roms.
 * Video resolutions supported only 1920x1080 and 1280x720.
-* Favorite list added (add or remove a game from the favorite list using :but select: button);
+* Favorite list added (add or remove a game from the favorite list using [Select] button);
 * Favorite list saved in a separate DB so as not to be overwritten by future updates;
 * Compatibility with Sega32 arcade system via the MAME125 core;
 * Added cheat (.CHT) files for the FBNEO core in the "/dev_hdd0 /game/FBNE00123/USRDIR/core/cheats/FBNeo - Arcade Games" folder;

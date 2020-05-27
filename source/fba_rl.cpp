@@ -1,13 +1,13 @@
 ﻿// ========================================================================================================
-// FB Alpha Retro Loader (CaptainCPS-X, 2013)
+// FB Neo Retro Loader Plus (CaptainCPS-X, 2013) - (CrystalCT, 2020)
 // ========================================================================================================
 /*
 
 Custom RETROARCH changes for FB Alpha RL (v1.XX):
 
-* platform_ps3.c 
+* platform_ps3.c
 
-	- Changed custom RetroArch "EMULATOR_CONTENT_DIR" macro to "FBAL00123" (previously set to "SSNE10000"),
+	- Changed custom RetroArch "EMULATOR_CONTENT_DIR" macro to "FBNE00123" (previously set to "SSNE10000"),
 	this will allow this custom RetroArch to be independent from an existing RetroArch installation
 	on the PS3.
 
@@ -15,7 +15,7 @@ Custom RETROARCH changes for FB Alpha RL (v1.XX):
 
 	Note: Arguments should be passed as follows (argv[])
 
-		> Argument 1 :	This should have a ROM / ZIP valid path in case of loading a game. 
+		> Argument 1 :	This should have a ROM / ZIP valid path in case of loading a game.
 		Or could just be a dummy argument.
 
 		> Argument 2 :	This should have the path of the external Application RELOAD.SELF
@@ -37,42 +37,68 @@ Custom RETROARCH changes for FB Alpha RL (v1.XX):
 	- Modified / Added menu items for in-game menu and main menu so RetroArch display the
 	proper name if launched from FB Alpha RL (Ex. "Return to FB alpha RL").
 
-* Makefile.ps3 
-	
+* Makefile.ps3
+
 	- edited with custom signing using scetool for Salamander / CORE
 
 ========================================================================================================*/
 
 //#define FBARL_DEBUG
+#include <lv2/sysfs.h>
+#include <net/netctl.h>
 #include "main.h"
 
 c_fbaRL* fbaRL;
 
-char ipaddress[256] = "255.255.255.255"; //ipv4
+char ipaddress[256] = "0.0.0.0"; //ipv4
 
-c_fbaRL::c_fbaRL() 
+c_fbaRL::c_fbaRL(bool StartWithGamesList)
 {
-	CellNetCtlInfo info;
-	cellNetCtlGetInfo(CELL_NET_CTL_INFO_IP_ADDRESS, &info);
-	strcpy(ipaddress, info.ip_address);
+	////CellNetCtlInfo info;
+	///cellNetCtlGetInfo(CELL_NET_CTL_INFO_IP_ADDRESS, &info);
+	///strcpy(ipaddress, info.ip_address);
+	union net_ctl_info netctl_info;
+	netCtlGetInfo(NET_CTL_INFO_IP_ADDRESS, &netctl_info);
+	if (netctl_info.ip_address != NULL)
+        strcpy(ipaddress, netctl_info.ip_address);
 
 	nFrameStep = 0; // for text shadow
 
 	nBurnSelected = -1;
 
 	bProcessingGames = false;
+	nSection = SECTION_MAIN;
 
-	MakeRetroDirs((char*)"/dev_hdd0/game/FBAL00123/USRDIR");
-	
-	if(DirExist((char*)"/dev_hdd0/game/FBAL00123/USRDIR")) 
+	MakeRetroDirs((char*)"/dev_hdd0/game/FBNE00123/USRDIR");
+
+	/*////if(dirExist((char*)"/dev_hdd0/game/FBNE00123/USRDIR"))
 	{
 		MakeRetroDirs((char*)"/dev_hdd0/game/SSNE10000/USRDIR");
-	}
+	}////*/
 
 	if(g_opt_bAutoInputCfgCreate) {
 		CreateAllInputCFG();
 	}
 
-	InitMainMenu();
-	nSection = SECTION_MAIN;
+
+
+	//InitMainMenu(); // CRYSTAL START
+	if (StartWithGamesList) {
+		//printf("StartwithFileSection = TRUE\n");
+		//InitMainMenu();
+		//EndMainMenu();
+		//InitGameList();
+        //fbaRL->InitGameList();
+        //InitFilterList();
+		nSection = SECTION_GAMELIST;
+		//EndMainMenu();
+	}
+	else {
+		//printf("StartwithFileSection = FALSE\n");
+
+		InitMainMenu();
+
+	} //CRYSTAL END
 }
+
+

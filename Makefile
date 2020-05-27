@@ -1,256 +1,215 @@
-# -----------------------------------------------------------------
-# FB Alpha Retro Loader Makefile (CaptainCPS-X, 2013)
-# -----------------------------------------------------------------
-
-# Change this line with your specific Python installation path
-PYTHON_PATH			= /c/Python27
-
-# If you have other tool paths put them here
-MY_BIN_TOOLS		= $(CURDIR)/bin
-
-# Update PATH environment variable with required changes
-export PATH 		:= $(PATH):$(PYTHON_PATH):$(MY_BIN_TOOLS)
-
-SDK_VERSION			?=	3_4_0
-CELL_SDK			?=	/usr/local/cell
-CELL_MK_DIR 		?= $(CELL_SDK)/samples/mk
-
-# This will create PKGs properly
-# "psn_package_npdrm" only add specific files and directories,
-# but for example, will not add "MANUAL" directory if present.
-PKG			 		?= pkg.py
-
-APP_NAME			?=	FB_ALPHA_RL
-APP_VER				?=	1.04
-DATE 				?=	$(shell date +"%Y%m%d")
-
-CONTENTID			?= FBARAL-FBAL00123_00-0000000000000000
-
-RARCH_PATH			=	retroarch
-FBARL_PATH			=	$(CURDIR)
-FBA_LIBRETRO_PATH	=	libretro/svn-current/trunk
-
-MAKE_SELF = bin/make_self.exe
-
-MAKE_SELF_NPDRM	= scetool.exe \
---sce-type=SELF \
---compress-data=TRUE \
---skip-sections=FALSE \
---key-revision=04 \
---self-ctrl-flags=4000000000000000000000000000000000000000000000000000000000000002 \
---self-auth-id=1010000001000003 \
---self-app-version=0001000000000000 \
---self-add-shdrs=TRUE \
---self-vendor-id=01000002 \
---self-type=NPDRM \
---self-fw-version=0003004000000000 \
---np-license-type=FREE \
---np-content-id=$(CONTENTID) \
---np-app-type=EXEC \
---np-real-fname="EBOOT.BIN" \
---np-klicensee=72F990788F9CFF745725F08E4C128387 \
---np-add-sig=FALSE \
---encrypt
-
-# -----------------------------------------------------------------
-
-ifneq ($(LINUX),1)
-ifneq ($(WIN32),1)
-export CELL=1
-export COLLADA_DOM_PLATFORM=CELL
+#---------------------------------------------------------------------------------
+# Clear the implicit built in rules
+#---------------------------------------------------------------------------------
+.SUFFIXES:
+#---------------------------------------------------------------------------------
+ifeq ($(strip $(PSL1GHT)),)
+$(error "Please set PSL1GHT in your environment. export PSL1GHT=<path>")
 endif
+ifeq ($(strip $(PORTLIBS)),)
+$(error "Please set PORTLIBS in your environment.")
 endif
 
-PPU_CWARNFLAGS		?= $(CWARNFLAGS_L1)
-PPU_CXXWARNFLAGS	?= $(CXXWARNFLAGS_L1)
+include $(PSL1GHT)/ppu_rules
 
-include $(CELL_MK_DIR)/sdk.makedef.mk
+#---------------------------------------------------------------------------------
+# TARGET is the name of the output
+# BUILD is the directory where object files & intermediate files will be placed
+# SOURCES is a list of directories containing source code
+# INCLUDES is a list of directories containing extra header files
+#---------------------------------------------------------------------------------
+TARGET		:=	$(notdir $(CURDIR))
+BUILD		:=	build
+SOURCES		:=	source source/ftp
+DATA		:=	data
+INCLUDES	:=	include
+PKGFILES	:=	$(CURDIR)/pkgfiles
 
-## PSGL specific
-PPU_LDLIBDIR		+= -L$(PPU_PSGL_LIBDIR) 
+TITLE		:=	FB NEO RL Plus
+APPID		:=	FBNE00123
+CONTENTID	:=	FBNEOO-$(APPID)_00-0000000000000000
+ICON0		:=	ICON0.PNG
+ICON1		:=	ICON1.PAM
+PIC1		:=	PIC1.PNG
+SFOXML		:=	sfo.xml
+APP_VER		:=	2.00
 
-## FW specific
-CELL_FW_DIR			?=$(CELL_SDK)/samples/fw
+#---------------------------------------------------------------------------------
+# options for code generation
+#---------------------------------------------------------------------------------
 
-PPU_LDLIBDIR		+= -L$(CELL_FW_DIR) -Lsource/zlib
+CFLAGS		=	-O2 -Wall -mcpu=cell $(MACHDEP) $(INCLUDE)
+CXXFLAGS	=	$(CFLAGS)
 
-ifeq ($(CELL_PSGL_VERSION),gcmhud)
-GRAPHICS_SAMPLE_CORE_LIBS = -lPSGLFX -lPSGL -lPSGLU -lgcm_hud -lgcm_pm \
-							-lsysmodule_stub -lusbd_stub -lio_stub -lm \
-							-lstdc++ -lsysutil_stub -lfs_stub -lsheap_stub \
-							-ldbgfont -lresc_stub -lperf
+LDFLAGS		=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
+
+#---------------------------------------------------------------------------------
+# any extra libraries we wish to link with the project
+#---------------------------------------------------------------------------------
+LIBS	:=	-lgcm_sys -lrsx -lcairo -lsysutil -lio -laudioplayer -lmpg123 -logg \
+			-lm -lnetctl -lnet -lfreetype -lzip -lz -lpixman-1 \
+			-lrt -llv2 -lsysmodule -lpng -lpngdec -ljpgdec -lps3sqlite -lsysfs -lspu_sound -laudio -I$(PORTLIBS)/modules/lib/spu_soundmodule.bin.a
+
+#---------------------------------------------------------------------------------
+# list of directories containing libraries, this must be the top level containing
+# include and lib
+#---------------------------------------------------------------------------------
+LIBDIRS	:= $(PORTLIBS)
+
+#---------------------------------------------------------------------------------
+# no real need to edit anything past this point unless you need to add additional
+# rules for different file extensions
+#---------------------------------------------------------------------------------
+ifneq ($(BUILD),$(notdir $(CURDIR)))
+#---------------------------------------------------------------------------------
+
+export OUTPUT	:=	$(CURDIR)/$(TARGET)
+
+export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+
+export DEPSDIR	:=	$(CURDIR)/$(BUILD)
+
+export BUILDDIR	:=	$(CURDIR)/$(BUILD)
+
+#---------------------------------------------------------------------------------
+# automatically build a list of object files for our project
+#---------------------------------------------------------------------------------
+CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
+CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
+sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
+SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.bin)))
+PNGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.png)))
+JPGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.jpg)))
+TTFFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.ttf)))
+VCGFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.vcg)))
+FCGFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.fcg)))
+
+#---------------------------------------------------------------------------------
+# use CXX for linking C++ projects, CC for standard C
+#---------------------------------------------------------------------------------
+ifeq ($(strip $(CPPFILES)),)
+	export LD	:=	$(CC)
 else
-GRAPHICS_SAMPLE_CORE_LIBS = -lPSGLFX -lPSGL -lPSGLU -lm -lusbd_stub -lfs_stub \
-							-lio_stub -lsysutil_stub -ldbgfont -lresc_stub \
-							-lgcm_cmd -lgcm_sys_stub -lsysmodule_stub -lperf
+	export LD	:=	$(CXX)
 endif
 
-PPU_INCDIRS			+= -I$(CELL_FW_DIR)/include
+export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
+			$(addsuffix .o,$(TTFFILES)) \
+			$(addsuffix .o,$(VPOFILES)) \
+			$(addsuffix .o,$(FPOFILES)) \
+			$(addsuffix .o,$(PNGFILES)) \
+			$(addsuffix .o,$(JPGFILES)) \
+					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
+					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
-# build everything without exceptions so you can link with fw
-PPU_CXXSTDFLAGS 	+= -DDATA_IN_HOME_DIR
-GCC_PPU_CXXSTDFLAGS += -fno-exceptions
-GCC_PPU_LDFLAGS     += -fno-exceptions
+#---------------------------------------------------------------------------------
+# build a list of include paths
+#---------------------------------------------------------------------------------
+export INCLUDE	:=	-I$(PORTLIBS)/include/freetype2 \
+			$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
+					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+					$(LIBPSL1GHT_INC) \
+					-I$(CURDIR)/$(BUILD)
 
-## PSGL samples specific
-COLLADA_DOM_DIR		= $(CELL_SDK)/samples/COLLADA_DOM
+#---------------------------------------------------------------------------------
+# build a list of library paths
+#---------------------------------------------------------------------------------
+export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
+					$(LIBPSL1GHT_LIB) -L$(PORTLIBS)/lib \
 
-# where to build the graphics data to
-CELL_GRAPHICS_DATA_DIR	= $(CELL_DATA_DIR)/graphics
+export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
-ifeq ($(NO_OPTIMIZATIONS),1)
-PPU_OPTIMIZE_LV = 
-endif 
+.PHONY: $(BUILD) clean
 
-PPU_CSTDFLAGS 	+= -std=gnu99
+#---------------------------------------------------------------------------------
+$(BUILD):
+	@[ -d $@ ] || mkdir -p $@
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-# --------------------------------------------------------------
+#---------------------------------------------------------------------------------
+clean:
+	@echo clean ...
+	@rm -fr $(BUILD) *.elf *.self *.pkg *~ */*~
 
-PPU_INCDIRS		+= 	-I$(CELL_FW_DIR)/include \
-					-Iinclude \
-					-Isource \
-					-Isource/miniz \
-					-Isource/rarch \
-					-Isource/zlib \
-					-Isource/ftp
-					
-PPU_LIBS		+= $(CELL_FW_DIR)/libfw.a
-PPU_LDLIBS		:= $(GRAPHICS_SAMPLE_CORE_LIBS) \
-					-lz \
-					-lsysutil_screenshot_stub \
-					-lnet_stub \
-					-lnetctl_stub
+#---------------------------------------------------------------------------------
+run:
+	ps3load $(OUTPUT).self
 
-PPU_CPPFLAGS	+= -DPSGL -DHAVE_ZLIB_DEFLATE -DMINIZ_NO_ZLIB_COMPATIBLE_NAMES
-PPU_CXXSTDFLAGS	+= -fno-exceptions
+#---------------------------------------------------------------------------------
+pkg: npdrm
+	$(VERB) echo building pkg ... $(notdir $@)
+	$(VERB) cp -f $(CURDIR)/../EBOOT.BIN $(CURDIR)/../pkg/USRDIR/EBOOT.BIN
+	$(VERB) cp -f $(CURDIR)/../$(TARGET).self $(CURDIR)/../pkg/USRDIR/RELOAD.SELF
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkg/PARAM.SFO
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkg/ $(TARGET)_$(APP_VER).pkg >> /dev/null
+#---------------------------------------------------------------------------------
 
-PPU_SRCS		= 	source/miniz/miniz.cpp \
-					source/main.cpp \
-					source/input.cpp \
-					source/misc.cpp \
-					source/burn_drivers.cpp \
-					source/fba_rl.cpp \
-					source/fba_rl_burndrv.cpp \
-					source/fba_rl_dialogs.cpp \
-					source/fba_rl_filebrowser.cpp \
-					source/fba_rl_gamelist_filter.cpp \
-					source/fba_rl_gamelist_parse.cpp \
-					source/fba_rl_input.cpp \
-					source/fba_rl_menu.cpp \
-					source/fba_rl_render.cpp \
-					source/fba_rl_section.cpp \
-					source/fba_rl_utility.cpp \
-					source/ini.cpp \
-					source/cfg.cpp \
-					source/rarch/image.cpp \
-					source/rarch/rpng.cpp \
-					source/ftp/ftp.cpp \
-					source/ftp/ftpcmd.cpp \
-					source/ftp/functions.cpp
+pkgsnes: npdrm
+	$(VERB) echo building SNES upgrade pkg ... $(notdir $@)
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgSnes/PARAM.SFO
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgSnes/ $(TARGET)_$(APP_VER)_snes_upgrade.pkg >> /dev/null
+#---------------------------------------------------------------------------------
 
-PPU_SRCS		+=	source/zlib/adler32.c \
-					source/zlib/compress.c \
-					source/zlib/crc32.c \
-					source/zlib/deflate.c \
-					source/zlib/gzclose.c \
-					source/zlib/gzlib.c \
-					source/zlib/gzread.c \
-					source/zlib/gzwrite.c \
-					source/zlib/infback.c \
-					source/zlib/inffast.c \
-					source/zlib/inflate.c \
-					source/zlib/inftrees.c \
-					source/zlib/trees.c \
-					source/zlib/uncompr.c \
-					source/zlib/zutil.c
-					
-PPU_TARGET		:= EBOOT.ELF
+pkgmd: npdrm
+	$(VERB) echo building Mega Drive upgrade pkg ... $(notdir $@)
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgMD/PARAM.SFO
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgMD/ $(TARGET)_$(APP_VER)_megadrive_upgrade.pkg >> /dev/null
+#---------------------------------------------------------------------------------
 
-include $(CELL_MK_DIR)/sdk.target.mk
+npdrm: $(BUILD)
+	@$(SELF_NPDRM) $(SCETOOL_FLAGS) --np-content-id=$(CONTENTID) --encrypt $(BUILDDIR)/$(basename $(notdir $(OUTPUT))).elf $(BUILDDIR)/../EBOOT.BIN
+	$(VERB) cp -f $(CURDIR)/$(TARGET).self $(CURDIR)/RELOAD.SELF
+else
 
-_cleanup: clean
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Cleaning all cores (please wait)..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	@cd $(FBA_LIBRETRO_PATH); make --no-print-directory -f makefile.libretro clean; cd ..
-	@rm -fr $(FBA_LIBRETRO_PATH)/fb_alpha_libretro_ps3.a
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3.salamander clean; cd ..
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3.rgl clean; cd ..
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3 clean; cd ..
-	@rm -fr $(RARCH_PATH)/libretro_ps3.a
-	@rm -fr $(OBJS_DIR)
-	
-_libretro:
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Building FB Alpha libretro core..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-#	make -f ./makefile.libretro clean
-	@cd $(FBA_LIBRETRO_PATH); make --no-print-directory -f makefile.libretro -j4 platform=ps3; cd ..
-	@rm -fr $(RARCH_PATH)/libretro_ps3.a
-	@cp -fr $(FBA_LIBRETRO_PATH)/fb_alpha_libretro_ps3.a $(RARCH_PATH)/libretro_ps3.a
-	
-_retroarch:
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Building RetroArch modified core..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3.salamander; cd ..
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3.rgl; cd ..
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3 clean; cd ..
-	@cd $(RARCH_PATH); make --no-print-directory -f Makefile.ps3; cd ..
-	@rm -fr release/PS3_GAME/USRDIR/cores/fb_alpha.SELF release_upd/PS3_GAME/USRDIR/cores/fb_alpha.SELF
-	@$(MAKE_SELF) $(RARCH_PATH)/retroarch_ps3.elf release/PS3_GAME/USRDIR/cores/fb_alpha.SELF
-	@cp -fr release/PS3_GAME/USRDIR/cores/fb_alpha.SELF release_upd/PS3_GAME/USRDIR/cores/fb_alpha.SELF
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Building FB Alpha Retro Loader..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	
-fbarl: _libretro _retroarch $(PPU_TARGET)
-	@$(PPU_STRIP) -s $(PPU_TARGET) -o $(OBJS_DIR)/$(PPU_TARGET)
-	@rm $(PPU_TARGET)
-	@rm -fr release/PS3_GAME/USRDIR/RELOAD.SELF release_upd/PS3_GAME/USRDIR/RELOAD.SELF
-	@$(MAKE_SELF) objs/EBOOT.ELF release/PS3_GAME/USRDIR/RELOAD.SELF
-	@cp -fr release/PS3_GAME/USRDIR/RELOAD.SELF release_upd/PS3_GAME/USRDIR/RELOAD.SELF
-	@cd bin; $(MAKE_SELF_NPDRM) ../objs/EBOOT.ELF ../release/PS3_GAME/USRDIR/EBOOT.BIN; cd ..
-	@cp -fr release/PS3_GAME/USRDIR/EBOOT.BIN release_upd/PS3_GAME/USRDIR/EBOOT.BIN	
-	@echo "Done!"
+DEPENDS	:=	$(OFILES:.o=.d)
 
-pkg:
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Preparing BASE PKG..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	$(PKG) --contentid $(CONTENTID) $(CURDIR)/release/PS3_GAME/ $(CURDIR)/$(CONTENTID).pkg
-	@mv *.pkg release/$(APP_NAME)_$(APP_VER)_[$(DATE)]_[CEX_34X_4XX]_[BASE].pkg
-	@echo "Done!"
+#---------------------------------------------------------------------------------
+# main targets
+#---------------------------------------------------------------------------------
+$(OUTPUT).self: $(OUTPUT).elf
+$(OUTPUT).elf:	$(OFILES)
 
-pkg_upd:
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Preparing PKG..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	$(PKG) --contentid $(CONTENTID) $(CURDIR)/release_upd/PS3_GAME/ $(CURDIR)/$(CONTENTID).pkg
-	@mv *.pkg release_upd/$(APP_NAME)_$(APP_VER)_[$(DATE)]_[CEX_34X_4XX]_[UPD].pkg
-	@echo "Done!"
-	
-SM_RELEASE = SOFTWARE_MANUAL_R1
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .bin extension
+#---------------------------------------------------------------------------------
+%.bin.o	:	%.bin
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 
-pkg_manual:
-	@echo "|"
-	@echo "---------------------------------------------------------------------------"
-	@echo "Preparing SOFTWARE MANUAL PKG..."
-	@echo "---------------------------------------------------------------------------"
-	@echo "|"
-	$(PKG) --contentid $(CONTENTID) $(CURDIR)/manual_pkg/PS3_GAME/ $(CURDIR)/$(SM_RELEASE).pkg
-	@mv *.pkg manual_pkg/$(APP_NAME)_$(SM_RELEASE).pkg
-	@echo "Done!"
+#---------------------------------------------------------------------------------
+%.ttf.o	:	%.ttf
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 
+#---------------------------------------------------------------------------------
+%.vpo.o	:	%.vpo
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+
+#---------------------------------------------------------------------------------
+%.fpo.o	:	%.fpo
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+
+#---------------------------------------------------------------------------------
+%.jpg.o	:	%.jpg
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+#---------------------------------------------------------------------------------
+%.png.o	:	%.png
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+
+-include $(DEPENDS)
+
+#---------------------------------------------------------------------------------
+endif
+#---------------------------------------------------------------------------------

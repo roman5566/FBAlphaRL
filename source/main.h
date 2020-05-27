@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 // ---------------------------------------------------------------------
-// FB Alpha Retro Loader (CaptainCPS-X, 2013)
+// FB Neo Retro Loader Plus (CaptainCPS-X, 2013) - (CrystalCT, 2020)
 // ---------------------------------------------------------------------
 #include <iostream>
 #include <math.h>
@@ -10,54 +10,28 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <inttypes.h>
-//
-#include <netex/libnetctl.h>
-#include <netex/net.h>
-//
-#include <PSGL/psgl.h>
-#include <PSGL/psglu.h>
-//
-#include <sysutil/sysutil_common.h>
-#include <sysutil/sysutil_msgdialog.h>
-#include <sysutil/sysutil_sysparam.h>  // used for cellVideoOutGetResolutionAvailability() and videoOutIsReady()
-#include <sysutil/sysutil_screenshot.h>
-//
-#include <sys/spu_initialize.h>
-#include <sys/memory.h>
-#include <sys/paths.h>
-#include <sys/process.h>
-#include <sys/stat.h>
-#include <sys/ppu_thread.h>
-//
-#include <cell/cell_fs.h>
-//#include <cell/fios/fios_scheduler.h>
-#include <cell/sysmodule.h>
-#include <cell/pad.h>
-#include <cell/dbgfont.h>
-//
-#include "FWInput.h"
-#include "FWDebugFont.h"
+#include <rsx/gcm_sys.h>
+#include <rsx/rsx.h>
+#include "rsxutil.h"
+#include <io/pad.h>
+#include <sysutil/video.h>
+#include "sqlite.h"
 
 //
-#define COLOR_ORANGE	0xff1780f8
-#define COLOR_GREEN		0xff00ff00
-#define COLOR_YELLOW	0xff00ccff
-#define COLOR_RED		0xff0000ff
-#define COLOR_WHITE		0xffffffff
-#define COLOR_BLACK		0xff000000
-
+#define TOTAL_CORES         5
 //
-#define TEX_MAIN_MENU	0
-#define TEX_GAME_LIST	1
-#define TEX_ZIP_INFO	2
-#define TEX_ROM_INFO	3
-#define TEX_OPTIONS		4
-#define TEX_FILEBROWSER	5
-#define TEX_PREVIEW		6
+#define TEX_MAIN_MENU		0
+#define TEX_GAME_LIST		1
+#define TEX_ZIP_INFO		2
+#define TEX_ROM_INFO		3
+#define TEX_OPTIONS			4
+#define TEX_FILEBROWSER		5
+#define TEX_PREVIEW			6
+#define TEX_PREVIEW_TITLES	7
 
 // Button organized by values ( ex. (1<<0), (1<<1), etc... )
-#define BT_SELECT	0 
-#define BT_L3		1	
+#define BT_SELECT	0
+#define BT_L3		1
 #define BT_R3		2
 #define BT_START	3
 #define BT_UP		4
@@ -77,83 +51,145 @@
 #include "misc.h"
 #include "ini.h"
 #include "fba_rl.h"
-#include "ftp.h"
-#include "miniz.h"
 
-extern "C" 
+#include "miniz.h"
+#include "hashmap.h"
+
+#define DIRPATH01   "/dev_hdd0/ROMS/fba"
+#define DIRPATH02	"/dev_hdd0/ROMS/"
+#define DIRPATH03	"/dev_hdd0/game/ROMS00000/USRDIR"
+#define DIRPATH04	"/dev_hdd0/game/ROMS00000/USRDIR/roms"
+#define DIRPATH05	"/dev_hdd0/game/ROMS00000/USRDIR/roms/fba"
+#define DIRPATH06	"/dev_hdd0/game/ROMS00000/USRDIR/fba"
+#define DIRPATH07	"/dev_hdd0/game/FBNE00123/USRDIR/cores/roms"
+#define DIRPATH08	"/dev_hdd0/game/FBNE00123/USRDIR/cores/roms/fba"
+#define DIRPATH09	"/dev_hdd0/game/SSNE10000/USRDIR/cores/roms"
+#define DIRPATH10	"/dev_hdd0/game/SSNE10000/USRDIR/cores/roms/fba"
+#define DIRPATH11	"/dev_hdd0/game/FBNE00123/USRDIR/cores/roms"
+#define DIRPATH12	"/dev_hdd0/game/FBNE00123/USRDIR/cores/roms"
+#define NDIRPATH    12
+
+#define DIR_SKIP_DOT			1			//dont include "."
+#define DIR_SKIP_DOTDOT			2			//dont include ".."
+#define DIR_FILES				4			//include files
+#define DIR_DIRS				0x10		//include directories
+#define DIR_SKIP_HIDDEN			0x20		//skip entries starting with "." besides dot and dotdot
+#define DIR_NO_DOT_AND_DOTDOT	( DIR_SKIP_DOT | DIR_SKIP_DOTDOT )
+
+#define MAX_BUFFERS 2
+
+typedef unsigned int u32;
+typedef unsigned short u16;
+typedef unsigned char u8;
+
+typedef struct FBA_DRV_S
 {
-	extern bool		mm_shutdown;
-	extern uint8_t	ftp_clients;
-}
+	char szName[128];
+	char szParent[128];
+	char szBoardROM[32];
+	char szTitle[256];
+	char szYear[8];
+	char szCompany[96];
+	char szSystem[32];
+	char szSubSystem[32];
+	char szResolution[11];
+	char szAspectRatio[8];
+	uint32_t nGameID;
+	uint32_t nGameOrderID;
+	uint32_t nMaxPlayers;
+	uint32_t nDefCoreID;
+	uint32_t nCoreID;
+	char szSystemFilter[32];
+	bool isClone;
+	bool isAvailable;
+	bool isFavorite;
+	char key_string[KEY_MAX_LENGTH];
+} FBA_DRV;
+
+typedef struct FBA_GAMES_S
+{
+	char szPath[256];
+	char key_string[KEY_MAX_LENGTH];
+} FBA_GAMES;
+
 
 class c_tex
 {
 public:
 	uint32_t				nTexture;
 	char*					pszTexPath;
-	GLuint					nTexId[1];
-	struct texture_image	_texture;
 	bool bTextureOK;
+	pngData 				*png;
+	pngData                 *pngSec;
 
 	c_tex(uint32_t _nTexture, char* szPath);
-	void Render(GLuint x, GLuint y, GLsizei w, GLsizei h);
-	int BindTexture(char* pszPath); 
+	c_tex(uint32_t _nTexture, uint32_t display_mode);
+	void Render(u16 x, u16 y, u16 w, u16 h);
+	int BindSecTexture(char* pszPath);
+	c_tex(uint32_t _nTexture, unsigned width, unsigned height);
+	int BindTexture(char* pszPath);
 	~c_tex();
 
 };
 
+using namespace std;
+
 class CapApp
 {
-public:	
+public:
 	CapApp();
 	~CapApp() { }
 
 	bool bRun;
+	gcmContextData*             context;
+	int						    nTextures;
+	c_tex**					    textures;
+	char                        cores[TOTAL_CORES][32];
+    FBA_DRV*                    fba_drv;
+    map_t                       drvMap;
+    FBA_GAMES*                  fba_games;
+    map_t                       gamesMap;
+	unsigned int			    deviceWidth, deviceHeight;
+	void *					    host_addr;
+	rsxBuffer 				    buffers[MAX_BUFFERS];
+	int 					    currentBuffer;
+	videoState                  state;
+	u16 					    width;
+	u16 					    height;
+	padInfo 				    padinfo;
+	padData 				    paddata;
+	vector<string>              tracks;
+	vector<string>::iterator    trackID;
+	FILE *                      ftrack;
 
-	int						nTextures;
-	c_tex**					textures;
-	GLfloat					normals[12];
-	GLfloat					squareVertices[8];
-	GLfloat					texCoords[8];
-
-	struct PSGLdevice*		device;
-	struct PSGLcontext*		context;
-	GLuint					renderWidth, renderHeight;
-	unsigned int			deviceWidth, deviceHeight;
-	
 	void initGraphics();
+	void initSPUSound();
+	void deinitSPUSound();
+	int  InitDB();
+	void Flip();
+	void FlipSimple();
+	void remakegamesMaps();
 
 	bool ftp_service;
-
-	void ftp_on() {
-		if(ftp_service) { return; }
-		ftp_service = 1;
-		ftp_clients = 0;
-		main_ftp(0);
-	}
-
-	void ftp_off() {
-		if(!ftp_service) { return; }
-		ftp_service = 0;
-		ftp_clients = 0;
-		main_ftp(1);
-	}
 
 	bool		onInit(int argc, char **argv);
 	void		onRender();
 	void		onShutdown();
 	bool		onUpdate();
-	
-	void		dbgFontInit();
-	void		dbgFontDraw();
-	void		dbgFontExit();
+
+	void		FontInit();
+
 
 	uint64_t	mFrame;
+
+	uint32_t    nTotalBurnDrivers;
+	uint32_t    nTotalGamesWithDup;
+	uint32_t    nMissingGames;
 
 	// input
 	bool		mIsButtPressed[16];
 	bool		buttPressedNow[16];
-	
+
 	uint32_t	mValRStickX, mValRStickY;
 	uint32_t	mValLStickX, mValLStickY;
 

@@ -1,7 +1,8 @@
 // ---------------------------------------------------------------------
-// FB Alpha Retro Loader (CaptainCPS-X, 2013)
+// FB Neo Retro Loader Plus (CaptainCPS-X, 2013) - (CrystalCT, 2020)
 // ---------------------------------------------------------------------
 #include "main.h"
+#include <io/pad.h>
 
 void CapApp::InputFrameStart()
 {
@@ -17,24 +18,7 @@ void CapApp::InputFrameEnd()
 
 int CapApp::InputInit()
 {
-	// Init GamePad
-	int ret = 0;
-
-	ret = cellSysmoduleLoadModule( CELL_SYSMODULE_IO );
-	if ( ret != CELL_OK ) {
-		//FILE* fp = fopen("/dev_hdd0/game/PSGL00123/USRDIR/inputlog.txt", "w");
-		//if(fp) fprintf(fp, "input module failed \n");
-		//if(fp) fclose(fp);
-		return ret;
-	}
-
-	ret = cellPadInit( 7 );
-	if ( ret != CELL_PAD_OK ) {
-		//FILE* fp = fopen("/dev_hdd0/game/PSGL00123/USRDIR/inputlog.txt", "w");
-		//if(fp) fprintf(fp, "pad init failed \n");
-		//if(fp) fclose(fp);
-		return ret;
-	}
+	ioPadInit(7);
 
 	return 0;
 }
@@ -58,6 +42,94 @@ int CapApp::InputInit()
 
 int CapApp::npad_read()
 {
+	//Check the pads / Get gamepads information
+	ioPadGetInfo(&padinfo);
+
+	// Use controller 0 for operation (for now)
+	if(padinfo.status[0]){
+			ioPadGetData(0, &paddata);
+
+			//buttPressedNow[BT_X] = true;
+			if(paddata.BTN_START)
+				buttPressedNow[BT_START] = true;
+			else
+				buttPressedNow[BT_START] = false;
+			if(paddata.BTN_SELECT)
+				buttPressedNow[BT_SELECT] = true;
+			else
+				buttPressedNow[BT_SELECT] = false;
+			if(paddata.BTN_L3)
+				buttPressedNow[BT_L3] = true;
+			else
+				buttPressedNow[BT_L3] = false;
+			if(paddata.BTN_R3)
+				buttPressedNow[BT_R3] = true;
+			else
+				buttPressedNow[BT_R3] = false;
+			if(paddata.BTN_UP)
+				buttPressedNow[BT_UP] = true;
+			else
+				buttPressedNow[BT_UP] = false;
+			if(paddata.BTN_RIGHT)
+				buttPressedNow[BT_RIGHT] = true;
+			else
+				buttPressedNow[BT_RIGHT] = false;
+			if(paddata.BTN_DOWN)
+				buttPressedNow[BT_DOWN] = true;
+			else
+				buttPressedNow[BT_DOWN] = false;
+			if(paddata.BTN_LEFT)
+				buttPressedNow[BT_LEFT] = true;
+			else
+				buttPressedNow[BT_LEFT] = false;
+			if(paddata.BTN_L2)
+				buttPressedNow[BT_L2] = true;
+			else
+				buttPressedNow[BT_L2] = false;
+			if(paddata.BTN_R2)
+				buttPressedNow[BT_R2] = true;
+			else
+				buttPressedNow[BT_R2] = false;
+			if(paddata.BTN_L1)
+				buttPressedNow[BT_L1] = true;
+			else
+				buttPressedNow[BT_L1] = false;
+			if(paddata.BTN_R1)
+				buttPressedNow[BT_R1] = true;
+			else
+				buttPressedNow[BT_R1] = false;
+			if(paddata.BTN_TRIANGLE)
+				buttPressedNow[BT_TRIANGLE] = true;
+			else
+				buttPressedNow[BT_TRIANGLE] = false;
+			if(paddata.BTN_CIRCLE)
+				buttPressedNow[BT_CIRCLE] = true;
+			else
+				buttPressedNow[BT_CIRCLE] = false;
+			if(paddata.BTN_CROSS)
+				buttPressedNow[BT_CROSS] = true;
+			else
+				buttPressedNow[BT_CROSS] = false;
+			if(paddata.BTN_SQUARE)
+				buttPressedNow[BT_SQUARE] = true;
+			else
+				buttPressedNow[BT_SQUARE] = false;
+
+			mValRStickX = (uint32_t)paddata.ANA_R_H;
+			mValRStickY = (uint32_t)paddata.ANA_R_V;
+			mValLStickX = (uint32_t)paddata.ANA_L_H;
+			mValLStickY = (uint32_t)paddata.ANA_L_V;
+			/*if(paddata.BTN_START){
+					goto end;
+				}*/
+	}
+	else {
+		printf("Error: No Pads present.\n");
+		return 0;
+	}
+
+	//}
+	/*////
 	int32_t nRet = CELL_PAD_OK;
 
 	// Get gamepads information
@@ -113,13 +185,13 @@ int CapApp::npad_read()
 		}
 
 	} else {
-		// todo: report user to connect a controller 
+		// todo: report user to connect a controller
 	}
-
+*/
 	return 1;
 }
 
 void CapApp::InputExit()
 {
-	cellPadEnd();
+	ioPadEnd();
 }

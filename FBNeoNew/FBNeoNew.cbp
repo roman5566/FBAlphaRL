@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="FBNeoNew" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/FBNeoNew" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/FBNeoNew" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../source/fba_rl.cpp" />
+		<Unit filename="../source/fba_rl.h" />
+		<Unit filename="../source/fba_rl_burndrv.cpp" />
+		<Unit filename="../source/fba_rl_dialogs.cpp" />
+		<Unit filename="../source/fba_rl_filebrowser.cpp" />
+		<Unit filename="../source/fba_rl_gamelist_filter.cpp" />
+		<Unit filename="../source/fba_rl_gamelist_parse.cpp" />
+		<Unit filename="../source/fba_rl_input.cpp" />
+		<Unit filename="../source/fba_rl_menu.cpp" />
+		<Unit filename="../source/fba_rl_render.cpp" />
+		<Unit filename="../source/fba_rl_section.cpp" />
+		<Unit filename="../source/fba_rl_utility.cpp" />
+		<Unit filename="../source/fbneorlplus_main.cpp" />
+		<Unit filename="../source/fnt35.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../source/fnt35.h" />
+		<Unit filename="../source/fnt_print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../source/fnt_print.h" />
+		<Unit filename="../source/ftp/ftp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../source/ftp/ftp.h" />
+		<Unit filename="../source/hashmap.cpp" />
+		<Unit filename="../source/hashmap.h" />
+		<Unit filename="../source/image.h" />
+		<Unit filename="../source/ini.cpp" />
+		<Unit filename="../source/ini.h" />
+		<Unit filename="../source/input.cpp" />
+		<Unit filename="../source/main.h" />
+		<Unit filename="../source/miniz.h" />
+		<Unit filename="../source/misc.cpp" />
+		<Unit filename="../source/misc.h" />
+		<Unit filename="../source/rsxutil.cpp" />
+		<Unit filename="../source/rsxutil.h" />
+		<Unit filename="../source/soundlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../source/sqlite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../source/sqlite.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

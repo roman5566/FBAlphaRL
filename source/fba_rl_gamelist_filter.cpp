@@ -3,25 +3,25 @@
 
 #include "main.h"
 
-char szSysFilter[MASKALL][256] = { 
+char szSysFilter[MASKALL][256] = {
 	"MASKCAPMISC"		,"MASKCAVE"		,"MASKCPS"		,"MASKCPS2",
 	"MASKCPS3"			,"MASKDATAEAST"	,"MASKGALAXIAN"	,"MASKIREM",
 	"MASKKANEKO"		,"MASKKONAMI"	,"MASKNEOGEO"	,"MASKPACMAN",
-	"MASKPGM"			,"MASKPSIKYO"	,"MASKSEGA"		,"MASKSETA",
+	"MASKPGM"			,"MASKPSIKYO"	,"MASKSEGA"		,"MASKSEG32", "MASKSETA",
 	"MASKTAITO"			,"MASKTECHNOS"	,"MASKTOAPLAN"	,"MASKMISCPRE90S",
-	"MASKMISCPOST90S"	
+	"MASKMISCPOST90S", "MASKMIDWAY"	,"MASKSNES", "MASKMEGADRIVE", "MASKFAVORITE"
 	//,"MASKMEGADRIVE","MASKPCENGINE"	,"MASKSNES"
 };
 
-bool bSysFilter[MASKCUSTOM+1] = 
+bool bSysFilter[MASKCUSTOM+1] =
 {
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
-	true,
-	true,true // <--- fillers
+	true,true,true,true,
+	true,true,true,true // <--- fillers
 };
 
 int c_fbaRL::GetSystemMaskId(char* szMask)
@@ -38,6 +38,7 @@ int c_fbaRL::GetSystemMaskId(char* szMask)
 
 char* c_fbaRL::GetSystemFilter(int nFilter)
 {
+
 	char* pszFilter = NULL;
 	pszFilter = (char*)malloc(256);
 	memset(pszFilter, 0, 256);
@@ -59,27 +60,30 @@ char* c_fbaRL::GetSystemFilter(int nFilter)
 		case 12:  strcpy(pszFilter, "Poly Game Master (PGM)"); break;
 		case 13:  strcpy(pszFilter, "Psikyo"); break;
 		case 14:  strcpy(pszFilter, "Sega"); break;
-		case 15:  strcpy(pszFilter, "Seta"); break;
-		case 16:  strcpy(pszFilter, "Taito"); break;
-		case 17:  strcpy(pszFilter, "Technos"); break;
-		case 18:  strcpy(pszFilter, "Toaplan"); break;
-		case 19:  strcpy(pszFilter, "Misc Pre 90\'s"); break;
-		case 20:  strcpy(pszFilter, "Misc Post 90\'s"); break;
+		case 15:  strcpy(pszFilter, "Sega32"); break;
+		case 16:  strcpy(pszFilter, "Seta"); break;
+		case 17:  strcpy(pszFilter, "Taito"); break;
+		case 18:  strcpy(pszFilter, "Technos"); break;
+		case 19:  strcpy(pszFilter, "Toaplan"); break;
+		case 20:  strcpy(pszFilter, "Misc Pre 90\'s"); break;
+		case 21:  strcpy(pszFilter, "Misc Post 90\'s"); break;
 		//case 21:  strcpy(pszFilter, "Megadrive"); break;
-		//case 22:  strcpy(pszFilter, "PC Engine"); break;
-		//case 23:  strcpy(pszFilter, "SNES"); break;
-		case 21:  strcpy(pszFilter, "All Systems"); break;
-		case 22:  strcpy(pszFilter, "Custom System Filter"); break;
+		case 22:  strcpy(pszFilter, "Midway"); break;
+		case 23:  strcpy(pszFilter, "SNES"); break;
+		case 24:  strcpy(pszFilter, "Mega Drive"); break;
+		case 25:  strcpy(pszFilter, "Favorite"); break;
+		case 26:  strcpy(pszFilter, "All Games"); break;
+		case 27:  strcpy(pszFilter, "Custom Filter"); break;
 	}
+
 	return pszFilter;
 }
 
 void c_fbaRL::NextSysFilter()
 {
 	bProcessingGames = true;
-
-	// custom --> first single filter
-	if(g_opt_nActiveSysFilter == MASKCUSTOM)	
+    // custom --> first single filter
+	if(g_opt_nActiveSysFilter == MASKCUSTOM)
 	{
 		g_opt_nActiveSysFilter = 0;
 
@@ -96,7 +100,7 @@ void c_fbaRL::NextSysFilter()
 	}
 
 	// show all --> custom
-	if(g_opt_nActiveSysFilter == MASKALL)	
+	if(g_opt_nActiveSysFilter == MASKALL)
 	{
 		g_opt_nActiveSysFilter = MASKCUSTOM;
 
@@ -132,7 +136,7 @@ void c_fbaRL::PrevSysFilter()
 	bProcessingGames = true;
 
 	// custom --> show all
-	if(g_opt_nActiveSysFilter == MASKCUSTOM)	
+	if(g_opt_nActiveSysFilter == MASKCUSTOM)
 	{
 		g_opt_nActiveSysFilter = MASKALL;
 
@@ -149,7 +153,7 @@ void c_fbaRL::PrevSysFilter()
 	}
 
 	// first single filter --> custom
-	if(g_opt_nActiveSysFilter == 0)	
+	if(g_opt_nActiveSysFilter == 0)
 	{
 		g_opt_nActiveSysFilter = MASKCUSTOM;
 
@@ -182,12 +186,12 @@ void c_fbaRL::PrevSysFilter()
 
 bool c_fbaRL::FilterGame(char* szSystemMask)
 {
-	// show all?
+    // show all?
 	if(g_opt_nActiveSysFilter == MASKALL) {
 		return true;
 	}
 
-	if(g_opt_nActiveSysFilter == MASKCUSTOM) 
+	if(g_opt_nActiveSysFilter == MASKCUSTOM)
 	{
 		// filter...
 		for(uint32_t n=0; n < sizeof(bSysFilter)-2; n++)
@@ -204,6 +208,7 @@ bool c_fbaRL::FilterGame(char* szSystemMask)
 
 	}
 
+
 	if(strcmp(szSystemMask, szSysFilter[g_opt_nActiveSysFilter]) == 0)
 	{
 		return true;
@@ -214,7 +219,17 @@ bool c_fbaRL::FilterGame(char* szSystemMask)
 
 void c_fbaRL::InitFilterList()
 {
+	//printf("InitFilterList START - app.nTotalGamesWithDup: %d\n",app.nTotalGamesWithDup);
+//	printf("Total games with dup: %d\n", app.nTotalGamesWithDup);
 	bProcessingGames = true;
+    hashmap_map *drvmap, *gamesmap;
+    FBA_DRV *fba_drv;
+    FBA_GAMES *fba_games;
+    drvmap = (hashmap_map *) app.drvMap;
+    gamesmap =  (hashmap_map *) app.gamesMap;
+    uint32_t hashmap_position;
+    char key[KEY_MAX_LENGTH];
+    int ret = 0;
 
 	nBurnSelected = -1;
 
@@ -222,37 +237,72 @@ void c_fbaRL::InitFilterList()
 	nGameListTop = 0;
 	nFilteredGames = 0;
 
+//    printf("Games available: %d\n", nTotalGames);
 	fgames = (c_game**)malloc(sizeof(c_game) * MAX_GAMES);
+	if (fgames == NULL)
+        printf("Memory error fgames\n");
+//    else
+//        printf("Malloc Fgames OK\n");
 	//memset(fgames, 0, sizeof(c_game) * MAX_GAMES);
 
 	// process...
-	
-	for(int n=0; n < nTotalGames; n++) 
+    if (nTotalGames == 0) {
+		bProcessingGames = false;
+		return;
+	}
+
+	for(int n=0; n < (int) app.nTotalGamesWithDup; n++)
 	{
 		if(!g_opt_bDisplayMissingGames && !games[n]->bAvailable)
 		{
 			continue;
 		}
 
-		if(FilterGame(games[n]->sysmask) == false)
+		//favorite?
+        if(g_opt_nActiveSysFilter == MASKFAVORITE) {
+            if (!games[n]->isFavorite)
+                    continue;
+        }
+		else
+            if(FilterGame(games[n]->sysmask) == false)
+            {
+                continue;
+            }
+
+		if (!g_opt_bDisplayCloneGames && !!games[n]->isClone)
 		{
 			continue;
 		}
 		fgames[nFilteredGames] = new c_game(nFilteredGames);
 
-		strcpy(fgames[nFilteredGames]->path		, games[n]->path);
+		//strcpy(fgames[nFilteredGames]->path		, games[n]->path);
+		fgames[nFilteredGames]->GameID = games[n]->nGame;
+		fgames[nFilteredGames]->isFavorite = games[n]->isFavorite;
 		strcpy(fgames[nFilteredGames]->zipname	, games[n]->zipname);
-		strcpy(fgames[nFilteredGames]->title	, games[n]->title);
+		hashmap_position = games[n]->nSize;
+        fba_drv = (FBA_DRV *)drvmap->data[hashmap_position].data;
+        //fgames[nFilteredGames]->title = (char *)malloc(sizeof(char)*11);
+        //snprintf(fgames[nFilteredGames]->title,11,fba_drv->szTitle);
+        fgames[nFilteredGames]->title = fba_drv->szTitle;
+		//strcpy(fgames[nFilteredGames]->title, fba_drv->szTitle);
+		//1//strcpy(fgames[nFilteredGames]->title	, games[n]->title);
+		fgames[nFilteredGames]->def_core_id	= games[n]->def_core_id;
 		strcpy(fgames[nFilteredGames]->sysmask	, games[n]->sysmask);
-		memcpy(&fgames[nFilteredGames]->nSize	, &games[n]->nSize, sizeof(uint64_t));
+
+		snprintf(key, KEY_MAX_LENGTH, "%s%s%d", fba_drv->szSystem, fba_drv->szName, fba_drv->nCoreID);
+		ret = hashmap_get(gamesmap, key, (void**)(&fba_games));
+		fgames[nFilteredGames]->nSize = ret;
+		//printf("key: %s - Ret: %d\n", key, ret);
+		//memcpy(&fgames[nFilteredGames]->nSize	, &games[n]->nSize, sizeof(uint64_t));
 		memcpy(&fgames[nFilteredGames]->bAvailable	, &games[n]->bAvailable, sizeof(bool));
 
 		nFilteredGames++;
 	}
 
+//    printf("Games filtered: %d\n", nFilteredGames);
 	if(nFilteredGames < 1) {
 		bProcessingGames = false;
-		ResetPreviewImage();
+		////ResetPreviewImage();
 		return;
 	}
 
@@ -260,7 +310,12 @@ void c_fbaRL::InitFilterList()
 	qsort(fgames, nFilteredGames, sizeof(c_game*), _FcCompareStruct);
 	bProcessingGames = false;
 
+//	for(int n=0; n < nTotalGames; n++) {
+//        printf("%d - %s - %d\n", n , fgames[nFilteredGames]->title, fgames[nFilteredGames]->GameID);
+//	}
 	nStatus = STATUS_UPDATEPREVIEW;
+	nBurnSelected = fgames[0]->GameID;
+	//printf("InitFilterList END\n");
 }
 
 void c_fbaRL::EndFilterList()

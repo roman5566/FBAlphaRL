@@ -1,267 +1,507 @@
 #include "main.h"
+#include "MAIN_MENU_1920x1080_PNG_bin.h"
+#include "OPTIONS_MENU_1920x1080_PNG_bin.h"
+#include "GAME_LIST_1920x1080_PNG_bin.h"
+#include "ROM_INFO_1920x1080_PNG_bin.h"
+#include "ZIP_INFO_1920x1080_PNG_bin.h"
+#include "FILE_BROWSER_1920x1080_PNG_bin.h"
+#include "MAIN_MENU_1280x720_PNG_bin.h"
+#include "OPTIONS_MENU_1280x720_PNG_bin.h"
+#include "GAME_LIST_1280x720_PNG_bin.h"
+#include "ROM_INFO_1280x720_PNG_bin.h"
+#include "ZIP_INFO_1280x720_PNG_bin.h"
+#include "FILE_BROWSER_1280x720_PNG_bin.h"
+
 
 // =======================================================================
-// TEXTURE / GRAPHICS  / RENDERING 
+// TEXTURE / GRAPHICS  / RENDERING
 
-void c_tex::Render(GLuint x, GLuint y, GLsizei w, GLsizei h)
+void c_fbaRL::ScaleLine(u32 *Target, u32 *Source, u32 SrcWidth, u32 TgtWidth) {
+ //Thanks to: http://www.compuphase.com/graphic/scale.htm
+	int NumPixels1 = 0;
+	u32 IntPart1 = 0;
+	u32 FractPart1 = 0;
+	NumPixels1 = TgtWidth;
+	IntPart1 = SrcWidth / TgtWidth;
+	FractPart1 = SrcWidth % TgtWidth;
+	int E1 = 0;
+
+	while (NumPixels1-- > 0) {
+		*Target++ = *Source;
+		Source += IntPart1;
+		E1 += FractPart1;
+		if ((u32)E1 >= TgtWidth) {
+			E1 -= TgtWidth;
+			Source++;
+		} /* if */
+	} /* while */
+	return;
+}
+
+
+
+
+
+int c_fbaRL::ResizeImage(pngData *png_in, void *TgtTexture, u32 TgtWidth, u32 TgtHeight) {
+ //Thanks to: http://www.compuphase.com/graphic/scale.htm
+    if (TgtTexture == NULL)
+        return 1;
+
+    int NumPixels0 = 0;
+    u32 IntPart0 = 0;
+    u32 FractPart0 = 0;
+    int E0 = 0;
+	if(png_in->bmp_out){
+		//pngData *png_out = new pngData;
+		//png_out->bmp_out = (u32 *) malloc(TgtHeight*TgtWidth*sizeof(u32));
+		u32 *Source = (u32 *)(void *)png_in->bmp_out;
+		u32 *Target = (u32 *)TgtTexture;
+
+//		png_out->height = TgtHeight;
+//		png_out->width  = TgtWidth;
+//		png_out->pitch  = TgtWidth*4;
+
+		NumPixels0 = TgtHeight;
+		IntPart0 = (png_in->height / TgtHeight) * png_in->width;
+		FractPart0 = png_in->height % TgtHeight;
+		E0 = 0;
+		u32 *PrevSource = NULL;
+
+		while (NumPixels0-- > 0) {
+			if (Source == PrevSource) {
+				memcpy(Target, Target-TgtWidth, TgtWidth*sizeof(*Target));
+			} else {
+				ScaleLine(Target, Source, png_in->width, TgtWidth);
+				PrevSource = Source;
+			}
+			Target += TgtWidth;
+			Source += IntPart0;
+			E0 += FractPart0;
+			if ((u32)E0 >= TgtHeight) {
+				E0 -= TgtHeight;
+				Source += png_in->width;
+			}
+
+		}
+		//memset(TgtTexture, 33, TgtWidth * TgtHeight * sizeof(u32));
+        return 0;
+	}
+	return 1;
+}
+
+void c_tex::Render(u16 x, u16 y, u16 w, u16 h)
 {
-	if(!bTextureOK) return;	
+	if(!bTextureOK) return;
 
 	if(w == 0 || h == 0)	{
-		w = app.renderWidth;
-		h = app.renderHeight;
+		w = app.width;
+		h = app.height;
 	}
 
-	glViewport(x, y, w, h);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, nTexId[0]);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glVertexPointer(2, GL_FLOAT, 0, app.squareVertices);
-	glNormalPointer(GL_FLOAT, 0, app.normals);
-	glTexCoordPointer(2, GL_FLOAT, 0, app.texCoords);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); 
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 int c_tex::BindTexture(char* pszPath)
 {
+	//printf("Bind texture: %d - %s\n", nTexture, pszPath);
 	bTextureOK = false;
+    pngData *pngTmp = new pngData;
 
-	glGenTextures(1, &nTexId[0]);
-
-	if(fbaRL->FileExist(pszPath))
+	if(fileExist(pszPath))
 	{
-		if(!texture_image_load(pszPath, &_texture))
-		{
-			glDeleteTextures(1, &nTexId[0]);			
-			return 0;
-		} else {
-			bTextureOK = true;
+		if (png != NULL) {
+            if(png->bmp_out != NULL) {
+                //printf("png pieno\n");
+                SAFE_FREE(png->bmp_out);
+                }
+        SAFE_DELETE(png)
+        }
+        png = new pngData;
+		//printf("Load png.... ");
+		pngLoadFromFile(pszPath, pngTmp);
 
-			glEnable(GL_VSYNC_SCE);
-			glEnable(GL_TEXTURE_2D);
-			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_BLEND);
+		u32 out_w, out_h;
+            if (pngTmp->width < pngTmp->height) {
+                out_h = round( 460.0f * ((float)app.height / 1080.0f));
+                out_w = round((float)out_h * ((float)pngTmp->width / (float)pngTmp->height));
 
-			glBindTexture(GL_TEXTURE_2D, nTexId[0]);
+            }
+            else {
+                out_w = round( 551.0f * ((float)app.width / 1920.0f));
+                out_h = round((float)out_w * ((float)pngTmp->height / (float)pngTmp->width));
+                if (out_h > round( 460.0f * ((float)app.height / 1080.0f))) {
+                    out_h = round( 460.0f * ((float)app.height / 1080.0f));
+                    out_w = round((float)out_h * ((float)pngTmp->width / (float)pngTmp->height));
+                }
+            }
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				0, 
-				GL_ARGB_SCE,
-				_texture.width, 
-				_texture.height, 
-				0,
-				GL_BGRA, 
-				GL_UNSIGNED_INT_8_8_8_8_REV, 
-				_texture.pixels
-			);
+            png->bmp_out = malloc(out_w * out_h * sizeof(u32));
 
-			glBindTexture(GL_TEXTURE_2D, nTexId[0]);
+            if (png->bmp_out == NULL) {
+                printf("Memory error png temp\n");
+                exit(0);
+            }
 
-			SAFE_FREE(_texture.pixels)			
-			return 1;
-		}
+            int i = 0;
+
+            i =  fbaRL->ResizeImage(pngTmp, png->bmp_out, out_w, out_h);
+
+            SAFE_FREE(pngTmp->bmp_out);
+            SAFE_DELETE(pngTmp);
+
+            if (i == 0) {
+
+                   png->width = out_w;
+                    png->pitch = out_w * sizeof(uint32_t);
+                    png->height = out_h;
+                    bTextureOK = true;
+                    //printf("Prim resize: %dx%d\n", png->width, png->height);
+                    return 1;
+
+            }
+            else {
+                printf("Memory error png resize\n");
+                return 0;
+
+            }
+
 	}
 	return 0;
 }
 
-c_tex::c_tex(uint32_t _nTexture, char* szPath) 
+int c_tex::BindSecTexture(char* pszPath)
 {
+	//printf("Bind Sec texture: %d - %s\n", nTexture, pszPath);
+	pngData *pngTmp = new pngData;
+	bTextureOK = false;
+	//pngSec = new pngData;
+
+        if (pngSec != NULL) {
+            if(pngSec->bmp_out != NULL) {
+                //printf("pngSec pieno\n");
+                SAFE_FREE(pngSec->bmp_out);
+                }
+
+        SAFE_DELETE(pngSec)
+        }
+        pngSec = new pngData;
+
+		pngLoadFromFile(pszPath, pngTmp);
+		if(pngTmp->width <= 0)
+		{
+			return 0;
+		} else {
+			u32 out_w, out_h;
+			if (pngTmp->width < pngTmp->height) {
+                out_h = round( 360.0f * ((float)app.height / 1080.0f));
+                out_w = round((float)out_h * ((float)pngTmp->width / (float)pngTmp->height));
+
+            }
+            else {
+                out_w = round( 551.0f * ((float)app.width / 1920.0f));
+                out_h = round((float)out_w * ((float)pngTmp->height / (float)pngTmp->width));
+                if (out_h > round( 360.0f * ((float)app.height / 1080.0f))) {
+                    out_h = round( 360.0f * ((float)app.height / 1080.0f));
+                    out_w = round((float)out_h * ((float)pngTmp->width / (float)pngTmp->height));
+                }
+            }
+
+
+            pngSec->bmp_out = malloc(out_w * out_h * sizeof(u32));
+            if (pngSec->bmp_out == NULL) {
+                printf("Memory error pngSec temp\n");
+                exit(0);
+            }
+
+            int i = 0;
+
+            i =  fbaRL->ResizeImage(pngTmp, pngSec->bmp_out, out_w, out_h);
+
+            SAFE_FREE(pngTmp->bmp_out);
+            SAFE_DELETE(pngTmp);
+
+            if (i == 0) {
+
+                    pngSec->width = out_w;
+                    pngSec->pitch = out_w * sizeof(uint32_t);
+                    pngSec->height = out_h;
+                    bTextureOK = true;
+                    return 1;
+
+            }
+            else {
+                printf("Memory error png resize\n");
+                return 0;
+
+            }
+
+
+		}
+		return 0;
+}
+
+
+
+c_tex::c_tex(uint32_t _nTexture, uint32_t display)
+{
+	png = NULL;
+	pngSec = NULL;
+	//Min = new Minimum;
+	//IMG = new Image(Min);
+	png = new pngData;
+
+    //char fileTexture[256];
+	nTexture = _nTexture;
+    uint32_t i = display * 7 + nTexture;
+    //printf("Bind texture: %d\n", nTexture);
+	bTextureOK = false;
+
+	switch (i) {
+        case 7:
+            pngLoadFromBuffer(MAIN_MENU_1920x1080_PNG_bin, MAIN_MENU_1920x1080_PNG_bin_size, png);
+            break;
+        case 8:
+            pngLoadFromBuffer(GAME_LIST_1920x1080_PNG_bin, GAME_LIST_1920x1080_PNG_bin_size, png);
+            break;
+        case 9:
+           pngLoadFromBuffer(ZIP_INFO_1920x1080_PNG_bin, ZIP_INFO_1920x1080_PNG_bin_size, png);
+            break;
+        case 10:
+            pngLoadFromBuffer(ROM_INFO_1920x1080_PNG_bin, ROM_INFO_1920x1080_PNG_bin_size, png);
+            break;
+        case 11:
+            pngLoadFromBuffer(OPTIONS_MENU_1920x1080_PNG_bin, OPTIONS_MENU_1920x1080_PNG_bin_size, png);
+            break;
+        case 12:
+            pngLoadFromBuffer(FILE_BROWSER_1920x1080_PNG_bin, FILE_BROWSER_1920x1080_PNG_bin_size, png);
+            break;
+        case 14:
+            pngLoadFromBuffer(MAIN_MENU_1280x720_PNG_bin, MAIN_MENU_1280x720_PNG_bin_size, png);
+            break;
+        case 15:
+            pngLoadFromBuffer(GAME_LIST_1280x720_PNG_bin, GAME_LIST_1280x720_PNG_bin_size, png);
+            break;
+        case 16:
+           pngLoadFromBuffer(ZIP_INFO_1280x720_PNG_bin, ZIP_INFO_1280x720_PNG_bin_size, png);
+            break;
+        case 17:
+            pngLoadFromBuffer(ROM_INFO_1280x720_PNG_bin, ROM_INFO_1280x720_PNG_bin_size, png);
+            break;
+        case 18:
+            pngLoadFromBuffer(OPTIONS_MENU_1280x720_PNG_bin, OPTIONS_MENU_1280x720_PNG_bin_size, png);
+            break;
+        case 19:
+            pngLoadFromBuffer(FILE_BROWSER_1280x720_PNG_bin, FILE_BROWSER_1280x720_PNG_bin_size, png);
+            break;
+//        case 20:
+//            pngLoadFromBuffer(PREVIEW_1280x720_PNG_bin, PREVIEW_1280x720_PNG_bin_size, png);
+//            break;
+    }
+
+    bTextureOK = true;
+
+
+
+}
+
+c_tex::c_tex(uint32_t _nTexture, char* szPath)
+{
+	//printf("Texture: %s\n", szPath);
+	png = NULL;
+	pngSec = NULL;
+
+	//Min = new Minimum;
+	//IMG = new Image(Min);
+	png = new pngData;
+	png->bmp_out = NULL;
+	pngSec = new pngData;
+	pngSec->bmp_out = NULL;
+
 	nTexture = _nTexture;
 
-	pszTexPath = (char*)malloc(2048);
-	memset(pszTexPath, 0, 2048);
 
-	strcpy(pszTexPath, szPath);
-	
-	BindTexture(pszTexPath);
+
+//	pszTexPath = (char*)malloc(2048);
+//	memset(pszTexPath, 0, 2048);
+
+//	strcpy(pszTexPath, szPath);
+
+	if(!BindTexture(szPath))
+		printf("Error: can't BinTexture: %s\n", szPath);
+
+
+	if (_nTexture == TEX_PREVIEW) { // preview has to be resized
+            //pngData *png_out = NULL;
+//            printf("(Screen (%dx%d) - pre resize %d - %d - %p\n", app.width, app.height, png->width, png->height, png->bmp_out);
+
+
+            if (!BindSecTexture((char *)"/dev_hdd0/game/FBNE00123/USRDIR/cores/borders/default/TITLES.PNG"))
+                                    printf("Error: can't BinSecTexture: %s\n", szPath);
+    }
+    //printf("End texture %s\n", szPath);
 }
+
 
 c_tex::~c_tex()
 {
-	if(bTextureOK) 
+	printf("Destroy c_tex %d\n", nTexture);
+	if(bTextureOK)
 	{
-		glDeleteTextures(1, &nTexId[0]);
-		*&nTexId[0] = NULL;
-		*&bTextureOK = NULL;
+		////glDeleteTextures(1, &nTexId[0]);
+		//*&nTexId[0] = NULL;
+		//*&bTextureOK = NULL;
 	}
-	SAFE_FREE(pszTexPath)
+	////DA rivedere!!!!
+//	printf("pszTexPath c_tex\n");
+//	if (pszTexPath != NULL)
+//        SAFE_FREE(pszTexPath);
+//	printf("IMG c_tex\n");
+//	if (IMG != NULL)
+//        delete (IMG);
+//	printf("Min c_tex\n");
+//    if (Min != NULL)
+//        delete(Min);
+
+	if (png->bmp_out != NULL) {
+//        printf("%d - %d - %p\n", png->width, png->height, png->bmp_out);
+        SAFE_FREE(png->bmp_out);
+	}
+
+
+    //printf("png c_tex\n");
+	SAFE_DELETE (png);
+	if (pngSec != NULL) {
+        if (pngSec->bmp_out != NULL) {
+//        printf("%d - %d - %p\n", png->width, png->height, png->bmp_out);
+        SAFE_FREE(pngSec->bmp_out);
+        }
+
+	}
+
+
+
+    SAFE_DELETE(pngSec);
+//	printf("Exit\n");
 }
 
-void c_fbaRL::RenderBackground()
-{
-	if(fbaRL->nSection == SECTION_MAIN) {
-		app.textures[TEX_MAIN_MENU]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_GAMELIST) 
-	{
-		app.textures[TEX_GAME_LIST]->Render(0,0,0,0);
-
-		if(!fbaRL->bProcessingGames) 
-		{
-			// ------------------------------------------------------
-			// PROPER ASPECT RATIO CALCULATIONS 
-
-			float w = (float)app.textures[TEX_PREVIEW]->_texture.width * 4.0f;
-			float h = (float)app.textures[TEX_PREVIEW]->_texture.height * 4.0f;
-
-			float maxw = (27.604f / 100.0f) * (float)app.renderWidth;		// 530 @ 1920 x 1080 res
-			float maxh = (31.481f / 100.0f) * (float)app.renderHeight;		// 340 @ 1920 x 1080 res
-
-			if( app.textures[TEX_PREVIEW]->_texture.width > app.textures[TEX_PREVIEW]->_texture.height || 
-				app.textures[TEX_PREVIEW]->_texture.width == app.textures[TEX_PREVIEW]->_texture.height )
-			{
-				maxw = (27.604f / 100.0f) * (float)app.renderWidth;  // 530 @ 1920 x 1080 res
-				maxh = (31.481f / 100.0f) * (float)app.renderHeight; // 340 @ 1920 x 1080 res
-			} else {
-				maxw = (31.481f / 100.0f) * (float)app.renderWidth;  // 340 @ 1920 x 1080 res
-				maxh = (45.370f / 100.0f) * (float)app.renderHeight; // 490 @ 1920 x 1080 res
-			}
-
-			float ax = (float)fba_drv[nBurnSelected].nAspectX; 
-			float ay = (float)fba_drv[nBurnSelected].nAspectY;
-
-			bool bNoPreview = false;
-			if(strcmp(app.textures[TEX_PREVIEW]->pszTexPath, g_opt_szTextures[TEX_PREVIEW]) == 0) {
-				bNoPreview = true;
-			}
-
-			// max WIDTH
-			if(w > maxw) {
-				float nh = maxw * (float)(bNoPreview ? (h / w) : (ay / ax));
-				float nw = maxw;
-
-				// max HEIGHT
-				if(nh > maxh) {
-					nw = maxh * (float)(nw / nh);
-					nh = maxh;
-				}
-
-				w = nw;
-				h = nh;
-			}
-
-			// max HEIGHT
-			if(h > maxh) {
-				float nw = maxh * (float)(bNoPreview ? (w / h) : (ax / ay));
-				float nh = maxh;
-
-				// max WIDTH
-				if(nw > maxw) {
-					nh = maxw * (float)(nh / nw);
-					nw = maxw;
-				}
-
-				w = nw;
-				h = nh;
-			}
-			// ------------------------------------------------------
-
-			// Proper centering of preview
-			float xdiff = ((maxw - w) / 2.0f);
-			float ydiff = ((maxh - h) / 2.0f);
-
-			if( app.textures[TEX_PREVIEW]->_texture.width > app.textures[TEX_PREVIEW]->_texture.height || 
-				app.textures[TEX_PREVIEW]->_texture.width == app.textures[TEX_PREVIEW]->_texture.height )
-			{
-				float x = app.renderWidth - (app.renderWidth / 3) + (GLuint)xdiff;
-				float y = app.renderHeight - (app.renderHeight / 2) + (GLuint)ydiff;
-
-				app.textures[TEX_PREVIEW]->Render((GLuint)x, (GLuint)y, (GLsizei)w, (GLsizei)h);
-			} else {
-				// x - 70
-				// y - 75
-				float xadjust = (3.645833f / 100.0f) * (float)app.renderWidth;
-				float yadjust = (6.944444f / 100.0f) * (float)app.renderHeight;
-
-				float x = (((float)app.renderWidth - ((float)app.renderWidth / 4.0f)) - (xadjust * 2.80f)) + xdiff;
-				float y = (((float)app.renderHeight - ((float)app.renderHeight / 2.0f)) - yadjust) + ydiff;
-
-				app.textures[TEX_PREVIEW]->Render((GLuint)x, (GLuint)y, (GLsizei)w, (GLsizei)h);
-			}
-		}
-	}
-	if(fbaRL->nSection == SECTION_ZIPINFO) {
-		app.textures[TEX_ZIP_INFO]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_ROMINFO) {
-		app.textures[TEX_ROM_INFO]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_OPTIONS) {
-		app.textures[TEX_OPTIONS]->Render(0,0,0,0);
-	}
-	if(fbaRL->nSection == SECTION_FILEBROWSER) {
-		app.textures[TEX_FILEBROWSER]->Render(0,0,0,0);
-	}
-}
 
 void c_fbaRL::ResetPreviewImage()
 {
-	if(app.textures[TEX_PREVIEW]->bTextureOK) 
-	{
-		delete app.textures[TEX_PREVIEW];
-		*&app.textures[TEX_PREVIEW] = NULL;
-	}
-	// no preview available...
-	app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, g_opt_szTextures[TEX_PREVIEW]);
-
+    app.textures[TEX_PREVIEW]->BindTexture(g_opt_szTextures[TEX_PREVIEW]);
+	app.textures[TEX_PREVIEW]->BindSecTexture(g_opt_szTextures[TEX_PREVIEW_TITLES]);
+    //printf("Exit ResetPreviewImage\n");
 }
 
 void c_fbaRL::UpdatePreviewImage()
 {
-	if(nBurnSelected < 0) {
-		ResetPreviewImage();
-		//nStatus = STATUS_RESETPREVIEW;
-		return;
-	}
 
-	// clean memory first...
-	if(app.textures[TEX_PREVIEW]->bTextureOK) 
-	{
-		delete app.textures[TEX_PREVIEW];
-		*&app.textures[TEX_PREVIEW] = NULL;
-	}
 
-	if(nSection == SECTION_GAMELIST)
+	if(nSection == SECTION_GAMELIST || nSection == SECTION_MAIN)
 	{
-		char szPreviewPath[2048] = { 0 };
-		sprintf(szPreviewPath, "/dev_hdd0/game/FBAL00123/USRDIR/cores/previews/%s.png", fba_drv[nBurnSelected].szName);
-		
+		//printf("UpdatePreviewImage enter SECTION_GAMELIST %s\n", g_opt_szTextures[TEX_PREVIEW]);
+		char szPreviewPath[512] = { 0 };
+
+		if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png",games[nBurnSelected]->name);
+		}
+		else
+                if (strcmp(games[nBurnSelected]->sysmask, "MASKMEGADRIVE") == 0) {
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGADRIVE/%s.png",games[nBurnSelected]->name);
+                }
+                else
+                    if (strcmp(games[nBurnSelected]->sysmask, "MASKAMIGA") == 0) {
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/AMIGA/%s.png",games[nBurnSelected]->name);
+                    }
+                    else
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->name);
+        //printf("szPreviewPath: %s\n", szPreviewPath);
 		// try main romset name...
-		app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, szPreviewPath);
-		
+		if(fileExist(szPreviewPath)) {
+            app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);
+		}
+        else
 		// try parent...
-		if(!app.textures[TEX_PREVIEW]->bTextureOK) 
 		{
 			// clean memory again...
-			delete app.textures[TEX_PREVIEW];
-			*&app.textures[TEX_PREVIEW] = NULL;
-			
-			sprintf(szPreviewPath, "/dev_hdd0/game/FBAL00123/USRDIR/cores/previews/%s.png", fba_drv[nBurnSelected].szParent);
-			
-			app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, szPreviewPath);
-			//app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);
+			////delete app.textures[TEX_PREVIEW];
+			////*&app.textures[TEX_PREVIEW] = NULL;
+
+			if (games[nBurnSelected]->isClone == false)
+                    //app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, g_opt_szTextures[TEX_PREVIEW]);
+                    app.textures[TEX_PREVIEW]->BindTexture(g_opt_szTextures[TEX_PREVIEW]);
+            else {
+//                uint32_t parent = games[fgames[nSelectedGame]->GameID]->parent_id;
+                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png",games[nBurnSelected]->parent_name);
+                }
+                else
+                        if (strcmp(games[nBurnSelected]->sysmask, "MASKMEGADRIVE") == 0) {
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGADRIVE/%s.png",games[nBurnSelected]->parent_name);
+                        }
+                        else
+                            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->parent_name);
+
+
+
+                if(fileExist(szPreviewPath))
+                        //app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, szPreviewPath);
+                        app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);
+                //app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);
+                else
+                    // no preview available...
+                    //ResetPreviewImage();
+                    //app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, g_opt_szTextures[TEX_PREVIEW]);
+                    app.textures[TEX_PREVIEW]->BindTexture(g_opt_szTextures[TEX_PREVIEW]);
+            }
 		}
 
-		// no preview available...
-		if(!app.textures[TEX_PREVIEW]->bTextureOK) {
-			//nStatus = STATUS_RESETPREVIEW;
-			ResetPreviewImage();
+		//Boxart
+		//printf("Update title\n");
+		if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png",games[nBurnSelected]->name);
 		}
+		else
+                if (strcmp(games[nBurnSelected]->sysmask, "MASKMEGADRIVE") == 0) {
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png",games[nBurnSelected]->name);
+                }
+                else
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->name);
+
+
+
+		// try main romset name...
+		if(fileExist(szPreviewPath)) {
+          //printf("Pre title %s\n", szPreviewPath);
+            app.textures[TEX_PREVIEW]->BindSecTexture(szPreviewPath);
+            //printf("Post title\n");
+		}
+        else {
+
+			if (games[nBurnSelected]->isClone == false)
+                    app.textures[TEX_PREVIEW]->BindSecTexture(g_opt_szTextures[TEX_PREVIEW_TITLES]);
+            else {
+//                uint32_t parent = games[fgames[nSelectedGame]->GameID]->parent_id;
+
+                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png",games[nBurnSelected]->parent_name);
+                }
+                else
+                        if (strcmp(games[nBurnSelected]->sysmask, "MASKMEGADRIVE") == 0) {
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png",games[nBurnSelected]->parent_name);
+                        }
+                        else
+                            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->parent_name);
+
+                if(fileExist(szPreviewPath))
+                        app.textures[TEX_PREVIEW]->BindSecTexture(szPreviewPath);
+                //app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);
+                else
+                    // no preview available...
+                    //ResetPreviewImage();
+                    app.textures[TEX_PREVIEW]->BindSecTexture(g_opt_szTextures[TEX_PREVIEW_TITLES]);
+            }
+		}
+		//End Boxart
+
 	}
 }

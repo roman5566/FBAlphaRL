@@ -1,12 +1,12 @@
-#### FB Alpha RL (Retro Loader) [by CaptainCPS-X, 2013]
+#### Final Burn Neo Retro Loader Plus [by CrystalCT, 2020 and CaptainCPS-X, 2013]
 
 ---
 
-FB Alpha Retro Loader Core: v1.03
+FB Neo Retro Loader Plus Core: v2.00
 
-RetroArch Core: v0.9.9.6
+RetroArch Core: v1.8.5
 
-FB Alpha Core: v0.2.97.30
+FB Neo Core: v0.2.97.44 (e9fdba2d1); Genesis Plus GX Core: v1.7.4 (5055106); Snes9x Core v1.60 (0a89725); Mame 0.125 for PS3 by Ole;
 
 ---
 

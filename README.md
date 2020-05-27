@@ -18,6 +18,63 @@ Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
 
+## Cangelog from 1.20 to 2.0
+* The application has been divided into
+    1. basic version (arcade: fb neo and mame 0.125),
+    1. SNES expansion (snes9x) and
+    1. MEGA DRIVE expansion (genesis plus gx);
+* Frontend rewritten to be compiled through the free SDK PSL1GHT;
+* Frontend graphics engine: RSX;
+* Unicode graphic fonts to support Japanese characters;
+* List of games and data (descriptions, trivial, etc etc) in a SQLite DB;
+* New games list page;
+* Added titles of each game, in addition to the snaps preview;
+* Background music in MP3 format, 4 tracks already present, but editable by the user, by inserting and/or deleting MP3s in the "/dev_hdd0/game/FBNE00123/USRDIR/soundtracks" folder - change tracks using :but l3: and :but r3:;
+* Added background music ON/OFF option in the options list;
+* Re-written the page of Rom info ( :but tri: button) with various info and trivial;
+* Cheats enabled for MAME125 core;
+* Ultra fast search/scan roms.
+* Video resolutions supported only 1920x1080 and 1280x720.
+* Favorite list added (add or remove a game from the favorite list using :but select: button);
+* Favorite list saved in a separate DB so as not to be overwritten by future updates;
+* Compatibility with Sega32 arcade system via the MAME125 core;
+* Added cheat (.CHT) files for the FBNEO core in the "/dev_hdd0 /game/FBNE00123/USRDIR/core/cheats/FBNeo - Arcade Games" folder;
+
+Arcade games list: [links](https://docs.google.com/spreadsheets/d/1EnczQAbBoLvo8sLIB_VGxdN71fGWoSalzMdueaiQk94/edit?usp=sharing) (some games remain incompatible with PS3).
+
+## SNES expansion
+Change the format of the names of the roms. Adopted the MAME Software List ROMs nomenclature, with it there will be no more ambiguity as each game is unique according to the system (possible subsystem) and name of the rom (rom set).
+The roms for SNES (with ZIP extension) will be recognized only if placed in a folder named "snes" (case insensitive).
+Package content:
+* Libretro core SNES9X;
+* Snaps and titles of snes games;
+* Cheat file (.CHT), folder "/dev_hdd0/game/FBNE00123/USRDIR/core/cheats/Nintendo - Super Nintendo Entertainment System";
+SNES games list: [link](https://docs.google.com/spreadsheets/d/1EvNi8Rbu-YrHunqkek1oqpUunzxQz8qQ95de6hfkryE/edit?usp=sharing).
+
+## MEGADRIVE expansion
+Compatibility with mega drive/genesis, megaCD/SegaCD and megaCDJ games.
+Name format (mega drive with ZIP extension, megaCD/segaCD/megaCDJ with ISO or CUE / BIN or CHD extension) with the MAME Software List ROMs nomenclature.
+The roms (mega drive, megaCD, segaCD and megaCDJ) will be recognized only if placed in a folder named "megadriv" (case insensitive).
+Personally, I recommend the CHD format for all those games contained on a single CD, as they take about half the space of a normal ISO. There is a mame tool for converting ISO to CHD (see note at the end).
+The MegaCD, SegaCD and MegaCDJ games require bios to be inserted in the system folder (/dev_hdd0/game/FBNE00123/USRDIR/cores/system) and are not included in the PKG. The names of the bios files MUST be:
+* bios_CD_E.bin
+* bios_CD_U.bin
+* bios_CD_J.bin
+
+
+Package content:
+* Libretro core GENESIS PLUS GX;
+* Snaps and titles of the mega drive/genesis, megaCD/SegaCD and megaCDJ games;
+* Cheat files (.CHT), folders "/dev_hdd0/game/FBNE00123/USRDIR/core/cheats/Sega - Mega Drive - Genesis" and "/dev_hdd0/game/FBNE00123/USRDIR/core/cheats/Sega - Mega-CD - Sega CD";
+
+MEGADRIVE games list: [link](https://docs.google.com/spreadsheets/d/1oBGlGMD-T8-07jFI7RgLZZQ9Ud7-RHp39uRgvduTi1A/edit?usp=sharing).
+
+Note: CHD Archive Usage
+
+lr-genesis-plus-gx has support for the CHD (V1-V5) archive format.
+This format will save space and allow you to keep your Mega CD/Sega CD ROM folder tidy.
+The following archive contains a MAME 0.205 version of CHDMAN and Windows batch files that can be used to quickly convert your Mega CD/Sega CD games to CHD (V5): [Download](https://drive.google.com/file/d/0B-ElaPpvBHs5aUd0QUM3c05kY2c/view?usp=sharing)
+
 #### READ ME STILL INCOMPLETE AND WRONG - WORK in progress
 
 ### What is FB Neo Plus?:

@@ -18,7 +18,7 @@ Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
 
-#### READ ME STILL INCOMPLETE ND WRONG - WORK in progress
+#### READ ME STILL INCOMPLETE AND WRONG - WORK in progress
 
 ### What is FB Neo Plus?:
 

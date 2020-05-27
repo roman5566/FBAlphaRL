@@ -6,20 +6,21 @@ FB Neo Retro Loader Plus Core: v2.00
 
 RetroArch Core: v1.8.5
 
-FB Neo Core: v0.2.97.44 (e9fdba2d1); Genesis Plus GX Core: v1.7.4 (5055106); Snes9x Core v1.60 (0a89725); Mame 0.125 for PS3 by Ole;
+FB Neo Core: v0.2.97.44 (e9fdba2d1); 
+Genesis Plus GX Core: v1.7.4 (5055106); 
+Snes9x Core v1.60 (0a89725); 
+Mame 0.125 for PS3 by Ole;
 
 ---
+![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/ICON0.PNG)
+![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/PIC1.PNG)
+![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo1.png)
+![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2p8hB63UZpwO2HhixLFTTAYUukjSwOLCxTUMpAQ-UmqjeIf7o1T4J9CTse3eFWB0WL1WEfH78PA9cIklVaZSVVUtqHJqg2kEZqKwb7UWj_UxA/image_01.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2phSPVOiA9Oq3-lU2wrA8Ro6v3Rz5uZkXOfsOvWQc33R87enNrt5eHCxlHNVUiLalEWDRPo77Qx-knYq3SVKMw91-SC-eus0ZPwJnOaBF8WII/PIC1.PNG?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2ppllJNiBUizxc9vjgRmvidwPh1eAVSwuOI2U6PjVApjLCOjr_Cn5YT3geD0-i55NOY6x9fo_fUHhQrCYXYE2S-yuCpHxZe7iHsOE68mMABv0/RetroArch%20PS3_4.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2pS7wL8ldRoU16JG0JM9rJDUDDnwc3mX4a7NdZava1xnC2fIUIKzXGTxvJXXCogrRAhbOXgYskEyoFtPxGvUD8UeYHJWFb4Dcal8kPmV9etx8/RetroArch%20PS3_1.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2p6_yyQX1X5I7zgjqbWJHPWZQ_MaXTj6Hrx3g7FVp46zoET3rXssNLwuUCzpjDLXFFumD_AVtHecy1pq6e_jcnsmrJKn9ZKAk0iid6a7YSpe0/RetroArch%20PS3_5.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2pcMiV46tTXq2iOmLFMFT8NnCIX4GfmYq_MqE6vi5JHhgqG4r6QiVb72bXWzlJyydSIDR6XLXTh_IroSfT1pWYFODywx1hDnOvIlRzTrB63F4/RetroArch%20PS3_7.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2p4ZnxCo3Shu4O-0BBNGOUsQYfQtb88Jrygyxc3hCl2dqvV8iNfDqwOtFudPBurLZxp1xyuVdeoIcyagCSwaBZ9s-aNP2spJ7FgWZLEVGelok/RetroArch%20PS3_9.png?psid=1)
-![Image Alt](https://oab7sa.blu.livefilestore.com/y2pT199NUc7cHOLMIHY2SL3B4CQEwyHcLoN04BqhT5ZHaSsVaTFoj4_9I1BudavJGjfeb1KhRGf4IUad_gmgc8ZMErR9EfclR8MQcc57fUSM88/RetroArch%20PS3_8.png?psid=1)
 
-### What is FB Alpha?:
+#### READ ME STILL INCOMPLETE ND WRONG - WORK in progress
+
+### What is FB Neo Plus?:
 
 ---
 

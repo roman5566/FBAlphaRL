@@ -8,7 +8,7 @@ RetroArch Core: v1.8.5
 
 FB Neo Core: v0.2.97.44 (e9fdba2d1);<br/> 
 Genesis Plus GX Core: v1.7.4 (5055106);<br/> 
-Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 by Ole;<br/>
+Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 
 
 ---

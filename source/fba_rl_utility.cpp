@@ -225,7 +225,7 @@ void c_fbaRL::LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char
     argv[8] = (char *)malloc(3);
     argv[9] = (char *)malloc(64);
     argv[10] = (char *)malloc(3);
-    	strcpy(argv[2], "-s");
+    strcpy(argv[2], "-s");
 	strcpy(argv[3], "/dev_hdd0/game/FBNE00123/USRDIR/cores/savefiles");
 	strcpy(argv[4], "-c");
 	strcpy(argv[5], "/dev_hdd0/game/FBNE00123/USRDIR/retroarch.cfg");

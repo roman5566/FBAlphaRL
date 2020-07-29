@@ -32,7 +32,7 @@ ICON0		:=	ICON0.PNG
 ICON1		:=	ICON1.PAM
 PIC1		:=	PIC1.PNG
 SFOXML		:=	sfo.xml
-APP_VER		:=	2.00
+APP_VER		:=	2.10
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -156,6 +156,12 @@ pkgmd: npdrm
 	$(VERB) echo building Mega Drive upgrade pkg ... $(notdir $@)
 	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgMD/PARAM.SFO
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgMD/ $(TARGET)_$(APP_VER)_megadrive_upgrade.pkg >> /dev/null
+#---------------------------------------------------------------------------------
+
+pkgAmiga: npdrm
+	$(VERB) echo building Amiga upgrade pkg ... $(notdir $@)
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgAmiga/PARAM.SFO
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgMD/ $(TARGET)_$(APP_VER)_amiga_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------
 
 npdrm: $(BUILD)

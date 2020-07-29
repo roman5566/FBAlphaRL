@@ -386,8 +386,11 @@ void c_fbaRL::InputFrame()
 				if( fileExist(fba_rl_path) && fileExist(fba_core_path) )
 				{
 					//if(fileExist(fgames[nSelectedGame]->path))
+					char gamepath[256];
 					if(fileExist(fba_games->szPath))
 					{
+						//printf("fba_games->szPath: %s\n", fba_games->szPath);
+						snprintf(gamepath, sizeof(gamepath), "%s", fba_games->szPath);
 						app.onShutdown();
 
 						char aspect_ratio[12]	= { 0 };
@@ -396,8 +399,9 @@ void c_fbaRL::InputFrame()
 
 						int nSysMask = GetSystemMaskId(games[nBurnSelected]->sysmask);
 
+
 						LaunchFBACore(
-							(char*)fba_games->szPath,
+							gamepath,
 							(char*)fba_rl_path,
 							(char*)(fileExist(g_opt_szInputCFG[nSysMask]) ?  g_opt_szInputCFG[nSysMask] : "DUMMY_ARG"),
 							(char*)((g_opt_bAutoAspectRatio) ? aspect_ratio : "DUMMY_ARG"),

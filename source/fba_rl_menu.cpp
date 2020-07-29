@@ -59,6 +59,7 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"FILTER [MIDWAY]");
 	options_menu->AddItem((char*)"FILTER [SNES]");
 	options_menu->AddItem((char*)"FILTER [MEGA DRIVE]");
+	options_menu->AddItem((char*)"FILTER [AMIGA]");
 	options_menu->AddItem((char*)"FILTER [FAVORITE]");
 
 	options_menu->AddItem((char*)"ROMs PATH #1");
@@ -99,6 +100,7 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"[MIDWAY] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[SNES] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[MEGA DRIVE] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[AMIGA] INPUT .CFG PATH");
 }
 
 void c_fbaRL::EndOptionsMenu()
@@ -446,8 +448,7 @@ void c_fbaRL::InitRomInfoMenu()
 
 	rominfo_menu = new c_Menu(38);
 
-    uint32_t hashmap_position;
-	hashmap_map *drvmap;
+    hashmap_map *drvmap;
     FBA_DRV *fba_drv;
     drvmap = (hashmap_map *) app.drvMap;
 	hashmap_position = games[fgames[nSelectedGame]->GameID]->nSize;

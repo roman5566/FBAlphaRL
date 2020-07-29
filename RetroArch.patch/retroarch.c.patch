@@ -1,0 +1,32 @@
+--- RetroARch/retroarch.c
++++ RetroARch/retroarch.c
+@@ -16243,7 +16236,11 @@
+ #endif
+          break;
+       case CMD_EVENT_MENU_RESET_TO_DEFAULT_CONFIG:
+-         config_set_defaults(&p_rarch->g_extern);
++#ifdef __CELLOS_LV2__
++		 config_set_defaults_PS3();
++#else
++         config_set_defaults(&g_extern);
++#endif
+          break;
+       case CMD_EVENT_MENU_SAVE_CURRENT_CONFIG:
+ #ifdef HAVE_CONFIGFILE
+@@ -16267,10 +16264,16 @@
+          break;
+       case CMD_EVENT_MENU_SAVE_CONFIG:
+ #ifdef HAVE_CONFIGFILE
++#ifdef __CELLOS_LV2__
++		if (!frontend_driver_set_fork(FRONTEND_FORK_RESTART))
++            return false;
++		command_event(CMD_EVENT_QUIT, NULL);
++#else
+          if (!command_event_save_core_config(p_rarch,
+                   settings->paths.directory_menu_config))
+             return false;
+ #endif
++#endif
+          break;
+       case CMD_EVENT_SHADER_PRESET_LOADED:
+          ui_companion_event_command(cmd);

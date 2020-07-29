@@ -278,6 +278,15 @@ void c_fbaRL::DlgDisplayFrame()
             break;
         }
 
+        case STATUS_MISSING_CORE_5:
+        {
+            dialog = STATUS_MISSING_CORE_5;
+            msgDialogOpen2((msgType)((MSG_DIALOG_BTN_TYPE_OK
+                                |MSG_DIALOG_DISABLE_CANCEL_ON)),
+                                "Core E-UAE is missing. Install correct upgrade pack.",dialog_handler,(void *)&dialog,NULL);
+            break;
+        }
+
 		case STATUS_MISSING_GAME_DLG:
 		{
 			//int i = STATUS_ROMSCAN_DLG;

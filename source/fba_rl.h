@@ -16,8 +16,8 @@
 #include <rsx/rsx.h>
 
 // --------------------------------------------------------------------
-#define _APP_VER "2.00"
-#define _APP_TITLE "\tFB NEO PLUS RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013] Crystal Touch [2020]"
+#define _APP_VER "2.10"
+#define _APP_TITLE "\tFB NEO PLUS RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013] CrystalCT [2020]"
 // --------------------------------------------------------------------
 
 
@@ -109,11 +109,12 @@ void _ScanROMs(uint64_t);
 #define MASKMIDWAY		22
 #define MASKSNES		23
 #define MASKMEGADRIVE	24
-#define MASKFAVORITE	25
+#define MASKAMIGA       25
+#define MASKFAVORITE	26
 
 
-#define MASKALL			26
-#define MASKCUSTOM		27
+#define MASKALL			27
+#define MASKCUSTOM		28
 
 
 #define MENU_OPT_AUTO_AR		0
@@ -138,8 +139,8 @@ void _ScanROMs(uint64_t);
 #define SAFE_FREE(x)	if(x) {	free(x); *&x = NULL; }
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
-#define MAX_GAMES	13000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 12908
+#define MAX_GAMES	16000 // <-- should be enough xD
+#define TOTAL_DRV_GAMES 15708
 
 class c_game
 {
@@ -420,6 +421,7 @@ public:
 	int			nBurnSelected;
 	rsxBuffer*  rsxbuffer;
     //pngData*    png;
+    uint32_t    hashmap_position;
 
 	void		LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char* arg5, char* arg6 );  //CRYSTAL
 
@@ -480,7 +482,7 @@ public:
 	void		RomInfo_Frame();
 	void        RomScan2();
 
-
+    void        MakeAmigaCFG(char *romPath, char *subsystem, char** argv);
 
 	void		InputFrame();
 	void		DlgDisplayFrame();

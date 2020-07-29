@@ -1,4 +1,4 @@
-﻿// ========================================================================================================
+// ========================================================================================================
 // FB Neo Retro Loader Plus (CaptainCPS-X, 2013) - (CrystalCT, 2020)
 // ========================================================================================================
 /*
@@ -50,17 +50,39 @@ Custom RETROARCH changes for FB Alpha RL (v1.XX):
 
 c_fbaRL* fbaRL;
 
-char ipaddress[256] = "0.0.0.0"; //ipv4
+char ipaddress[16] = "0.0.0.0"; //ipv4
 
 c_fbaRL::c_fbaRL(bool StartWithGamesList)
 {
 	////CellNetCtlInfo info;
 	///cellNetCtlGetInfo(CELL_NET_CTL_INFO_IP_ADDRESS, &info);
 	///strcpy(ipaddress, info.ip_address);
-	union net_ctl_info netctl_info;
-	netCtlGetInfo(NET_CTL_INFO_IP_ADDRESS, &netctl_info);
-	if (netctl_info.ip_address != NULL)
-        strcpy(ipaddress, netctl_info.ip_address);
+#ifdef FDEBUG
+    FILE* fdebug = NULL;
+	fdebug = fopen("/dev_hdd0/game/FBNE00123/USRDIR/fdebug.log", "a");
+	if (fdebug == 0){
+        printf("Errore nel write\n");
+        exit(0);
+        }
+    fprintf(fdebug,"Start init fbaRL class \n");
+    fflush(fdebug);
+#endif // FDEBUG
+	s32 state = 0;
+
+    if(netCtlGetState(&state)>=0 && state == NET_CTL_STATE_IPObtained) {
+            union net_ctl_info netctl_info;
+            netctl_info.ip_address[0] = '\0';
+            netCtlGetInfo(NET_CTL_INFO_IP_ADDRESS, &netctl_info);
+            if (netctl_info.ip_address[0] != '\0') strcpy(ipaddress, netctl_info.ip_address);
+    }
+	//union net_ctl_info netctl_info;
+	//netCtlGetInfo(NET_CTL_INFO_IP_ADDRESS, &netctl_info);
+#ifdef FDEBUG
+    fprintf(fdebug,"netCtlGetInfo OK\n");
+    fflush(fdebug);
+#endif // FDEBUG
+	//if (netctl_info.ip_address != NULL)
+        //strcpy(ipaddress, netctl_info.ip_address);
 
 	nFrameStep = 0; // for text shadow
 
@@ -70,7 +92,10 @@ c_fbaRL::c_fbaRL(bool StartWithGamesList)
 	nSection = SECTION_MAIN;
 
 	MakeRetroDirs((char*)"/dev_hdd0/game/FBNE00123/USRDIR");
-
+#ifdef FDEBUG
+    fprintf(fdebug,"MakeRetroDirs OK\n");
+    fflush(fdebug);
+#endif // FDEBUG
 	/*////if(dirExist((char*)"/dev_hdd0/game/FBNE00123/USRDIR"))
 	{
 		MakeRetroDirs((char*)"/dev_hdd0/game/SSNE10000/USRDIR");
@@ -80,7 +105,10 @@ c_fbaRL::c_fbaRL(bool StartWithGamesList)
 		CreateAllInputCFG();
 	}
 
-
+#ifdef FDEBUG
+    fprintf(fdebug,"CreateAllInputCFG OK\n");
+    fflush(fdebug);
+#endif // FDEBUG
 
 	//InitMainMenu(); // CRYSTAL START
 	if (StartWithGamesList) {
@@ -97,7 +125,10 @@ c_fbaRL::c_fbaRL(bool StartWithGamesList)
 		//printf("StartwithFileSection = FALSE\n");
 
 		InitMainMenu();
-
+#ifdef FDEBUG
+    fprintf(fdebug,"InitMainMenu OK\n");
+    fclose(fdebug);
+#endif // FDEBUG
 	} //CRYSTAL END
 }
 

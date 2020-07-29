@@ -32,15 +32,13 @@ static void Ddialog_handler2(msgButton button,void *usrData)
 	}
 }*/
 
+
 void c_fbaRL::InputFrame()
 {
 	if(bProcessingGames) return;
 
 	static int nSelInputFrame = 0;
-	char *errmsg;
-    char buf[128] = "";
-    int rc = 0;
-    sqlite3 *mdb;
+
 
 	// ------------------------------------------------------
 	// Navigation UP/DOWN with delay
@@ -355,6 +353,11 @@ void c_fbaRL::InputFrame()
                 char fba_core_path[256];
 				char fba_rl_path[]		= "/dev_hdd0/game/FBNE00123/USRDIR/RELOAD.SELF";
 				sprintf(fba_core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/fb_neo.SELF");
+				hashmap_map *gamesmap;
+                gamesmap =  (hashmap_map *) app.gamesMap;
+                FBA_GAMES *fba_games;
+                hashmap_position = fgames[nSelectedGame]->nSize;
+                fba_games = (FBA_GAMES *)gamesmap->data[hashmap_position].data;
 				if (strcmp(fgames[nSelectedGame]->sysmask, "MASKSNES") == 0){
                             sprintf(fba_core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/snes9x.SELF");
                             if (!fileExist(fba_core_path)) {
@@ -369,15 +372,19 @@ void c_fbaRL::InputFrame()
                                 break;
                             }
 				}
+				if (strcmp(fgames[nSelectedGame]->sysmask, "MASKAMIGA") == 0){
+                            sprintf(fba_core_path,"/dev_hdd0/game/FBNE00123/USRDIR/EUAE/e-uae.SELF");
+                            if (!fileExist(fba_core_path)) {
+                                nStatus = STATUS_MISSING_CORE_5;
+                                break;
+                            }
+                            /*else {
+                                MakeAmigaCFG(fba_games->szPath, games[fgames[nSelectedGame]->GameID]->subsystem);
+                                return;
+                            }*/
+				}
 				if( fileExist(fba_rl_path) && fileExist(fba_core_path) )
 				{
-
-					hashmap_map *gamesmap;
-                    gamesmap =  (hashmap_map *) app.gamesMap;
-                    FBA_GAMES *fba_games;
-                    uint32_t hashmap_position;
-					hashmap_position = fgames[nSelectedGame]->nSize;
-                    fba_games = (FBA_GAMES *)gamesmap->data[hashmap_position].data;
 					//if(fileExist(fgames[nSelectedGame]->path))
 					if(fileExist(fba_games->szPath))
 					{
@@ -396,7 +403,7 @@ void c_fbaRL::InputFrame()
 							(char*)((g_opt_bAutoAspectRatio) ? aspect_ratio : "DUMMY_ARG"),
 							//(char*)(g_opt_bUseAltMenuKeyCombo ? "yes" : "no"),
 							//(char*)(g_opt_bUseUNIBIOS ? "yes" : "no")  //CRYSTAL
-                            (char*)("DUMMY_ARG"),
+                            (char*)(games[fgames[nSelectedGame]->GameID]->subsystem), //SUBSYSTEM
 							(char*)("DUMMY_ARG")  //CRYSTAL
 						);
 					} else {
@@ -427,6 +434,7 @@ void c_fbaRL::InputFrame()
 					nSection = SECTION_GAMELIST;
 					EndMainMenu();
 					//printf("EndmainMenu\n");
+
 					break;
 				}
 
@@ -774,6 +782,10 @@ void c_fbaRL::InputFrame()
 					if (nBurnSelected < 0)
                         break;
 
+                    char *errmsg;
+                    char buf[128] = "";
+                    int rc = 0;
+                    sqlite3 *mdb;
                     hashmap_map *drvmap;
                     drvmap = (hashmap_map *) app.drvMap;
                     FBA_DRV *fba_drv;

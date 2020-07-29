@@ -1,0 +1,4 @@
+
+#ifdef __CELLOS_LV2__
+void config_set_defaults_PS3(void);
+#endif

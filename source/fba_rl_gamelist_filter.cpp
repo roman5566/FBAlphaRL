@@ -2,6 +2,7 @@
 // GAMELIST (FILTERS)
 
 #include "main.h"
+static char pszFilter[64];
 
 char szSysFilter[MASKALL][256] = {
 	"MASKCAPMISC"		,"MASKCAVE"		,"MASKCPS"		,"MASKCPS2",
@@ -9,7 +10,8 @@ char szSysFilter[MASKALL][256] = {
 	"MASKKANEKO"		,"MASKKONAMI"	,"MASKNEOGEO"	,"MASKPACMAN",
 	"MASKPGM"			,"MASKPSIKYO"	,"MASKSEGA"		,"MASKSEG32", "MASKSETA",
 	"MASKTAITO"			,"MASKTECHNOS"	,"MASKTOAPLAN"	,"MASKMISCPRE90S",
-	"MASKMISCPOST90S", "MASKMIDWAY"	,"MASKSNES", "MASKMEGADRIVE", "MASKFAVORITE"
+	"MASKMISCPOST90S", "MASKMIDWAY"	,"MASKSNES", "MASKMEGADRIVE",
+	"MASKAMIGA", "MASKFAVORITE"
 	//,"MASKMEGADRIVE","MASKPCENGINE"	,"MASKSNES"
 };
 
@@ -21,7 +23,8 @@ bool bSysFilter[MASKCUSTOM+1] =
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
-	true,true,true,true // <--- fillers
+	true,true,true,true,
+	true // <--- fillers
 };
 
 int c_fbaRL::GetSystemMaskId(char* szMask)
@@ -39,9 +42,9 @@ int c_fbaRL::GetSystemMaskId(char* szMask)
 char* c_fbaRL::GetSystemFilter(int nFilter)
 {
 
-	char* pszFilter = NULL;
-	pszFilter = (char*)malloc(256);
-	memset(pszFilter, 0, 256);
+//	char* pszFilter = NULL;
+//	pszFilter = (char*)malloc(256);
+//	memset(pszFilter, 0, 256);
 
 	switch(nFilter)
 	{
@@ -71,9 +74,10 @@ char* c_fbaRL::GetSystemFilter(int nFilter)
 		case 22:  strcpy(pszFilter, "Midway"); break;
 		case 23:  strcpy(pszFilter, "SNES"); break;
 		case 24:  strcpy(pszFilter, "Mega Drive"); break;
-		case 25:  strcpy(pszFilter, "Favorite"); break;
-		case 26:  strcpy(pszFilter, "All Games"); break;
-		case 27:  strcpy(pszFilter, "Custom Filter"); break;
+		case 25:  strcpy(pszFilter, "Amiga"); break;
+		case 26:  strcpy(pszFilter, "Favorite"); break;
+		case 27:  strcpy(pszFilter, "All Games"); break;
+		case 28:  strcpy(pszFilter, "Custom Filter"); break;
 	}
 
 	return pszFilter;
@@ -227,7 +231,6 @@ void c_fbaRL::InitFilterList()
     FBA_GAMES *fba_games;
     drvmap = (hashmap_map *) app.drvMap;
     gamesmap =  (hashmap_map *) app.gamesMap;
-    uint32_t hashmap_position;
     char key[KEY_MAX_LENGTH];
     int ret = 0;
 

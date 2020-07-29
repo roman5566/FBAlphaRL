@@ -20,7 +20,6 @@
 #include <rsx/gcm_sys.h>
 #include <rsx/rsx.h>
 #include <sys/process.h>
-//#include <NoRSX.h>
 #include <sysmodule/sysmodule.h>
 #include <pngdec/pngdec.h>
 #include <io/pad.h>
@@ -31,12 +30,8 @@
 #include "hashmap.h"
 #include "fnt_print.h"
 #include "fnt35.h"
-//#include "rpng.h"
-#include <cairo/cairo.h>
 #include <math.h>
 #include <sys/thread.h>
-
-
 
 #include <ps3sqlite/sqlite3.h>
 #include "sqlite.h"
@@ -360,30 +355,65 @@ CapApp::CapApp()
 
 bool CapApp::onInit(int argc, char* argv[])
 {
+#ifdef FDEBUG
+    FILE* fdebug = NULL;
+	fdebug = fopen("/dev_hdd0/game/FBNE00123/USRDIR/fdebug.log", "w");
+	if (fdebug == 0){
+        printf("Errore nel write\n");
+        return 0;
+        }
+    fprintf(fdebug,"Start FB Neo Rl Plus\n");
+    fflush(fdebug);
+#endif // FDEBUG
 	(void)argc;
 	(void)argv;
-    sysModuleLoad(SYSMODULE_PNGDEC);
 
+    if(sysModuleLoad(SYSMODULE_FS) != 0) exit(0);
+    if(sysModuleLoad(SYSMODULE_PNGDEC) != 0) exit(0);
+    if(sysModuleLoad(SYSMODULE_NETCTL) != 0) exit(0);
+#ifdef FDEBUG
+    fprintf(fdebug,"SYSMODULE_PNGDEC loaded\n");
+    fflush(fdebug);
+#endif // FDEBUG
 
 	//atexit(onShutdown);
 	//if( cellSysutilRegisterCallback( 0, callback_sysutil_exit, NULL ) < 0 ) {
 	if( sysUtilRegisterCallback(0,sysutil_exit_callback,NULL) < 0 ) {
 			printf("sysUtilRegisterCallback error.\n");
 	}
-
+#ifdef FDEBUG
+    fprintf(fdebug,"sysUtilRegisterCallback OK\n");
+    fflush(fdebug);
+#endif // FDEBUG
 
 
 
 
 
 	if(!iniRead()) {
+#ifdef FDEBUG
+    fprintf(fdebug,"iniRead OK\n");
+    fflush(fdebug);
+#endif
 		iniWrite(); // create settings file...
+#ifdef FDEBUG
+    fprintf(fdebug,"iniWrite OK\n");
+    fflush(fdebug);
+#endif
 	}
 
     initGraphics();
+#ifdef FDEBUG
+    fprintf(fdebug,"initGraphics OK\n");
+    fflush(fdebug);
+#endif
     //printf("End init Graphics\n");
-    initSPUSound();
 
+    initSPUSound();
+#ifdef FDEBUG
+    fprintf(fdebug,"initSPUSound OK\n");
+    fflush(fdebug);
+#endif
 	//CRYSTAL
 	//LOAD  FBA Games Array
 	if(InitDB())
@@ -392,13 +422,20 @@ bool CapApp::onInit(int argc, char* argv[])
         exit(0);
 		return(1);
 	}
-
+#ifdef FDEBUG
+    fprintf(fdebug,"InitDB OK\n");
+    fflush(fdebug);
+#endif
     //printf("End init DB\n");
 	////
 	// ----------------------------------------------
 	// FTP
-	int r = ftp_init();
 
+	int r = ftp_init();
+#ifdef FDEBUG
+    fprintf(fdebug,"ftp_init OK\n");
+    fflush(fdebug);
+#endif
 
         if(r == 0)
         {
@@ -411,6 +448,8 @@ bool CapApp::onInit(int argc, char* argv[])
             else if(r == -4) printf("Net Disconnected or Connection not Established\n");
             else printf("Another FTP service present!\n");
         }
+
+
 	/*cellSysmoduleLoadModule(CELL_SYSMODULE_NET);
 	cellNetCtlInit();
 	cellSysmoduleLoadModule(CELL_SYSMODULE_HTTP);
@@ -422,8 +461,22 @@ bool CapApp::onInit(int argc, char* argv[])
 
 
 	FontInit();
+#ifdef FDEBUG
+    fprintf(fdebug,"FontInit OK\n");
+    fflush(fdebug);
+#endif
 	//printf("End init Font\n");
 	InputInit();
+#ifdef FDEBUG
+    fprintf(fdebug,"InputInit OK\n");
+    struct smeminfo {
+            uint32_t total;
+            uint32_t avail;
+    } meminfo;
+    lv2syscall1(352, (uint64_t) &meminfo);
+    fprintf(fdebug,"MEMORY TOTAL: %d - AVAIL: %d\n", meminfo.total / 1024, meminfo.avail / 1024);
+    fclose(fdebug);
+#endif
     //printf("End init Imput\n");
 	//long frame = 0; // To keep track of how many frames we have rendered.
 
@@ -445,12 +498,25 @@ bool CapApp::onInit(int argc, char* argv[])
 		else {
 					fbaRL = new c_fbaRL(false);
         }
+#ifdef FDEBUG
+        fdebug = fopen("/dev_hdd0/game/FBNE00123/USRDIR/fdebug.log", "a");
+        fprintf(fdebug,"fbaRL class OK\n");
+        fflush(fdebug);
+#endif
         //printf("fbaRL->InitGameList()\n");
         fbaRL->InitGameList();
+#ifdef FDEBUG
+        fprintf(fdebug,"InitGameList OK\n");
+        fflush(fdebug);
+#endif
         //fbaRL->InitGameList();
 
         //printf("fbaRL->InitFilterList()\n");
         fbaRL->InitFilterList();
+#ifdef FDEBUG
+        fprintf(fdebug,"InitFilterList OK\n");
+        fclose(fdebug);
+#endif
         //printf("Start while\n");
 
 
@@ -810,6 +876,7 @@ int CapApp::InitDB()
                         nMissingGames++;
                 }
                 snprintf(fba_drv->key_string, KEY_MAX_LENGTH, "%s%s", (char *)sqlite3_column_text(stmt, COL10), (char *)sqlite3_column_text(stmt, COL07));
+
                 error = hashmap_put(drvMap, fba_drv->key_string, fba_drv);
 //				if (error !=MAP_OK) {
 //                    printf("Error: %d - %s\n", error, fba_drv->szName);

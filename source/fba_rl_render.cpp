@@ -439,7 +439,11 @@ void c_fbaRL::UpdatePreviewImage()
                                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGADRIVE/%s.png",games[nBurnSelected]->parent_name);
                         }
                         else
-                            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->parent_name);
+                            if (strcmp(games[nBurnSelected]->sysmask, "MASKAMIGA") == 0) {
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/AMIGA/%s.png",games[nBurnSelected]->parent_name);
+                            }
+                            else
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->parent_name);
 
 
 
@@ -465,7 +469,11 @@ void c_fbaRL::UpdatePreviewImage()
                         sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png",games[nBurnSelected]->name);
                 }
                 else
-                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->name);
+                    if (strcmp(games[nBurnSelected]->sysmask, "MASKAMIGA") == 0) {
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/AMIGA/%s.png",games[nBurnSelected]->name);
+                    }
+                    else
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->name);
 
 
 
@@ -490,7 +498,11 @@ void c_fbaRL::UpdatePreviewImage()
                                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png",games[nBurnSelected]->parent_name);
                         }
                         else
-                            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->parent_name);
+                            if (strcmp(games[nBurnSelected]->sysmask, "MASKAMIGA") == 0) {
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/AMIGA/%s.png",games[nBurnSelected]->parent_name);
+                            }
+                            else
+                                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->parent_name);
 
                 if(fileExist(szPreviewPath))
                         app.textures[TEX_PREVIEW]->BindSecTexture(szPreviewPath);

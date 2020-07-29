@@ -1,0 +1,12 @@
+--- menu/menu_setting.c
++++ menu/menu_setting.c
+@@ -8046,7 +8046,8 @@
+          CONFIG_ACTION(
+                list, list_info,
+                MENU_ENUM_LABEL_SAVE_NEW_CONFIG,
+-               MENU_ENUM_LABEL_VALUE_SAVE_NEW_CONFIG,
++               //MENU_ENUM_LABEL_VALUE_SAVE_NEW_CONFIG,
++               MENU_ENUM_LABEL_VALUE_RESTART_RETROARCH,
+                &group_info,
+                &subgroup_info,
+                parent_group);

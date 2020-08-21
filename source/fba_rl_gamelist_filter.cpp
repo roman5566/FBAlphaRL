@@ -291,8 +291,10 @@ void c_fbaRL::InitFilterList()
 		//1//strcpy(fgames[nFilteredGames]->title	, games[n]->title);
 		fgames[nFilteredGames]->def_core_id	= games[n]->def_core_id;
 		strcpy(fgames[nFilteredGames]->sysmask	, games[n]->sysmask);
-
-		snprintf(key, KEY_MAX_LENGTH, "%s%s%d", fba_drv->szSystem, fba_drv->szName, fba_drv->nCoreID);
+        if (games[n]->core_id > 0)
+                snprintf(key, KEY_MAX_LENGTH, "%s%s%d", fba_drv->szSystem, fba_drv->szName, games[n]->core_id);
+		else
+            snprintf(key, KEY_MAX_LENGTH, "%s%s%d", fba_drv->szSystem, fba_drv->szName, fba_drv->nCoreID);
 		ret = hashmap_get(gamesmap, key, (void**)(&fba_games));
 		fgames[nFilteredGames]->nSize = ret;
 		//printf("key: %s - Ret: %d\n", key, ret);

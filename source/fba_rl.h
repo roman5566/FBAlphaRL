@@ -139,8 +139,8 @@ void _ScanROMs(uint64_t);
 #define SAFE_FREE(x)	if(x) {	free(x); *&x = NULL; }
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
-#define MAX_GAMES	16000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 15708
+#define MAX_GAMES	18000 // <-- should be enough xD
+#define TOTAL_DRV_GAMES 15833
 
 class c_game
 {
@@ -167,6 +167,7 @@ public:
 	bool 		isClone;
 	bool        isFavorite;
 	uint32_t    def_core_id; //have a default core if > 0
+	uint16_t    core_id;
 
 	c_game(uint32_t _nGame)
 	{

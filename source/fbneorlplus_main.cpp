@@ -865,7 +865,7 @@ int CapApp::InitDB()
                         snprintf(fba_games->key_string, KEY_MAX_LENGTH, "%s%s%d",
                                     (char *)sqlite3_column_text(stmt, COL10), (char *)sqlite3_column_text(stmt, COL07), sqlite3_column_int(stmt, COL15));
                         error = hashmap_put(gamesMap, fba_games->key_string, fba_games);
-//                        if (error !=MAP_OK) {
+                        //                        if (error !=MAP_OK) {
 //                            printf("Error: %d - %s\n", error, fba_games->szPath);
 //                        }
                         fba_drv->isAvailable = true;

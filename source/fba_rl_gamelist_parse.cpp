@@ -133,6 +133,7 @@ int c_fbaRL::ParseGameListCache()
                 games[row]->GameID = fba_drv->nGameID;
                 games[row]->bAvailable = fba_drv->isAvailable;
                 games[row]->isClone = fba_drv->isClone;
+                games[row]->core_id = 0;
                 if (fba_drv->isClone)
                     snprintf(games[row]->parent_name, 128,  "%s", fba_drv->szParent);
 
@@ -163,7 +164,7 @@ int c_fbaRL::ParseGameListCache()
                                     //fbaRL->games[row]->parent_id = sqlite3_column_int(stmt, COL08);
                                     games[row]->players = fba_drv->nMaxPlayers;
                                     games[row]->def_core_id = fba_drv->nDefCoreID;
-
+                                    games[row]->core_id = j;
                                     games[row]->nSize = i;				// hash map position
                                     games[row]->GameID = fba_drv->nGameID;
                                     games[row]->bAvailable = fba_drv->isAvailable;
@@ -172,6 +173,8 @@ int c_fbaRL::ParseGameListCache()
                                             snprintf(games[row]->parent_name, 128,  "%s", fba_drv->szParent);
                                     games[row]->isFavorite = fba_drv->isFavorite;
                                 }
+                                else
+                                    games[row]->core_id = j;
                                 flag_available = true;
                                 //snprintf(fbaRL->games[row]->path, 256, "%s", fba_games->szPath);
                                 str = strrchr(fba_games->szPath,'/');
@@ -561,8 +564,14 @@ void c_fbaRL::RomScan2() {
                                                 snprintf(system, sizeof(system), "amiga");
                                             }
                                             else {
-                                                coreid = 1;
-                                                snprintf(system, sizeof(system), "mame");
+                                                if (strstr(lower, "neocd")) {
+                                                    coreid = 1;
+                                                    snprintf(system, sizeof(system), "neocd");
+                                                }
+                                                else {
+                                                        coreid = 1;
+                                                        snprintf(system, sizeof(system), "mame");
+                                                    }
                                             }
                                         }
                                 }
@@ -574,7 +583,8 @@ void c_fbaRL::RomScan2() {
                         snprintf(key, KEY_MAX_LENGTH, "%s%s", system, lower);
                         free(lower);
 
-                        if (hashmap_get(drvmap, key, (void**)(&fba_drv)) >= 0) {
+                        if (((*it).substr((*it).find_last_of(".") + 1) != "bin" && (*it).substr((*it).find_last_of(".") + 1) != "BIN") || strcmp(system, "neocd") != 0)
+                            if (hashmap_get(drvmap, key, (void**)(&fba_drv)) >= 0) {
                                     //printf("Trovato: %s\n", (*it).c_str());
                                     fba_games = (FBA_GAMES*) malloc(sizeof(FBA_GAMES));
                                     if (fba_games == NULL) {
@@ -595,7 +605,7 @@ void c_fbaRL::RomScan2() {
                                                 "values(%d, '%s', %d)",fba_drv->nGameID , fba_games->szPath, coreid);
                                     rc = sqlite3_exec(mdb, sql, NULL, NULL, &errmsg);
 
-                        }
+                            }
 
 
                         if (barDown % 100 == 0) {

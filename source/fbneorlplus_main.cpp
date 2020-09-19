@@ -752,7 +752,6 @@ int CapApp::InitDB()
             printf("Open DB failed!\n");
             return 1;
     }
-
     snprintf(buf, sizeof(buf), "SELECT ord_game_id COL00 FROM games_favorite");
     rc = sqlite3_prepare_v2(mdb, buf, -1, &stmt, 0);
     if( rc != SQLITE_OK ) {
@@ -763,7 +762,6 @@ int CapApp::InitDB()
     }
     rc = sqlite3_step(stmt);
     int row = 0;
-
     while (rc == SQLITE_ROW) {
         row = sqlite3_column_int(stmt, COL00);
         fav[row] = true;

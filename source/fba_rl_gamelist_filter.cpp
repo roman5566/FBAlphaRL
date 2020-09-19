@@ -223,8 +223,6 @@ bool c_fbaRL::FilterGame(char* szSystemMask)
 
 void c_fbaRL::InitFilterList()
 {
-	//printf("InitFilterList START - app.nTotalGamesWithDup: %d\n",app.nTotalGamesWithDup);
-//	printf("Total games with dup: %d\n", app.nTotalGamesWithDup);
 	bProcessingGames = true;
     hashmap_map *drvmap, *gamesmap;
     FBA_DRV *fba_drv;
@@ -239,17 +237,15 @@ void c_fbaRL::InitFilterList()
 	nSelectedGame = 0;
 	nGameListTop = 0;
 	nFilteredGames = 0;
-
-//    printf("Games available: %d\n", nTotalGames);
 	fgames = (c_game**)malloc(sizeof(c_game) * MAX_GAMES);
 	if (fgames == NULL)
-        printf("Memory error fgames\n");
+		printf("Memory error fgames\n");
 //    else
 //        printf("Malloc Fgames OK\n");
 	//memset(fgames, 0, sizeof(c_game) * MAX_GAMES);
 
 	// process...
-    if (nTotalGames == 0) {
+	if (nTotalGames == 0) {
 		bProcessingGames = false;
 		return;
 	}
@@ -260,30 +256,38 @@ void c_fbaRL::InitFilterList()
 		{
 			continue;
 		}
-
+		//printf("1 %s\n", games[n]->name);
 		//favorite?
         if(g_opt_nActiveSysFilter == MASKFAVORITE) {
             if (!games[n]->isFavorite)
                     continue;
         }
-		else
-            if(FilterGame(games[n]->sysmask) == false)
+		else {
+			//printf("ELSE %s\n", games[n]->sysmask);
+			if(FilterGame(games[n]->sysmask) == false)
             {
                 continue;
             }
-
+		}
+		 
 		if (!g_opt_bDisplayCloneGames && !!games[n]->isClone)
 		{
 			continue;
 		}
+		 
 		fgames[nFilteredGames] = new c_game(nFilteredGames);
-
+		
 		//strcpy(fgames[nFilteredGames]->path		, games[n]->path);
 		fgames[nFilteredGames]->GameID = games[n]->nGame;
+		
 		fgames[nFilteredGames]->isFavorite = games[n]->isFavorite;
+		
 		strcpy(fgames[nFilteredGames]->zipname	, games[n]->zipname);
+		
 		hashmap_position = games[n]->nSize;
+		
         fba_drv = (FBA_DRV *)drvmap->data[hashmap_position].data;
+		
         //fgames[nFilteredGames]->title = (char *)malloc(sizeof(char)*11);
         //snprintf(fgames[nFilteredGames]->title,11,fba_drv->szTitle);
         fgames[nFilteredGames]->title = fba_drv->szTitle;
@@ -304,7 +308,6 @@ void c_fbaRL::InitFilterList()
 		nFilteredGames++;
 	}
 
-//    printf("Games filtered: %d\n", nFilteredGames);
 	if(nFilteredGames < 1) {
 		bProcessingGames = false;
 		////ResetPreviewImage();

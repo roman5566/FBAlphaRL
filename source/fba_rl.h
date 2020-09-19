@@ -61,6 +61,7 @@ void _ScanROMs(uint64_t);
 #define STATUS_CORRUPT_APP_DLG	22
 
 #define STATUS_ROMSCAN_START	30
+#define STATUS_ROMSCAN_WORKING	33
 #define STATUS_ROMSCAN_END		31
 #define STATUS_ROMPATH_CHANGED	32
 
@@ -481,7 +482,7 @@ public:
 	void		InitRomInfoMenu();
 	void		EndRomInfoMenu();
 	void		RomInfo_Frame();
-	void        RomScan2();
+	//void        RomScan2();
 
     void        MakeAmigaCFG(char *romPath, char *subsystem, char** argv);
 

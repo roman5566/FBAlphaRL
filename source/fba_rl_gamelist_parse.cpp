@@ -13,6 +13,7 @@
 #include "misc.h"
 #include <sys/systime.h>
 #include <sysutil/sysutil.h>
+#include <sys/thread.h>
 
 
 #define DIR_SKIP_DOT			1			//dont include "."
@@ -383,9 +384,7 @@ void c_fbaRL::RefreshGameList()
 
 void c_fbaRL::InitGameList()
 {
-	//printf("InitGameList START\n");
-
-    nTotalGames = 0;
+	nTotalGames = 0;
 	//nMissingGames = 0;
 
 	bProcessingGames = true;
@@ -396,17 +395,13 @@ void c_fbaRL::InitGameList()
         printf("Exit memory fail\n");
         exit(0);
 	}
-	//printf("Malloc games OK\n");
 	//memset(games, 0, sizeof(c_game) * MAX_GAMES);
 
-//    printf("Init games 1\n");
-	// Check for FBA.GAMELIST.CACHE.DAT...
+    // Check for FBA.GAMELIST.CACHE.DAT...
 	if(!ParseGameListCache())
 	{
 		// Not found, rescan ROMs
-//		printf("Init games 2\n");
 		ParseGameList();
-//		printf("Init games 3\n");
 	}
 	//InitFilterList();
 
@@ -416,8 +411,7 @@ void c_fbaRL::InitGameList()
 void c_fbaRL::EndGameList()
 {
 	bProcessingGames = true;
-    //printf("Process to delete games array of %d\n", app.nTotalGamesWithDup);
-
+    
 	for(unsigned n = 0; n < app.nTotalGamesWithDup; n++)
 	{
 		if (games[n] != NULL) {
@@ -440,232 +434,7 @@ void c_fbaRL::EndGameList()
 }
 
 
-void c_fbaRL::RomScan2() {
-     int rc = 1;
 
-    sqlite3 *mdb;
-    char buf[256];
-    char szMsg[256] = "";
-    sprintf(szMsg, "Scanning ROM(s), please wait...\n\nNotice: If you have MAME complete romset, be patient, the process could take a few minutes.");
-    vs32 progressbar_action = 0;
-    char sql[256];
-    //char pszFilePath[256];
-    u64 tsec1, tnsec1, tsec2, tnsec2;
-    hashmap_map *gamesmap, *drvmap;
-    gamesmap =  (hashmap_map *) app.gamesMap;
-    drvmap = (hashmap_map *) app.drvMap;
-    FBA_DRV *fba_drv;
-    FBA_GAMES *fba_games;
-
-    msgDialogOpen2((msgType)(MSG_DIALOG_DOUBLE_PROGRESSBAR | MSG_DIALOG_DISABLE_CANCEL_ON | MSG_DIALOG_MUTE_ON),
-                   szMsg, NULL, NULL, NULL);
-	msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX0,"");
-	msgDialogProgressBarReset(MSG_PROGRESSBAR_INDEX0);
-	msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX1,"");
-	msgDialogProgressBarReset(MSG_PROGRESSBAR_INDEX1);
-	msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX0,0);
-	msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX1,0);
-    //waitFlip();
-    app.Flip();
-
-
-    snprintf(buf, sizeof(buf), "/dev_hdd0/game/FBNE00123/USRDIR/retro.db");
-
-    rc = sqlite3_open_v2(buf, &mdb,
-			   SQLITE_OPEN_READWRITE,
-		       NULL);
-
-    if(mdb == NULL) {
-            printf("Open DB failed!\n");
-            return ;
-        }
-    while(!progressbar_action) {
-
-        sqlite3_stmt *stmt;
-
-        snprintf(sql, sizeof(sql), "DELETE FROM games_available");
-        rc = sqlite3_prepare_v2(mdb, sql, -1, &stmt, 0);
-        if( rc != SQLITE_OK ) {
-                printf("DELETE games_available failed!\n");
-                return ;
-        }
-        rc = sqlite3_step(stmt);
-
-        sqlite3_finalize(stmt);
-
-
-        int coreid;
-        char system[64];
-        char *lower = NULL;
-        std::vector<std::string> dirs;
-        std::vector<std::string>::iterator it;
-        uint32_t nPaths = sizeof(g_opt_szROMPaths) / 2048;
-
-        size_t found ;
-
-        int error;
-        int nDrv = 0;
-        char *errmsg;
-        int barUp = 0;
-        int barDown = 0;
-        char msg[256] = "";
-        char key[KEY_MAX_LENGTH];
-        nTotalGames = 0;
-        int dup = 0;
-
-        uint32_t x;
-
-        for(x = 0; x < (uint32_t) drvmap->table_size; x++) {  // Reset avilable
-            if(drvmap->data[x].in_use == 1) {
-                fba_drv = (FBA_DRV *)drvmap->data[x].data;
-                fba_drv->isAvailable = false;
-            }
-        }
-
-        for(x = 0; x < nPaths; x++) {
-            usleep(1000);
-            barUp++;
-            msgDialogProgressBarReset(MSG_PROGRESSBAR_INDEX1);
-            sprintf(msg,"%d / %d - Folders.", barUp, nPaths );
-            msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX0,msg);
-            msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX0,(int)100/nPaths);
-
-            if(dirExist(g_opt_szROMPaths[x])) {
-                //printf("DIR: %s\n", g_opt_szROMPaths[x]);
-                dirs.clear();
-                dirs = readDir( g_opt_szROMPaths[x], DIR_NO_DOT_AND_DOTDOT | DIR_FILES);
-                it = dirs.begin();
-                barDown = 0;
-                while( it < dirs.end()) {
-
-                    barDown++;
-
-                    found = (*it).find_last_of(".");
-                    if (found > 0) {
-                        sysGetCurrentTime(&tsec1, &tnsec1);
-                        lower = toLowerCase(g_opt_szROMPaths[x],strlen(g_opt_szROMPaths[x]));
-                        if (strstr(lower, "mame125")) {
-                                coreid = 3;
-                                snprintf(system, sizeof(system), "mame");
-                        }
-                        else
-                                if (strstr(lower, "snes")) {
-                                            coreid = 2;
-                                            snprintf(system, sizeof(system), "snes");
-                                }
-                                else {
-                                        if (strstr(lower, "megadriv")) {
-                                            coreid = 4;
-                                            snprintf(system, sizeof(system), "megadrive");
-                                        }
-                                        else {
-                                            if (strstr(lower, "amiga")) {
-                                                coreid = 5;
-                                                snprintf(system, sizeof(system), "amiga");
-                                            }
-                                            else {
-                                                if (strstr(lower, "neocd")) {
-                                                    coreid = 1;
-                                                    snprintf(system, sizeof(system), "neocd");
-                                                }
-                                                else {
-                                                        coreid = 1;
-                                                        snprintf(system, sizeof(system), "mame");
-                                                    }
-                                            }
-                                        }
-                                }
-
-
-    //                    printf("GGGame: %s \n", (*it).substr(0,found).c_str());
-                        free(lower);
-                        lower = toLowerCase((char *)(*it).substr(0,found).c_str(), (*it).substr(0,found).length());
-                        snprintf(key, KEY_MAX_LENGTH, "%s%s", system, lower);
-                        free(lower);
-
-                        if (((*it).substr((*it).find_last_of(".") + 1) != "bin" && (*it).substr((*it).find_last_of(".") + 1) != "BIN") || strcmp(system, "neocd") != 0)
-                            if (hashmap_get(drvmap, key, (void**)(&fba_drv)) >= 0) {
-                                    //printf("Trovato: %s\n", (*it).c_str());
-                                    fba_games = (FBA_GAMES*) malloc(sizeof(FBA_GAMES));
-                                    if (fba_games == NULL) {
-                                                printf("Exit.... memory error malloc(sizeof(FBA_GAMES)\n");
-                                                exit(0);
-                                    }
-                                    snprintf(fba_games->szPath, 256, "%s/%s",g_opt_szROMPaths[x], (*it).c_str());
-                                    snprintf(fba_games->key_string, KEY_MAX_LENGTH, "%s%s%d",system, fba_drv->szName, coreid);
-                                    error = hashmap_put(gamesmap, fba_games->key_string, fba_games);
-                                    if (error == MAP_OK) {
-                                        //printf("Error: %d - %s\n", error, fba_games->szPath);
-                                        nTotalGames++;
-                                    }
-                                    else
-                                        dup++;
-                                    fba_drv->isAvailable = true;
-                                    snprintf(sql, sizeof(sql), "INSERT INTO games_available (game_id, path, coreid) "
-                                                "values(%d, '%s', %d)",fba_drv->nGameID , fba_games->szPath, coreid);
-                                    rc = sqlite3_exec(mdb, sql, NULL, NULL, &errmsg);
-
-                            }
-
-
-                        if (barDown % 100 == 0) {
-                            sysGetCurrentTime(&tsec2, &tnsec2);
-                            sprintf(msg,"%d / %d - Files. Time: %f", barDown, static_cast<int>(dirs.size()), (double) (tsec2 - tsec1) +
-                                            (tsec2 - tsec1) > 0 ? (double)((long)(1000000000L - tnsec2 + tnsec1))/1000000000L : (double)((long)(tnsec2 - tnsec1))/1000000000L);
-                            msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX1,msg);
-                            msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX1,(int)100/static_cast<int>(dirs.size()));
-
-                            waitFlip();
-                            app.Flip();
-                            sysUtilCheckCallback();
-                        //usleep(1000);
-                        }
-                    }
-
-                    ++it;
-
-
-                }
-                nDrv++;
-            }
-
-
-        }
-
-        snprintf(sql, sizeof(sql), "select count(g.id) from games g left join games_available ga on g.id = ga.game_id");
-        rc = sqlite3_prepare_v2(mdb, sql, -1, &stmt, 0);
-        if( rc != SQLITE_OK ) {
-                printf("Query failed!\n");
-                sqlite3_finalize(stmt);
-                sqlite3_close(mdb);
-                return ;
-        }
-        rc = sqlite3_step(stmt);
-        app.nTotalGamesWithDup = sqlite3_column_int(stmt, 0);
-        app.nMissingGames = app.nTotalGamesWithDup - nTotalGames - dup;
-
-        sqlite3_finalize(stmt);
-        rc = sqlite3_close(mdb);
-        //printf("nTotalGamesWithDup: %d - nTotalGames: %d - nMissingGames: %d\n", app.nTotalGamesWithDup, nTotalGames, app.nMissingGames);
-
-        if (rc)
-            printf("CLOSE PROBLEM:select count(*) %d\n",rc);
-
-        break;
-    }
-    hashmap_free(app.drvMap);
-    hashmap_free(app.gamesMap);
-    app.drvMap = hashmap_new();
-    app.gamesMap = hashmap_new();
-    app.InitDB();
-    msgDialogAbort();
-    waitFlip();
-    bProcessingGames = false;
-    nStatus = STATUS_ROMSCAN_END;
-
-    ParseGameListCache();
-
-}
 
 
 

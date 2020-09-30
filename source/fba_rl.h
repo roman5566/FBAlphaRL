@@ -111,11 +111,12 @@ void _ScanROMs(uint64_t);
 #define MASKSNES		23
 #define MASKMEGADRIVE	24
 #define MASKAMIGA       25
-#define MASKFAVORITE	26
+#define MASKCOLECO		26
+#define MASKFAVORITE	27
 
 
-#define MASKALL			27
-#define MASKCUSTOM		28
+#define MASKALL			28
+#define MASKCUSTOM		29
 
 
 #define MENU_OPT_AUTO_AR		0
@@ -141,7 +142,7 @@ void _ScanROMs(uint64_t);
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
 #define MAX_GAMES	18000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 15833
+#define TOTAL_DRV_GAMES 16126
 
 class c_game
 {

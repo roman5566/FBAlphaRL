@@ -9,6 +9,18 @@
 #include <sys/thread.h>
 #include <sys/systime.h>
 
+
+CoreOptions resolveCoreOption(string lower) {
+    if (strstr(lower.c_str(), "mame125")) return mame125;
+    if (strstr(lower.c_str(), "snes")) return snes;
+    if (strstr(lower.c_str(), "megadriv")) return megadriv;
+    if (strstr(lower.c_str(), "amiga")) return amiga;
+    if (strstr(lower.c_str(), "neocd")) return neocd;
+    if (strstr(lower.c_str(), "coleco")) return coleco;
+    //...
+    return CoreOptionsInvalid;
+}
+
 static void RomScan2(void* arg) {
     int rc = 1;
     
@@ -119,7 +131,46 @@ static void RomScan2(void* arg) {
                     if (found > 0) {
                         sysGetCurrentTime(&tsec1, &tnsec1);
                         lower = toLowerCase(g_opt_szROMPaths[x], strlen(g_opt_szROMPaths[x]));
-                        if (strstr(lower, "mame125")) {
+                        switch (resolveCoreOption(lower))
+                        {
+                            case mame125: {
+                                coreid = 3;
+                                snprintf(system, sizeof(system), "mame");
+                                break;
+                            }
+                            case snes: {
+                                coreid = 2;
+                                snprintf(system, sizeof(system), "snes");
+                                break;
+                            }
+                            case megadriv: {
+                                coreid = 4;
+                                snprintf(system, sizeof(system), "megadrive");
+                                break;
+                            }
+                            case amiga: {
+                                coreid = 5;
+                                snprintf(system, sizeof(system), "amiga");
+                                break;
+                            }
+                            case neocd: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "neocd");
+                                break;
+                            }
+                            case coleco: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "coleco");
+                                break;
+                            }
+                                        // handles Option_Invalid and any other missing/unmapped cases
+                            default: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "mame");
+                                break;
+                            }
+                        }
+                        /*if (strstr(lower, "mame125")) {
                             coreid = 3;
                             snprintf(system, sizeof(system), "mame");
                         }
@@ -149,7 +200,7 @@ static void RomScan2(void* arg) {
                                         }
                                     }
                                 }
-                            }
+                            }*/
 
 
                         //                    printf("GGGame: %s \n", (*it).substr(0,found).c_str());

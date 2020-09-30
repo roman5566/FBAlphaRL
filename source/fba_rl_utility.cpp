@@ -280,7 +280,7 @@ void c_fbaRL::LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char
 		{
 		char *pathUpper = toUpperCase(argv[0], strlen(argv[0])); //Check if is a MAME 0.125   // CRYSTAL START
 
-		if (strstr(pathUpper, "MAME125") != NULL || strcmp(fgames[nSelectedGame]->sysmask, "MASKMIDWAY") == 0){
+		if (strstr(pathUpper, "MAME125") != NULL) { //|| strcmp(fgames[nSelectedGame]->sysmask, "MASKMIDWAY") == 0){
 						free(pathUpper);
 						char mame125_core_path[]	= "/dev_hdd0/game/FBNE00123/USRDIR/MAME125/mame125.SELF";
 

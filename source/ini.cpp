@@ -45,7 +45,8 @@ char g_opt_szInputCFG[][2048] = {
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/midway.cfg",  //CRYSTAL
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/snes.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/megadrive.cfg",
-	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/amiga.cfg"
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/amiga.cfg",
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/coleco.cfg"
 
 };
 
@@ -87,7 +88,7 @@ bool g_opt_bCustomSysFilter[MASKCUSTOM+1] =
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
-	true // <--- fillers
+	true, true // <--- fillers
 };
 
 bool g_opt_bUseUNIBIOS = false;
@@ -203,6 +204,7 @@ int iniWrite()
 		fprintf(fp, "filter_snes:\"%s\"\n"			, g_opt_bCustomSysFilter[23] ? "yes" : "no");
 		fprintf(fp, "filter_megadrive:\"%s\"\n"		, g_opt_bCustomSysFilter[24] ? "yes" : "no");
 		fprintf(fp, "filter_amiga:\"%s\"\n"	    	, g_opt_bCustomSysFilter[25] ? "yes" : "no");
+		fprintf(fp, "filter_coleco:\"%s\"\n"		, g_opt_bCustomSysFilter[26] ? "yes" : "no");
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -284,6 +286,7 @@ int iniWrite()
 		fprintf(fp, "input_snes:\"%s\"\n"			, g_opt_szInputCFG[23]);
 		fprintf(fp, "input_megadrive:\"%s\"\n"		, g_opt_szInputCFG[24]);
 		fprintf(fp, "input_amiga:\"%s\"\n"		    , g_opt_szInputCFG[25]);
+		fprintf(fp, "input_coleco:\"%s\"\n"			, g_opt_szInputCFG[26]);
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -580,6 +583,7 @@ int iniRead()
 		if(!getBoolOption(fp, "filter_snes:\""			, &g_opt_bCustomSysFilter[23])) {return 0;}
         if(!getBoolOption(fp, "filter_megadrive:\""		, &g_opt_bCustomSysFilter[24])) {return 0;}
         if(!getBoolOption(fp, "filter_amiga:\""		    , &g_opt_bCustomSysFilter[25])) {return 0;}
+		if(!getBoolOption(fp, "filter_coleco:\""		, &g_opt_bCustomSysFilter[26])) { return 0; }
 
 		// -----------------------------------------------------------------------------------------
 		// Enable / Disable Neo-Geo UNI-BIOS
@@ -730,6 +734,10 @@ int iniRead()
 		pszStrOption = getStrOption(fp, "input_amiga:\"");
 		if(pszStrOption == NULL) {return 0;}
 		strcpy(g_opt_szInputCFG[25], pszStrOption);
+
+		pszStrOption = getStrOption(fp, "input_coleco:\"");
+		if (pszStrOption == NULL) { return 0; }
+		strcpy(g_opt_szInputCFG[26], pszStrOption);
 
 
 

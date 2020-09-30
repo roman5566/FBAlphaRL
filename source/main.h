@@ -83,6 +83,18 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char u8;
 
+enum CoreOptions {
+	CoreOptionsInvalid,
+	mame125,
+	snes,
+	megadriv,
+	amiga,
+	neocd,
+	coleco
+};
+
+//CoreOptions resolveCoreOption(string input);
+
 typedef struct FBA_DRV_S
 {
 	char szName[128];

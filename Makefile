@@ -161,7 +161,7 @@ pkgmd: npdrm
 pkgAmiga: npdrm
 	$(VERB) echo building Amiga upgrade pkg ... $(notdir $@)
 	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgAmiga/PARAM.SFO
-	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgMD/ $(TARGET)_$(APP_VER)_amiga_upgrade.pkg >> /dev/null
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgAmiga/ $(TARGET)_$(APP_VER)_amiga_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------
 
 npdrm: $(BUILD)

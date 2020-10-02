@@ -16,7 +16,7 @@
 #include <rsx/rsx.h>
 
 // --------------------------------------------------------------------
-#define _APP_VER "2.10"
+#define _APP_VER "2.11"
 #define _APP_TITLE "\tFB NEO PLUS RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013] CrystalCT [2020]"
 // --------------------------------------------------------------------
 

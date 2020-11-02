@@ -117,9 +117,9 @@ void CapApp::initSPUSound() {
 	SND_Init_cpp(spu);
 
 	SND_Pause_cpp(0);
-
+    std::vector <std::string> tmp;
     tracks.clear();
-	tracks = readDir("/dev_hdd0/game/FBNE00123/USRDIR/soundtracks", DIR_NO_DOT_AND_DOTDOT | DIR_FILES);
+	readDir("/dev_hdd0/game/FBNE00123/USRDIR/soundtracks", DIR_NO_DOT_AND_DOTDOT | DIR_FILES, tracks, tmp);
 	trackID = tracks.begin() + g_opt_nTrackID;
 	if (trackID < tracks.end() && g_opt_bMusic) {
         char tpath[256];

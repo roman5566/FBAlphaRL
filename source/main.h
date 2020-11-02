@@ -90,7 +90,10 @@ enum CoreOptions {
 	megadriv,
 	amiga,
 	neocd,
-	coleco
+	coleco,
+	turbografx16,
+	pcengine,
+	supergrafx
 };
 
 //CoreOptions resolveCoreOption(string input);

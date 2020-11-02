@@ -15,7 +15,7 @@ char*		toUpperCase(char* pszStr, size_t nLen);
 double		GetByteUnit(int64_t nSize);
 const char* GetByteUnitStr(int64_t nSize);
 char        *adjustQuotation(char *str);
-std::vector<std::string> readDir(const char *path, u32 flags );
+int readDir(const char *path, u32 flags, std::vector<std::string>& files, std::vector<std::string> &dirs);
 bool		dirExist(const char* szDir);
 bool		fileExist(const char* szFile);
 uint64_t	getFileSize(const char* szFilePath);

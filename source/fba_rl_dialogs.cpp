@@ -17,13 +17,16 @@ CoreOptions resolveCoreOption(string lower) {
     if (strstr(lower.c_str(), "amiga")) return amiga;
     if (strstr(lower.c_str(), "neocd")) return neocd;
     if (strstr(lower.c_str(), "coleco")) return coleco;
+    if (strstr(lower.c_str(), "tg16")) return turbografx16;
+    if (strstr(lower.c_str(), "pce")) return pcengine;
+    if (strstr(lower.c_str(), "sgx")) return supergrafx;
     //...
     return CoreOptionsInvalid;
 }
 
 static void RomScan2(void* arg) {
     int rc = 1;
-    
+
     //sleep(5);
     sqlite3* mdb;
     char buf[256];
@@ -40,6 +43,7 @@ static void RomScan2(void* arg) {
     FBA_GAMES* fba_games;
     //fbaRL->nStatus = STATUS_ROMSCAN_END;
     //sysThreadExit(0);
+    
     msgDialogOpen2((msgType)(MSG_DIALOG_DOUBLE_PROGRESSBAR | MSG_DIALOG_DISABLE_CANCEL_ON | MSG_DIALOG_MUTE_ON),
         szMsg, NULL, NULL, NULL);
     msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX0, "");
@@ -80,7 +84,8 @@ static void RomScan2(void* arg) {
         int coreid;
         char system[64];
         char* lower = NULL;
-        std::vector<std::string> dirs;
+        std::vector<std::string> files;
+        std::vector<std::string> dir;
         std::vector<std::string>::iterator it;
         uint32_t nPaths = sizeof(g_opt_szROMPaths) / 2048;
 
@@ -93,44 +98,52 @@ static void RomScan2(void* arg) {
         int numfiles = 0;
         int barDown = 0;
         int step = 0;
+        int deltadir = 0;
         char msg[256] = "";
         char key[KEY_MAX_LENGTH];
         fbaRL->nTotalGames = 0;
         int dup = 0;
         uint32_t x;
 
-        for (x = 0; x < (uint32_t)drvmap->table_size; x++) {  // Reset avilable
+        for (x = 0; x < (uint32_t)drvmap->table_size; x++) {  // Reset available
             if (drvmap->data[x].in_use == 1) {
                 fba_drv = (FBA_DRV*)drvmap->data[x].data;
                 fba_drv->isAvailable = false;
             }
         }
+        dir.clear();
         for (x = 0; x < nPaths; x++) {
-           
+            if (dirExist(g_opt_szROMPaths[x]))
+                dir.push_back(g_opt_szROMPaths[x]);
+        }
+
+        //for (x = 0; x < nPaths; x++) {
+        while (dir.size() > 0) {
             barUp++;
             //msgDialogProgressBarReset(MSG_PROGRESSBAR_INDEX1);
-            sprintf(msg, "%d / %d - Folders.", barUp, nPaths);
+            sprintf(msg, "%d / %d - Folders.", barUp, (int)dir.size() + deltadir);
             msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX0, msg);
-            msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX0, (int)round(1.4 + 100 / nPaths));
+            msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX0, (int)round(1.4 + 100 / (dir.size() + deltadir)));
             msgDialogProgressBarReset(MSG_PROGRESSBAR_INDEX1);
             msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX1, 0);
 
-            if (dirExist(g_opt_szROMPaths[x])) {
-                //printf("DIR: %s\n", g_opt_szROMPaths[x]);
-                dirs.clear();
-                dirs = readDir(g_opt_szROMPaths[x], DIR_NO_DOT_AND_DOTDOT | DIR_FILES);
-                it = dirs.begin();
+            //if (dirExist(g_opt_szROMPaths[x])) {
+                //printf("DIR: %s size: %d\n", dir.back().c_str(), (int) dir.size());
+                files.clear();
+                //readDir(g_opt_szROMPaths[x], DIR_NO_DOT_AND_DOTDOT | DIR_FILES | DIR_DIRS, files, dir);
+                readDir(dir.back().c_str(), DIR_NO_DOT_AND_DOTDOT | DIR_FILES | DIR_DIRS, files, dir);
+                it = files.begin();
                 barDown = 0;
-                while (it < dirs.end()) {
+                while (it < files.end()) {
 
                     barDown++;
-                    numfiles = static_cast<int>(dirs.size());
+                    numfiles = static_cast<int>(files.size());
                     step = (int)floor(0.9 + (numfiles / 10));
 
                     found = (*it).find_last_of(".");
                     if (found > 0) {
                         sysGetCurrentTime(&tsec1, &tnsec1);
-                        lower = toLowerCase(g_opt_szROMPaths[x], strlen(g_opt_szROMPaths[x]));
+                        lower = toLowerCase((char *)dir.back().c_str(), strlen(dir.back().c_str()));
                         switch (resolveCoreOption(lower))
                         {
                             case mame125: {
@@ -161,6 +174,21 @@ static void RomScan2(void* arg) {
                             case coleco: {
                                 coreid = 1;
                                 snprintf(system, sizeof(system), "coleco");
+                                break;
+                            }
+                            case turbografx16: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "turbografx16");
+                                break;
+                            }
+                            case pcengine: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "pcengine");
+                                break;
+                            }
+                            case supergrafx: {
+                                coreid = 1;
+                                snprintf(system, sizeof(system), "supergrafx");
                                 break;
                             }
                                         // handles Option_Invalid and any other missing/unmapped cases
@@ -202,8 +230,7 @@ static void RomScan2(void* arg) {
                                 }
                             }*/
 
-
-                        //                    printf("GGGame: %s \n", (*it).substr(0,found).c_str());
+                        
                         free(lower);
                         lower = toLowerCase((char*)(*it).substr(0, found).c_str(), (*it).substr(0, found).length());
                         snprintf(key, KEY_MAX_LENGTH, "%s%s", system, lower);
@@ -216,7 +243,7 @@ static void RomScan2(void* arg) {
                                     printf("Exit.... memory error malloc(sizeof(FBA_GAMES)\n");
                                     exit(0);
                                 }
-                                snprintf(fba_games->szPath, 256, "%s/%s", g_opt_szROMPaths[x], (*it).c_str());
+                                snprintf(fba_games->szPath, 256, "%s/%s", dir.back().c_str(), (*it).c_str());
                                 snprintf(fba_games->key_string, KEY_MAX_LENGTH, "%s%s%d", system, fba_drv->szName, coreid);
                                 error = hashmap_put(gamesmap, fba_games->key_string, fba_games);
                                 if (error == MAP_OK) {
@@ -235,7 +262,7 @@ static void RomScan2(void* arg) {
 
                         if (barDown % step == 0) {
                             sysGetCurrentTime(&tsec2, &tnsec2);
-                            sprintf(msg, "%d / %d - Files. Time: %f", barDown, static_cast<int>(dirs.size()), (double)(tsec2 - tsec1) +
+                            sprintf(msg, "%d / %d - Files. Time: %f", barDown, static_cast<int>(files.size()), (double)(tsec2 - tsec1) +
                                 (tsec2 - tsec1) > 0 ? (double)((long)(1000000000L - tnsec2 + tnsec1)) / 1000000000L : (double)((long)(tnsec2 - tnsec1)) / 1000000000L);
                             msgDialogProgressBarSetMsg(MSG_PROGRESSBAR_INDEX1, msg);
                             msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX1, (int)round(1.4 + (numfiles / step)));
@@ -256,11 +283,13 @@ static void RomScan2(void* arg) {
                 }
                 nDrv++;
             
-            }
+            //}
             msgDialogProgressBarInc(MSG_PROGRESSBAR_INDEX1, 100);
             usleep(200000);
-            
+            dir.pop_back();
+            deltadir++;
         }
+        
         snprintf(sql, sizeof(sql), "select count(g.id) from games g left join games_available ga on g.id = ga.game_id");
         rc = sqlite3_prepare_v2(mdb, sql, -1, &stmt, 0);
         if (rc != SQLITE_OK) {

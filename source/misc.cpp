@@ -227,23 +227,20 @@ uint64_t getFileSize(const char* szFilePath)
     return ret;
 }
 
-std::vector<std::string> readDir( const char *path, u32 flags )
+int readDir( const char *path, u32 flags, std::vector<std::string>& files, std::vector<std::string> &dir)
 {
 	int i;
 	s32 fd;
 	sysFSDirent entry;
 	u64 read;
-
-	std::vector<std::string> ret;
-	std::vector<std::string> files;
-	std::vector<std::string> dirs;
+	std::string fpath = path;
 
 	//open dir
 	i = sysFsOpendir( path, &fd );
 	if( i )
 	{
 		printf("sysFsOpendir( %s ): %i\n", path, i );
-		return ret;
+		return 0;
 	}
 
 	while( !sysFsReaddir( fd, &entry , &read ) && read > 0 )
@@ -259,7 +256,7 @@ std::vector<std::string> readDir( const char *path, u32 flags )
 			if( entry.d_name[ 1 ] == 0 )
 			{
 				if( !( flags & DIR_SKIP_DOT ) )
-					dirs.push_back( str );
+					dir.push_back( str );
 
 				continue;
 			}
@@ -267,7 +264,7 @@ std::vector<std::string> readDir( const char *path, u32 flags )
 			if( entry.d_name[ 1 ] == '.' && entry.d_name[ 2 ] == 0 )
 			{
 				if( !( flags & DIR_SKIP_DOTDOT ) )
-					dirs.push_back( str );
+					dir.push_back( str );
 
 				continue;
 			}
@@ -281,7 +278,7 @@ std::vector<std::string> readDir( const char *path, u32 flags )
 		//sub dirs
 		if( entry.d_type == 1 && ( flags & DIR_DIRS ) )
 		{
-			dirs.push_back( str );
+			dir.insert(dir.begin(), fpath + "/" + str );
 			continue;
 		}
 		//files
@@ -296,12 +293,12 @@ std::vector<std::string> readDir( const char *path, u32 flags )
 	sysFsClosedir( fd );
 
 	//sort
-	std::sort( dirs.begin(), dirs.end() );
-	std::sort( files.begin(), files.end() );
-	ret.insert( ret.begin(), dirs.begin(), dirs.end() );
-	ret.insert( ret.end(), files.begin(), files.end() );
+	//std::sort( ds.begin(), ds.end() );
+	//std::sort( files.begin(), files.end() );
+	//files.insert(files.begin(), dir.begin(), dir.end() );
+	//files.insert(files.end(), files.begin(), files.end() );
 
-	return ret;
+	return 1;
 }
 
 void removeCarraigeReturn(char * str) {

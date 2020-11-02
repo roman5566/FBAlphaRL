@@ -16,7 +16,7 @@
 #include <rsx/rsx.h>
 
 // --------------------------------------------------------------------
-#define _APP_VER "2.11"
+#define _APP_VER "2.12"
 #define _APP_TITLE "\tFB NEO PLUS RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013] CrystalCT [2020]"
 // --------------------------------------------------------------------
 
@@ -112,11 +112,14 @@ void _ScanROMs(uint64_t);
 #define MASKMEGADRIVE	24
 #define MASKAMIGA       25
 #define MASKCOLECO		26
-#define MASKFAVORITE	27
+#define MASKTG16		27
+#define MASKPCE			28
+#define MASKSGX			29
+#define MASKFAVORITE	30
 
 
-#define MASKALL			28
-#define MASKCUSTOM		29
+#define MASKALL			31
+#define MASKCUSTOM		32
 
 
 #define MENU_OPT_AUTO_AR		0
@@ -141,8 +144,8 @@ void _ScanROMs(uint64_t);
 #define SAFE_FREE(x)	if(x) {	free(x); *&x = NULL; }
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
-#define MAX_GAMES	18000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 16126
+#define MAX_GAMES	20000 // <-- should be enough xD
+#define TOTAL_DRV_GAMES 16543
 
 class c_game
 {

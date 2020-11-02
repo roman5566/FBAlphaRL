@@ -61,6 +61,9 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"FILTER [MEGA DRIVE]");
 	options_menu->AddItem((char*)"FILTER [AMIGA]");
 	options_menu->AddItem((char*)"FILTER [COLECO]");
+	options_menu->AddItem((char*)"FILTER [TURBOGRAFX-16]");
+	options_menu->AddItem((char*)"FILTER [PC ENGINE]");
+	options_menu->AddItem((char*)"FILTER [SUPERGRAFX]");
 	options_menu->AddItem((char*)"FILTER [FAVORITE]");
 
 	options_menu->AddItem((char*)"ROMs PATH #1");
@@ -103,6 +106,9 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"[MEGA DRIVE] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[AMIGA] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[COLECO] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[TURBOGRAFX-16] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[PC ENGINE] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[SUPERGRAFX] INPUT .CFG PATH");
 }
 
 void c_fbaRL::EndOptionsMenu()

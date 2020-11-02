@@ -42,11 +42,14 @@ char g_opt_szInputCFG[][2048] = {
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/toaplan.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/misc_pre90.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/misc_post90.cfg",
-	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/midway.cfg",  //CRYSTAL
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/midway.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/snes.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/megadrive.cfg",
 	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/amiga.cfg",
-	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/coleco.cfg"
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/coleco.cfg",
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/turbografx-16.cfg",
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/pcengine.cfg",
+	"/dev_hdd0/game/FBNE00123/USRDIR/cores/presets/input/supergrafx.cfg"
 
 };
 
@@ -88,7 +91,8 @@ bool g_opt_bCustomSysFilter[MASKCUSTOM+1] =
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
-	true, true // <--- fillers
+	true,true,true,true,
+	true // <--- fillers
 };
 
 bool g_opt_bUseUNIBIOS = false;
@@ -205,6 +209,9 @@ int iniWrite()
 		fprintf(fp, "filter_megadrive:\"%s\"\n"		, g_opt_bCustomSysFilter[24] ? "yes" : "no");
 		fprintf(fp, "filter_amiga:\"%s\"\n"	    	, g_opt_bCustomSysFilter[25] ? "yes" : "no");
 		fprintf(fp, "filter_coleco:\"%s\"\n"		, g_opt_bCustomSysFilter[26] ? "yes" : "no");
+		fprintf(fp, "filter_turbografx-16:\"%s\"\n"	, g_opt_bCustomSysFilter[27] ? "yes" : "no");
+		fprintf(fp, "filter_pcengine:\"%s\"\n"		, g_opt_bCustomSysFilter[28] ? "yes" : "no");
+		fprintf(fp, "filter_supergrafx:\"%s\"\n"	, g_opt_bCustomSysFilter[29] ? "yes" : "no");
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -287,6 +294,9 @@ int iniWrite()
 		fprintf(fp, "input_megadrive:\"%s\"\n"		, g_opt_szInputCFG[24]);
 		fprintf(fp, "input_amiga:\"%s\"\n"		    , g_opt_szInputCFG[25]);
 		fprintf(fp, "input_coleco:\"%s\"\n"			, g_opt_szInputCFG[26]);
+		fprintf(fp, "input_turbografx-16:\"%s\"\n"	, g_opt_szInputCFG[27]);
+		fprintf(fp, "input_pcengine:\"%s\"\n"		, g_opt_szInputCFG[28]);
+		fprintf(fp, "input_supergrafx:\"%s\"\n"		, g_opt_szInputCFG[29]);
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -583,7 +593,10 @@ int iniRead()
 		if(!getBoolOption(fp, "filter_snes:\""			, &g_opt_bCustomSysFilter[23])) {return 0;}
         if(!getBoolOption(fp, "filter_megadrive:\""		, &g_opt_bCustomSysFilter[24])) {return 0;}
         if(!getBoolOption(fp, "filter_amiga:\""		    , &g_opt_bCustomSysFilter[25])) {return 0;}
-		if(!getBoolOption(fp, "filter_coleco:\""		, &g_opt_bCustomSysFilter[26])) { return 0; }
+		if(!getBoolOption(fp, "filter_coleco:\""		, &g_opt_bCustomSysFilter[26])) {return 0;}
+		if(!getBoolOption(fp, "filter_turbografx-16:\""	, &g_opt_bCustomSysFilter[27])) {return 0;}
+		if(!getBoolOption(fp, "filter_pcengine:\""		, &g_opt_bCustomSysFilter[28])) {return 0;}
+		if(!getBoolOption(fp, "filter_supergrafx:\""	, &g_opt_bCustomSysFilter[29])) {return 0;}
 
 		// -----------------------------------------------------------------------------------------
 		// Enable / Disable Neo-Geo UNI-BIOS
@@ -739,6 +752,17 @@ int iniRead()
 		if (pszStrOption == NULL) { return 0; }
 		strcpy(g_opt_szInputCFG[26], pszStrOption);
 
+		pszStrOption = getStrOption(fp, "input_turbografx-16:\"");
+		if (pszStrOption == NULL) { return 0; }
+		strcpy(g_opt_szInputCFG[27], pszStrOption);
+
+		pszStrOption = getStrOption(fp, "input_pcengine:\"");
+		if (pszStrOption == NULL) { return 0; }
+		strcpy(g_opt_szInputCFG[28], pszStrOption);
+
+		pszStrOption = getStrOption(fp, "input_supergrafx:\"");
+		if (pszStrOption == NULL) { return 0; }
+		strcpy(g_opt_szInputCFG[29], pszStrOption);
 
 
 		// -----------------------------------------------------------------------------------------

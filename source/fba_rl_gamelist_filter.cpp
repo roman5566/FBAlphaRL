@@ -10,9 +10,9 @@ char szSysFilter[MASKALL][256] = {
 	"MASKKANEKO"		,"MASKKONAMI"	,"MASKNEOGEO"	,"MASKPACMAN",
 	"MASKPGM"			,"MASKPSIKYO"	,"MASKSEGA"		,"MASKSEG32", "MASKSETA",
 	"MASKTAITO"			,"MASKTECHNOS"	,"MASKTOAPLAN"	,"MASKMISCPRE90S",
-	"MASKMISCPOST90S", "MASKMIDWAY"	,"MASKSNES", "MASKMEGADRIVE",
-	"MASKAMIGA", "MASKCOLECO", "MASKFAVORITE"
-	//,"MASKMEGADRIVE","MASKPCENGINE"	,"MASKSNES"
+	"MASKMISCPOST90S"	,"MASKMIDWAY"	,"MASKSNES"		,"MASKMEGADRIVE",
+	"MASKAMIGA"			,"MASKCOLECO"	,"MASKTG16"		,"MASKPCE",
+	"MASKSGX"			,"MASKFAVORITE"
 };
 
 bool bSysFilter[MASKCUSTOM+1] =
@@ -24,7 +24,8 @@ bool bSysFilter[MASKCUSTOM+1] =
 	true,true,true,true,
 	true,true,true,true,
 	true,true,true,true,
-	true, true // <--- fillers
+	true,true,true,true,
+	true// <--- fillers
 };
 
 int c_fbaRL::GetSystemMaskId(char* szMask)
@@ -75,9 +76,12 @@ char* c_fbaRL::GetSystemFilter(int nFilter)
 		case 24:  strcpy(pszFilter, "Mega Drive"); break;
 		case 25:  strcpy(pszFilter, "Amiga"); break;
 		case 26:  strcpy(pszFilter, "Coleco"); break;
-		case 27:  strcpy(pszFilter, "Favorite"); break;
-		case 28:  strcpy(pszFilter, "All Games"); break;
-		case 29:  strcpy(pszFilter, "Custom Filter"); break;
+		case 27:  strcpy(pszFilter, "TurboGrafx-16"); break;
+		case 28:  strcpy(pszFilter, "PC Engine"); break;
+		case 29:  strcpy(pszFilter, "SuperGrafx"); break;
+		case 30:  strcpy(pszFilter, "Favorite"); break;
+		case 31:  strcpy(pszFilter, "All Games"); break;
+		case 32:  strcpy(pszFilter, "Custom Filter"); break;
 	}
 
 	return pszFilter;

@@ -19,6 +19,19 @@ E-UAE Core: v0.8.29-WIP4 r11 by Ole (r11 update by CrystalCT);<br>
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo1.png)
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
+## Cangelog from 2.11 to 2.12
+* Improved Roms Scan (Subfolders scan)
+* FBNeo core 1.0
+* Added FBNeo subsystem:
+	* PC Engine  - [games list](https://docs.google.com/spreadsheets/d/1riv8nG6u0ZrMPG-ovXT7HIvP4bk-UEWfLXkRVjqnQRk/edit?usp=sharing)
+	* TurboGrafx-16  - [games list](https://docs.google.com/spreadsheets/d/1llYXk0R8cNYBxPDryrg75qqmeksTNssuYIQb3zNbw0Y/edit?usp=sharing)
+	* SuperGrafx  - [games list](https://docs.google.com/spreadsheets/d/1aSxdVarAHPvW5Pa93_RToztlRfGiiIqyJoP6iGjGebg/edit?usp=sharing)
+
+## Cangelog from 2.10 to 2.11
+* Improved and fixed Roms Scan (Scan on separate thread and wait untill all scan tasks are finished)
+* Hiscores.dat added
+* Coleco subsystem added to FBNeo core - [games list](https://docs.google.com/spreadsheets/d/17grbAEn3Ns_2cbtAUUlc_6p3W9978weg4opxI8iN7rY/edit?usp=sharing)
+
 ## Cangelog from 2.0 to 2.10
 * RetroArch core upgrated to v1.9.0;
 * Modded and fixed Retroarch core "Configuration file" submenu:

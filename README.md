@@ -32,8 +32,8 @@ Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 * New megadrive game recognized:
 	* Street Fighter II' - Remastered Edition (Hack).
 * New systems of games:
-	* Amiga (using E-UAE Core)
-	* Neo geo CD (using FB Neo core)
+	* Amiga (using E-UAE Core) - [games list](https://docs.google.com/spreadsheets/d/17P0DQTofdb9SVhMJ7KqYuXpyJJjsXf9Fhp05h9kLrIM/edit?usp=sharing)
+	* Neo geo CD (using FB Neo core) - [games list](https://docs.google.com/spreadsheets/d/1ni3Av3GhoW1jqDjWe58ni_UI-J0EdAG2N0bUiZO2tHI/edit?usp=sharing)
 * Onscreen messages when a romset isn't good:
     * ![Alt Text](https://www.psx-place.com/attachments/senzanome-png.27485/)
 

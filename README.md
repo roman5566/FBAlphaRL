@@ -17,12 +17,31 @@ Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo1.png)
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
+## Cangelog from 2.0 to 2.10
+* RetroArch core upgrated to v1.9.0;
+* Modded and fixed Retroarch core "Configuration file" submenu:
+    * Reset retroarch.cfg to Default
+    * Save Current Configuration
+    * Reload retroarch.cfg and Restart
+* Fixed a memory leak issue on Frontend;
+* Improved compatibility with all CFW and Hen;
+* New arcades recognized:
+	* Action Hollywood, 3 On 3 Dunk Madness (US, prototype? 1997/02/04), The Three Stooges In Brides Is Brides (set 1), Argus (Gottlieb, prototype), Curve Ball, Front Line (set 1), Goori Goori, Gulun.Pa! (Japan 931220 L), Insector (prototype), Knightmare (prototype), Krull, Mag Max, NeoTRIS (Free Beta Ver. 202005), Oriental Legend 2 (Korea) / Xi You Shi E Zhuan Super Plus, Reactor, Roller Jammer, Screw Loose (prototype), Seicross (set 1), Shuffleshot (v1.40), Solite Spirits, Super Shanghai Dragon's Eye (World), Stunt Air, Time Killers (v1.32), Tube Panic, Tylz (prototype), Video Vince and the Game Factory (prototype), Wiz Warz (prototype), Galactic Storm (Japan), Arm Champs II v2.6, Big Run (11th Rallye version), Blocken (Japan), Cisco Heat, Cool Minigame Collection, Crazy War, Date Quiz Go Go Episode 2, Dynamite Bomber (Korea, Rev 1.5), Grand Prix Star (ver 4.0), F-1 Grand Prix Star II, Final Godori (Korea, version 2.20.5915), Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05), Gals Panic 3 (Euro), G-Stream G2020, Hebereke no Popoon (Japan), Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected), Hidden Catch 3 (ver 1.00 / pcb ver 3.05), Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03), Hot Chase (set 1), Hyper Duel (Japan set 1), Quiz & Variety Sukusuku Inufuku (Japan), Boong-Ga Boong-Ga (Spank'em!), Candy Candy, Diet Family, Iron Fortress, Jumping Break (set 1), Kick Goal (set 1), KlonDike+, Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02), Mission Craft (version 2.7), Mr. Dig, Mr. Kicker (F-E1-16-010 PCB), New Cross Pang, Poosho Poosho, Puzzle King (Dance & Puzzle), Raccoon World, Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518), Toy Land Adventure, Vamf x1/2 (Europe, version 1.1.0908), Wivern Wings, World Adventure.
+* Arcades fixed for FBNeo core on PS3:
+	* Quiz & Variety Sukusuku Inufuku (Japan), 3 On 3 Dunk Madness (US, prototype? 1997/02/04), Kick Goal, Action Hollywood, Boong-Ga Boong-Ga (Spank'em!), Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07), Wivern Wings, Toy Land Adventure, Mr. Kicker, Final Godori (Korea, version 2.20.5915), Diet Family, Mr. Dig, Mission Craft (version 2.7), Date Quiz Go Go Episode 2, Vamf x1/2 (Europe), Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518), World Adventure, New Cross Pang, Poosho Poosho, Jumping Break, Cool Minigame Collection, Double Wings, Alien Challenge (World), Alien Challenge (World), Lord of Gun (USA), Scud Hammer, Wild Pilot, F-1 Grand Prix Star II, Grand Prix Star (ver 4.0), Cisco Heat, Big Run (11th Rallye version), Michael Jackson's Moonwalker (World), Mad Planets, Out Run (sitdown/upright, Rev B), D-Day, Capcom Bowling (set 1), Food Fight (rev 3), Beast Busters (World), Momoko 120% (Japanese text), Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II, Blocken (Japan), Hebereke no Popoon (Japan), Shanghai III (World), Candy Candy, Mechanized Attack (World), Asterix (ver EAD), Rack 'em Up (program code L), Battlantis (program code G), Bishi Bashi Championship Mini Game Senshuken (ver JAA, 3 Players), Super Bishi Bashi Championship (ver JAA, 2 Players), Blades of Steel (version T), Dragonball Z (rev B), Dragonball Z 2 - Super Battle, Bucky O'Hare (ver EAB), Wild West C.O.W.-Boys of Moo Mesa (ver EAB), Metamorphic Force (ver EAA), Violent Storm (ver EAC), Mystic Warriors (ver EAA), Xexex (ver EAA).
+* New megadrive game recognized:
+	* Street Fighter II' - Remastered Edition (Hack).
+* New systems of games:
+	* Amiga (using E-UAE Core)
+	* Neo geo CD (using FB Neo core)
+* Onscreen messages when a romset isn't good:
+    * ![Alt Text](https://www.psx-place.com/attachments/senzanome-png.27485/)
 
 ## Cangelog from 1.20 to 2.0
 * The application has been divided into
-    1. basic version (arcade: fb neo and mame 0.125),
-    1. SNES expansion (snes9x) and
-    1. MEGA DRIVE expansion (genesis plus gx);
+    * basic version (arcade: fb neo and mame 0.125),
+    * SNES expansion (snes9x) and
+    * MEGA DRIVE expansion (genesis plus gx);
 * Frontend rewritten to be compiled through the free SDK PSL1GHT;
 * Frontend graphics engine: RSX;
 * Unicode graphic fonts to support Japanese characters;

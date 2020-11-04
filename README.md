@@ -2,13 +2,15 @@
 
 ---
 
-FB Neo Retro Loader Plus Core: v2.00
+FB Neo Retro Loader Plus Core: v2.12
 
-RetroArch Core: v1.8.5
+RetroArch Core: v1.9.0 (a bit modded to work better on PS3 and with Frontend)
 
-FB Neo Core: v0.2.97.44 (e9fdba2d1);<br/> 
-Genesis Plus GX Core: v1.7.4 (5055106);<br/> 
-Snes9x Core v1.60 (0a89725);<br/>Mame 0.125 for PS3 Core by Ole;<br/>
+FB Neo Core: v1.0.0.01 (fccba95f2);<br/> 
+Genesis Plus GX Core: v1.7.4 (7fa34f2);<br/> 
+Snes9x Core: v1.60 (4ec8679);<br/>
+Mame 0.125 for PS3 Core by Ole;<br/>
+E-UAE Core: v0.8.29-WIP4 r11 by Ole (r11 update by CrystalCT);<br>
 
 
 ---

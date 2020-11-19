@@ -16,7 +16,6 @@
 extern char g_opt_szROMPaths[12][2048];
 extern char g_opt_szInputCFG[][2048];
 extern char g_opt_szTextures[][2048];
-extern bool g_opt_bAutoAspectRatio;
 extern bool g_opt_bAutoInputCfgCreate;
 extern bool g_opt_bCustomSysFilter[MASKCUSTOM+1];
 extern bool g_opt_bMusic;
@@ -27,6 +26,8 @@ extern unsigned int g_opt_nRetroArchMenu;
 extern char g_opt_sRetroArchMenu[][10];
 extern bool g_opt_bUseUNIBIOS;
 extern unsigned int g_opt_nTrackID;
+extern unsigned int g_opt_nMegaDriveDefaultCore;
+extern char g_opt_sMegaDriveCores[][11];
 
 int iniWrite();
 int iniRead();

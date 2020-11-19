@@ -24,15 +24,15 @@ void c_fbaRL::EndMainMenu()
 
 void c_fbaRL::InitOptionsMenu()
 {
-	options_menu = new c_Menu(7);
+	options_menu = new c_Menu(7); // 7 -> num max of rows shown on screen
 
-	options_menu->AddItem((char*)"AUTO ASPECT RATIO");
 	options_menu->AddItem((char*)"AUTO CREATE ALL INPUT .CFG");
 	options_menu->AddItem((char*)"BACKGROUND MUSIC");
 	options_menu->AddItem((char*)"RETRO ARCH MENU");
 	options_menu->AddItem((char*)"DISPLAY CLONE GAMES");
 	options_menu->AddItem((char*)"USE NEO-GEO UNI-BIOS");
 	options_menu->AddItem((char*)"DISPLAY MISSING GAMES");
+	options_menu->AddItem((char*)"MEGADRIVE DEFAULT CORE");
 
 	options_menu->AddItem((char*)"FILTER [CAPCOM MISC]");
 	options_menu->AddItem((char*)"FILTER [CAVE]");

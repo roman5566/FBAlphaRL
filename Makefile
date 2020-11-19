@@ -11,6 +11,7 @@ $(error "Please set PORTLIBS in your environment.")
 endif
 
 include $(PSL1GHT)/ppu_rules
+RETROARCH_PATH := ../tmpwork/Retroarch
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -32,7 +33,7 @@ ICON0		:=	ICON0.PNG
 ICON1		:=	ICON1.PAM
 PIC1		:=	PIC1.PNG
 SFOXML		:=	sfo.xml
-APP_VER		:=	2.10
+APP_VER		:=	2.13
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -131,7 +132,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) *.elf *.self *.pkg *~ */*~
+	@rm -fr $(BUILD) *.elf *.BIN *.SELF *.self *.pkg *~ */*~
 
 #---------------------------------------------------------------------------------
 run:
@@ -146,21 +147,25 @@ pkg: npdrm
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkg/ $(TARGET)_$(APP_VER).pkg >> /dev/null
 #---------------------------------------------------------------------------------
 
-pkgsnes: npdrm
+pkgsnes:
 	$(VERB) echo building SNES upgrade pkg ... $(notdir $@)
-	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgSnes/PARAM.SFO
+	$(VERB) cp -f $(RETROARCH_PATH)/retroarch_ps3.elf $(CURDIR)/snes9x.elf
+	$(VERB) bin/make_self_wc.exe $(CURDIR)/snes9x.elf $(CURDIR)/../pkgMD/USRDIR/cores/snes9x.SELF
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)"
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgSnes/ $(TARGET)_$(APP_VER)_snes_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------
 
-pkgmd: npdrm
+pkgmd:
 	$(VERB) echo building Mega Drive upgrade pkg ... $(notdir $@)
-	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgMD/PARAM.SFO
+	$(VERB) cp -f $(RETROARCH_PATH)/retroarch_ps3.elf $(CURDIR)/genesis_plus_gx.elf
+	$(VERB) bin/make_self_wc.exe $(CURDIR)/genesis_plus_gx.elf $(CURDIR)/../pkgMD/USRDIR/cores/genesis_plus_gx.SELF
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)"
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgMD/ $(TARGET)_$(APP_VER)_megadrive_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------
 
-pkgAmiga: npdrm
+pkgAmiga:
 	$(VERB) echo building Amiga upgrade pkg ... $(notdir $@)
-	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)" -f $(SFOXML) $(CURDIR)/../pkgAmiga/PARAM.SFO
+	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)"
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgAmiga/ $(TARGET)_$(APP_VER)_amiga_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------
 

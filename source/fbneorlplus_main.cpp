@@ -32,6 +32,7 @@
 #include "fnt35.h"
 #include <math.h>
 #include <sys/thread.h>
+#include <lv2/sysfs.h>
 
 #include <ps3sqlite/sqlite3.h>
 #include "sqlite.h"
@@ -414,7 +415,52 @@ bool CapApp::onInit(int argc, char* argv[])
     fprintf(fdebug,"initSPUSound OK\n");
     fflush(fdebug);
 #endif
-	//CRYSTAL
+	//Check for Upgrade installs
+    if (fileExist("/dev_hdd0/game/FBNE00123/USRDIR/GENESIS.INST"))
+    {
+        g_opt_nMegaDriveDefaultCore = 1;
+        iniWrite();
+        sysFsUnlink("/dev_hdd0/game/FBNE00123/USRDIR/GENESIS.INST");
+        dialog_action = 0;
+        msgDialogOpen2((msgType)((MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK)),
+            "MEGADRIVE expansion was correctly installed. Now you can play Sega/Mega CD(J) games. \nDefault core for Mega Drive becomes Genesis Plus FX, but you can change it in the Options.",
+            dialog_handler, (void*)&dialog_action, NULL);
+        while (dialog_action == 0) 
+        {
+            waitFlip();
+            Flip();
+            sysUtilCheckCallback();
+        }
+    }
+    if (fileExist("/dev_hdd0/game/FBNE00123/USRDIR/SNES.INST"))
+    {
+        sysFsUnlink("/dev_hdd0/game/FBNE00123/USRDIR/SNES.INST");
+        dialog_action = 0;
+        msgDialogOpen2((msgType)((MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK)),
+            "SNES expansion was correctly installed. Now you can play SNES games.",
+            dialog_handler, (void*)&dialog_action, NULL);
+        while (dialog_action == 0)
+        {
+            waitFlip();
+            Flip();
+            sysUtilCheckCallback();
+        }
+    }
+    if (fileExist("/dev_hdd0/game/FBNE00123/USRDIR/AMIGA.INST"))
+    {
+        sysFsUnlink("/dev_hdd0/game/FBNE00123/USRDIR/AMIGA.INST");
+        dialog_action = 0;
+        msgDialogOpen2((msgType)((MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK)),
+            "AMIGA expansion was correctly installed. Now you can play Amiga games.",
+            dialog_handler, (void*)&dialog_action, NULL);
+        while (dialog_action == 0)
+        {
+            waitFlip();
+            Flip();
+            sysUtilCheckCallback();
+        }
+    }
+    //CRYSTAL
 	//LOAD  FBA Games Array
 	if(InitDB())
     {

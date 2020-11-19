@@ -71,10 +71,14 @@ char g_opt_sRetroArchMenu[][10] = {
 	RETROARCH_MENU_XMB_S
 };
 
+char g_opt_sMegaDriveCores[][11] = {
+	"FBNEO","GENESIS+FX"
+};
+
 unsigned int g_opt_nRetroArchMenu = 2;
+unsigned int g_opt_nMegaDriveDefaultCore = 0;
 unsigned int g_opt_nTrackID = 0;
 
-bool g_opt_bAutoAspectRatio		= true;
 bool g_opt_bAutoInputCfgCreate	= true;
 bool g_opt_bMusic           	= true;
 bool g_opt_bDisplayMissingGames = false;
@@ -233,12 +237,6 @@ int iniWrite()
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
-		fprintf(fp, "// Automatically set proper Screen Aspect Ratio on game launch \n");
-		fprintf(fp, "// --------------------------------------------------------------------------\n");
-		fprintf(fp, "auto_ar:\"%s\"\n"				, g_opt_bAutoAspectRatio ? "yes" : "no");
-		fprintf(fp, "\n");
-
-		fprintf(fp, "// --------------------------------------------------------------------------\n");
 		fprintf(fp, "// Enaable / Disable background MP3 music \n");
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
 		fprintf(fp, "background_music:\"%s\"\n"	, g_opt_bMusic ? "yes" : "no");
@@ -260,6 +258,12 @@ int iniWrite()
 		fprintf(fp, "// Enaable / Disable the display of clone games \n");
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
 		fprintf(fp, "display_clone_games:\"%s\"\n"	, g_opt_bDisplayCloneGames ? "yes" : "no");
+		fprintf(fp, "\n");
+
+		fprintf(fp, "// --------------------------------------------------------------------------\n");
+		fprintf(fp, "// Select default core for MegaDrive games \n");
+		fprintf(fp, "// --------------------------------------------------------------------------\n");
+		fprintf(fp, "megadrive_default_core:\"%d\"\n", g_opt_nMegaDriveDefaultCore);
 		fprintf(fp, "\n");
 
 		fprintf(fp, "// --------------------------------------------------------------------------\n");
@@ -615,11 +619,6 @@ int iniRead()
 		if(!getBoolOption(fp, "display_missing:\"", &g_opt_bDisplayMissingGames)) {return 0;}
 
 		// -----------------------------------------------------------------------------------------
-		// Auto aspect ratio option
-		// -----------------------------------------------------------------------------------------
-		if(!getBoolOption(fp, "auto_ar:\"", &g_opt_bAutoAspectRatio)) {return 0;}
-
-		// -----------------------------------------------------------------------------------------
 		// Bckground MP3 music
 		// -----------------------------------------------------------------------------------------
 		if(!getBoolOption(fp, "background_music:\"", &g_opt_bMusic)) {return 0;}
@@ -628,7 +627,6 @@ int iniRead()
 		// Start MP3 track number
 		// -----------------------------------------------------------------------------------------
 		if(!getIntOption(fp, "starting_track:\"", &g_opt_nTrackID)) {return 0;}
-
 
 		// -----------------------------------------------------------------------------------------
 		// RetroArch Menu Driver option
@@ -640,6 +638,10 @@ int iniRead()
 		// -----------------------------------------------------------------------------------------
 		if(!getBoolOption(fp, "display_clone_games:\"", &g_opt_bDisplayCloneGames)) {return 0;}
 
+		// -----------------------------------------------------------------------------------------
+		// Select default core for megadrive games
+		// -----------------------------------------------------------------------------------------
+		if (!getIntOption(fp, "megadrive_default_core:\"", &g_opt_nMegaDriveDefaultCore)) { return 0; }
 
 		// -----------------------------------------------------------------------------------------
 		// Game System Input preset options

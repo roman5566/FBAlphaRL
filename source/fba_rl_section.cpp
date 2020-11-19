@@ -468,23 +468,11 @@ void c_fbaRL::Options_Frame()
 			float y = 0.8900f;
 			//float size = nSmallSize2; // small text 2
 
-			////if(nFrameStep == 0) { y += nShadowXYpos2; x +=nShadowXYpos2; }
-
-			if(nMenuItem == MENU_OPT_AUTO_AR) {
-				snprintf(txt,sizeof(txt),"Auto set the proper aspect ratio on game launch.");
-                fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
-                           (int)(y * rsxbuffer->height),
-                            txt, nColor, 0x00000000, fontSize, fontSize);
-
-				////cellDbgFontPrintf(x, y, size, nColor, "Auto set the proper aspect ratio on game launch.");
-			}
-
 			if(nMenuItem == MENU_OPT_AUTO_CFG) {
 				snprintf(txt,sizeof(txt),"Auto create basic Input Preset CFG files for all systems.");
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-                ////cellDbgFontPrintf(x, y, size, nColor, "Auto create basic Input Preset CFG files for all systems.");
 			}
 
 			if(nMenuItem == MENU_OPT_MUSIC) {
@@ -492,7 +480,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Use [SELECT] + [TRIANGLE] and [SELECT] + [SQUARE] to access RetroArch menu.");
 			}
 
 			if(nMenuItem == MENU_OPT_RETROARCH_MENU) {
@@ -500,7 +487,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Change Retro Arch menu driver.");
 			}
 
 			if(nMenuItem == MENU_OPT_DISP_CLONES) {
@@ -508,7 +494,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Enable / Disable display of clone games.");
 			}
 
 			if(nMenuItem == MENU_OPT_USE_UNIBIOS) {
@@ -516,7 +501,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Use UNI-BIOS when playing Neo-Geo games.");
 			}
 
 			if(nMenuItem == MENU_OPT_DISP_MISS_GMS) {
@@ -524,7 +508,13 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Enable / Disable display of missing games.");
+			}
+
+			if (nMenuItem == MENU_OPT_MD_DEF_CORE) {
+				snprintf(txt, sizeof(txt), "Select default core for MegaDrive games.");
+				fnt_print_vram(&fontM, (u32*)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
+					(int)(y * rsxbuffer->height),
+					txt, nColor, 0x00000000, fontSize, fontSize);
 			}
 
 			if(nMenuItem >= MENU_OPT_FILTER_START && nMenuItem <=  MASKFAVORITE+MENU_OPT_FILTER_START) {
@@ -532,7 +522,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Choose the emulated system(s) you want to be displayed / filtered.");
 			}
 
 			// Rom Paths (directories)
@@ -542,7 +531,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Current: %s", g_opt_szROMPaths[nRomPath]);
 			}
 
 			// Input Preset Paths (CFG)
@@ -552,25 +540,11 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontM, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(x * rsxbuffer->width),
                            (int)(y * rsxbuffer->height),
                             txt, nColor, 0x00000000, fontSize, fontSize);
-				////cellDbgFontPrintf(x, y, size, nColor, "Current: %s", g_opt_szInputCFG[nCfgPath]);
 			}
 
 			nColor = nSelectColor;
 
 			////if(nFrameStep == 0) { nColor = nShadowColor; } // Shadow color
-		}
-
-		if(nMenuItem == MENU_OPT_AUTO_AR) {
-                snprintf(txt,sizeof(txt),"%s: [%s]", options_menu->item[nMenuItem]->szMenuLabel,
-                    g_opt_bAutoAspectRatio ? "ON" : "OFF");
-                fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
-                           (int)(yPos * rsxbuffer->height),
-                            txt, nColor, 0x00000000, 1, 1);
-
-//			cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bAutoAspectRatio ? "ON" : "OFF"
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_AUTO_CFG) {
@@ -579,10 +553,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bAutoInputCfgCreate ? "ON" : "OFF"
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_MUSIC) {
@@ -592,10 +562,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			 cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bUseAltMenuKeyCombo ? "ON" : "OFF"
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_RETROARCH_MENU) {
@@ -604,10 +570,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			 cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_sRetroArchMenu[g_opt_nRetroArchMenu]
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_DISP_CLONES) { //CRYSTAL
@@ -616,10 +578,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bDisplayCloneGames ? "ON" : "OFF"
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_USE_UNIBIOS) {
@@ -628,10 +586,6 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bUseUNIBIOS ? "ON" : "OFF"
-//			);
 		}
 
 		if(nMenuItem == MENU_OPT_DISP_MISS_GMS) {
@@ -640,10 +594,14 @@ void c_fbaRL::Options_Frame()
                 fnt_print_vram(&fontL, (u32 *)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
                            (int)(yPos * rsxbuffer->height),
                             txt, nColor, 0x00000000, 1, 1);
-//			cellDbgFontPrintf(xPos, yPos, nfontLize, nColor, "%s: [%s]",
-//				options_menu->item[nMenuItem]->szMenuLabel,
-//				g_opt_bDisplayMissingGames ? "ON" : "OFF"
-//			);
+		}
+
+		if (nMenuItem == MENU_OPT_MD_DEF_CORE) {
+			snprintf(txt, sizeof(txt), "%s: [%s]", options_menu->item[nMenuItem]->szMenuLabel,
+				g_opt_sMegaDriveCores[g_opt_nMegaDriveDefaultCore]);
+			fnt_print_vram(&fontL, (u32*)rsxbuffer->ptr, rsxbuffer->width, (int)(xPos * rsxbuffer->width),
+				(int)(yPos * rsxbuffer->height),
+				txt, nColor, 0x00000000, 1, 1);
 		}
 
 		// Custom System Filters

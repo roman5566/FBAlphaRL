@@ -242,12 +242,6 @@ void c_fbaRL::InputFrame()
 			{
 				int nMenuItem = options_menu->nSelectedItem;
 
-				// Auto Aspect ratio toggle
-				if(nMenuItem == MENU_OPT_AUTO_AR)
-				{
-					g_opt_bAutoAspectRatio = g_opt_bAutoAspectRatio ? false : true;
-				}
-
 				// Auto Input CFG create toggle
 				if(nMenuItem == MENU_OPT_AUTO_CFG)
 				{
@@ -296,6 +290,15 @@ void c_fbaRL::InputFrame()
 								break;
 						}
 
+				}
+
+				// MegaDrive Default Core
+				if (nMenuItem == MENU_OPT_MD_DEF_CORE)
+				{
+					if (!fileExist("/dev_hdd0/game/FBNE00123/USRDIR/cores/genesis_plus_gx.SELF"))
+						g_opt_nMegaDriveDefaultCore = 0;
+					else
+						g_opt_nMegaDriveDefaultCore = g_opt_nMegaDriveDefaultCore ? 0 : 1;
 				}
 
 				// Display clones
@@ -366,7 +369,8 @@ void c_fbaRL::InputFrame()
                             }
 				}
 				if (strcmp(fgames[nSelectedGame]->sysmask, "MASKMEGADRIVE") == 0){
-                            sprintf(fba_core_path,"/dev_hdd0/game/FBNE00123/USRDIR/cores/genesis_plus_gx.SELF");
+                            if (strcmp(fgames[nSelectedGame]->subsystem, "megacd") == 0 || g_opt_nMegaDriveDefaultCore == 1)
+									sprintf(fba_core_path,"/dev_hdd0/game/FBNE00123/USRDIR/cores/genesis_plus_gx.SELF");
                             if (!fileExist(fba_core_path)) {
                                 nStatus = STATUS_MISSING_CORE_4;
                                 break;
@@ -404,7 +408,7 @@ void c_fbaRL::InputFrame()
 							gamepath,
 							(char*)fba_rl_path,
 							(char*)(fileExist(g_opt_szInputCFG[nSysMask]) ?  g_opt_szInputCFG[nSysMask] : "DUMMY_ARG"),
-							(char*)((g_opt_bAutoAspectRatio) ? aspect_ratio : "DUMMY_ARG"),
+							(char*)("DUMMY_ARG"),
 							//(char*)(g_opt_bUseAltMenuKeyCombo ? "yes" : "no"),
 							//(char*)(g_opt_bUseUNIBIOS ? "yes" : "no")  //CRYSTAL
                             (char*)(games[fgames[nSelectedGame]->GameID]->subsystem), //SUBSYSTEM

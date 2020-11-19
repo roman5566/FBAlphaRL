@@ -16,7 +16,7 @@
 #include <rsx/rsx.h>
 
 // --------------------------------------------------------------------
-#define _APP_VER "2.12"
+#define _APP_VER "2.13"
 #define _APP_TITLE "\tFB NEO PLUS RETRO LOADER "_APP_VER" - by CaptainCPS-X [2013] CrystalCT [2020]"
 // --------------------------------------------------------------------
 
@@ -122,22 +122,22 @@ void _ScanROMs(uint64_t);
 #define MASKCUSTOM		32
 
 
-#define MENU_OPT_AUTO_AR		0
-#define MENU_OPT_AUTO_CFG		1
-#define MENU_OPT_MUSIC  		2
-#define MENU_OPT_RETROARCH_MENU 3
-#define MENU_OPT_DISP_CLONES	4
-#define MENU_OPT_USE_UNIBIOS	5
-#define MENU_OPT_DISP_MISS_GMS	6
-#define MENU_OPT_FILTER_START	(MENU_OPT_DISP_MISS_GMS+1)
+#define MENU_OPT_AUTO_CFG		0
+#define MENU_OPT_MUSIC  		1
+#define MENU_OPT_RETROARCH_MENU 2
+#define MENU_OPT_DISP_CLONES	3
+#define MENU_OPT_USE_UNIBIOS	4
+#define MENU_OPT_DISP_MISS_GMS	5
+#define MENU_OPT_MD_DEF_CORE	6
+#define MENU_OPT_FILTER_START	(MENU_OPT_MD_DEF_CORE+1)
 
-#define RETROARCH_MENU_GLUI_S "glui"
+#define RETROARCH_MENU_GLUI_S "GLUI"
 #define RETROARCH_MENU_GLUI_N 0
-#define RETROARCH_MENU_OZONE_S "ozone"
+#define RETROARCH_MENU_OZONE_S "OZONE"
 #define RETROARCH_MENU_OZONE_N 1
-#define RETROARCH_MENU_RGUI_S "rgui"
+#define RETROARCH_MENU_RGUI_S "RGUI"
 #define RETROARCH_MENU_RGUI_N 2
-#define RETROARCH_MENU_XMB_S "xmb"
+#define RETROARCH_MENU_XMB_S "XMB"
 #define RETROARCH_MENU_XMB_N 3
 
 
@@ -145,7 +145,7 @@ void _ScanROMs(uint64_t);
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
 #define MAX_GAMES	20000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 16543
+#define TOTAL_DRV_GAMES 16919
 
 class c_game
 {

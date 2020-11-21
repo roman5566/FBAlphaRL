@@ -19,6 +19,12 @@ E-UAE Core: v0.8.29-WIP4 r11 by Ole (r11 update by CrystalCT);<br>
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo1.png)
 ![Alt Text](https://raw.githubusercontent.com/crystalct/FBNeoRLPlus/master/images/fbneo2.png)
 
+## Cangelog from 2.12 to 2.13
+* Fixed a Retroarch layer bug (PS3 crash when Retroarch layer tried show a message on screen)
+* Fbneo core (basepack) can be used to execute genesis/megadrive games
+* Added in the options the selection of which core to use to execute genesis/megadrive games
+* Added more than 300 genesis/megadrive games (hacks, translations and homebrews)
+
 ## Cangelog from 2.11 to 2.12
 * Improved Roms Scan (Subfolders scan)
 * FBNeo core 1.0

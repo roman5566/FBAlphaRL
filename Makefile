@@ -150,7 +150,7 @@ pkg: npdrm
 pkgsnes:
 	$(VERB) echo building SNES upgrade pkg ... $(notdir $@)
 	$(VERB) cp -f $(RETROARCH_PATH)/retroarch_ps3.elf $(CURDIR)/snes9x.elf
-	$(VERB) bin/make_self_wc.exe $(CURDIR)/snes9x.elf $(CURDIR)/../pkgMD/USRDIR/cores/snes9x.SELF
+	$(VERB) bin/make_self_wc.exe $(CURDIR)/snes9x.elf $(CURDIR)/../pkgSnes/USRDIR/cores/snes9x.SELF
 	$(VERB) $(SFO) --title "$(TITLE)" --appid "$(APPID)"
 	$(VERB) $(PKG) --contentid $(CONTENTID) $(CURDIR)/../pkgSnes/ $(TARGET)_$(APP_VER)_snes_upgrade.pkg >> /dev/null
 #---------------------------------------------------------------------------------

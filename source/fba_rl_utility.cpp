@@ -256,7 +256,11 @@ void c_fbaRL::LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char
             return;
 	}
 	if (strcmp(fgames[nSelectedGame]->sysmask, "MASKMEGADRIVE") == 0){
-		char core_path[]	= "/dev_hdd0/game/FBNE00123/USRDIR/cores/genesis_plus_gx.SELF";
+		char core_path[256];
+		if (strcmp(fgames[nSelectedGame]->subsystem, "megacd") == 0 || g_opt_nMegaDriveDefaultCore == 1)
+			sprintf(core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/genesis_plus_gx.SELF");
+		else
+			sprintf(core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/fb_neo.SELF");
 //		char core_path[]	= "/dev_hdd0/game/FBNE00123/USRDIR/cores/fb_neo.SELF";
 //		argv[11] = (char *)malloc(13);
 //        argv[12] = (char *)malloc(3);

@@ -24,7 +24,7 @@ E-UAE Core: v0.8.29-WIP4 r11 by Ole (r11 update by CrystalCT);<br>
 * Approach to 2D graphics Frontend using RSX 3D graphics capabilities
 * Frontend more responsive
 * Added 570p and 480p Frontend resolutions
-* Usend a new Font library [BDF/FNT](https://github.com/crystalct/PS3_BDF_FNT_fonts_lib)
+* Used a new Font library [BDF/FNT](https://github.com/crystalct/PS3_BDF_FNT_fonts_lib)
 
 ## Changelog from 2.12 to 2.13
 * Fixed a Retroarch layer bug (PS3 crash when Retroarch layer tried show a message on screen)

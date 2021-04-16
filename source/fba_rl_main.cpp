@@ -712,6 +712,19 @@ bool CapApp::onInit(int argc, char* argv[])
 			sysUtilCheckCallback();
 		}
 	}
+	if (fileExist("/dev_hdd0/game/FBNE00123/USRDIR/MGBA.INST"))
+	{
+		sysFsUnlink("/dev_hdd0/game/FBNE00123/USRDIR/MGBA.INST");
+		dialog_action = 0;
+		msgDialogOpen2((msgType)((MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK)),
+			"GAME BOY expansion was correctly installed. Now you can play Game Boy/Color/Advance games.",
+			dialog_handler, (void*)&dialog_action, NULL);
+		while (dialog_action == 0)
+		{
+			flip();
+			sysUtilCheckCallback();
+		}
+	}
 
 	if (InitDB() == 1)
 		return true;
@@ -981,7 +994,6 @@ int CapApp::InitDB()
 			nMissingGames++;
 		}
 		snprintf(fba_drv->key_string, KEY_MAX_LENGTH, "%s%s", (char*)sqlite3_column_text(stmt, COL10), (char*)sqlite3_column_text(stmt, COL07));
-
 		hashmap_put(drvMap, fba_drv->key_string, fba_drv);
 		
 		row++;

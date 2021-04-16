@@ -9,7 +9,7 @@
 #include "sqlite.h"
 
 //
-#define TOTAL_CORES         5
+#define TOTAL_CORES         6
 //
 #define TEX_MAIN_MENU		0
 #define TEX_GAME_LIST		1
@@ -85,7 +85,10 @@ enum CoreOptions {
 	coleco,
 	turbografx16,
 	pcengine,
-	supergrafx
+	supergrafx,
+	gameboy,
+	gbcolor,
+	gbadvance
 };
 
 typedef struct {

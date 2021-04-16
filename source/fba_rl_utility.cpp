@@ -272,6 +272,17 @@ void c_fbaRL::LaunchFBACore(char* arg1, char* arg2, char* arg3, char* arg4, char
 		return;
 
 	}
+
+	switch (systemMasks[fgames[nSelectedGame]->sysmask])
+	{
+		case MASKGB:
+		case MASKGBA:
+		case MASKGBC:
+			char mgba_core_path[] = "/dev_hdd0/game/FBNE00123/USRDIR/cores/mgba.SELF";
+			sysProcessExitSpawn2(mgba_core_path, (const char**)argv, NULL, NULL, 0, 1001, SYS_PROCESS_SPAWN_STACK_SIZE_1M);
+			return;
+	}
+
 	if (strcmp(fgames[nSelectedGame]->sysmask, "MASKSNES") == 0){
 		char snes9x_core_path[]	= "/dev_hdd0/game/FBNE00123/USRDIR/cores/snes9x.SELF";
 

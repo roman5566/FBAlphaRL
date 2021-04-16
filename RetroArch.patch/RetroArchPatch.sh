@@ -27,6 +27,7 @@ cat intl/msg_hash_us.h.mod > intl/msg_hash_us.h
 #rm -f frontend/drivers/platform_ps3.c
 #mv frontend/drivers/platform_ps3.c.new frontend/drivers/platform_ps3.c
 cd menu
+dos2unix.exe menu_displaylist.c
 cat ../../RetroArch.patch/menu_displaylist.c.patch | /h/cygwin64/bin/patch
 #cat ../../RetroArch.patch/menu_setting.c.patch | /h/cygwin64/bin/patch
 

@@ -64,6 +64,9 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"FILTER [TURBOGRAFX-16]");
 	options_menu->AddItem((char*)"FILTER [PC ENGINE]");
 	options_menu->AddItem((char*)"FILTER [SUPERGRAFX]");
+	options_menu->AddItem((char*)"FILTER [GAME BOY]");
+	options_menu->AddItem((char*)"FILTER [GB COLOR]");
+	options_menu->AddItem((char*)"FILTER [GB ADVANCE]");
 	options_menu->AddItem((char*)"FILTER [FAVORITE]");
 
 	options_menu->AddItem((char*)"ROMs PATH #1");
@@ -109,6 +112,9 @@ void c_fbaRL::InitOptionsMenu()
 	options_menu->AddItem((char*)"[TURBOGRAFX-16] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[PC ENGINE] INPUT .CFG PATH");
 	options_menu->AddItem((char*)"[SUPERGRAFX] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[GAME BOY] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[GB COLOR] INPUT .CFG PATH");
+	options_menu->AddItem((char*)"[GB ADVANCE] INPUT .CFG PATH");
 }
 
 void c_fbaRL::EndOptionsMenu()

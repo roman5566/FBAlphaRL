@@ -42,12 +42,148 @@ void c_fbaRL::InputFrame()
 	static u64 start_seconds = 0, seconds, start_nseconds, nseconds;
 
 	// ------------------------------------------------------
+	// Navigation UP/DOWN no delay with one click/one scroll
+
+	if (!app.mIsButtPressed[BT_UP] && app.buttPressedNow[BT_UP])
+	{
+		switch (nSection)
+		{
+			case SECTION_MAIN:
+			{
+				if (main_menu->nSelectedItem > 0 && main_menu->nSelectedItem <= main_menu->nTotalItem)
+				{
+					main_menu->nSelectedItem--;
+				}
+				break;
+			}
+
+			case SECTION_OPTIONS:
+			{
+				if (options_menu->nSelectedItem > 0 && options_menu->nSelectedItem <= options_menu->nTotalItem)
+				{
+					options_menu->nSelectedItem--;
+				}
+				break;
+			}
+
+			case SECTION_GAMELIST:
+			{
+				if (nSelectedGame > 0 && nSelectedGame <= nFilteredGames)
+				{
+					nSelectedGame--;
+					if (nFilteredGames >= 1) {
+						nStatus = STATUS_UPDATEPREVIEW;
+					}
+					else {
+						nStatus = STATUS_RESETPREVIEW;
+					}
+				}
+				break;
+			}
+
+			case SECTION_FILEBROWSER:
+			{
+				if (filebrowser->nSelectedItem > 0 && filebrowser->nSelectedItem <= filebrowser->nTotalItem)
+				{
+					filebrowser->nSelectedItem--;
+				}
+				break;
+			}
+
+			case SECTION_ZIPINFO:
+			{
+				if (zipinfo_menu->nSelectedItem > 0 && zipinfo_menu->nSelectedItem <= zipinfo_menu->nTotalItem)
+				{
+					zipinfo_menu->nSelectedItem--;
+				}
+				break;
+			}
+
+			case SECTION_ROMINFO:
+			{
+				if (rominfo_menu->nSelectedItem > 0 && rominfo_menu->nSelectedItem <= rominfo_menu->nTotalItem)
+				{
+					rominfo_menu->nSelectedItem--;
+				}
+				break;
+			}
+		}
+
+	}
+
+	if (!app.mIsButtPressed[BT_DOWN] && app.buttPressedNow[BT_DOWN])
+	{
+		switch (nSection)
+		{
+			case SECTION_MAIN:
+			{
+				if (main_menu->nSelectedItem >= 0 && main_menu->nSelectedItem < main_menu->nTotalItem - 1)
+				{
+					main_menu->nSelectedItem++;
+				}
+				break;
+			}
+
+			case SECTION_OPTIONS:
+			{
+				if (options_menu->nSelectedItem >= 0 && options_menu->nSelectedItem < options_menu->nTotalItem - 1)
+				{
+					options_menu->nSelectedItem++;
+				}
+				break;
+			}
+
+			case SECTION_GAMELIST:
+			{
+				//printf("nSelectedGame %d - nFilteredGames %d\n",nSelectedGame, nFilteredGames);
+				if (nSelectedGame >= 0 && nSelectedGame < nFilteredGames - 1)
+				{
+					nSelectedGame++;
+					if (nFilteredGames >= 1) {
+						nStatus = STATUS_UPDATEPREVIEW;
+					}
+					else {
+						nStatus = STATUS_RESETPREVIEW;
+					}
+				}
+				break;
+			}
+
+			case SECTION_FILEBROWSER:
+			{
+				if (filebrowser->nSelectedItem >= 0 && filebrowser->nSelectedItem < filebrowser->nTotalItem - 1)
+				{
+					filebrowser->nSelectedItem++;
+				}
+				break;
+			}
+
+			case SECTION_ZIPINFO:
+			{
+				if (zipinfo_menu->nSelectedItem >= 0 && zipinfo_menu->nSelectedItem < zipinfo_menu->nTotalItem - 1)
+				{
+					zipinfo_menu->nSelectedItem++;
+				}
+				break;
+			}
+
+			case SECTION_ROMINFO:
+			{
+				if (rominfo_menu->nSelectedItem >= 0 && rominfo_menu->nSelectedItem < rominfo_menu->nTotalItem - 1)
+				{
+					rominfo_menu->nSelectedItem++;
+				}
+				break;
+			}
+		}
+	}
+
+	// ------------------------------------------------------
 	// Navigation UP/DOWN with delay
 
 	if(((app.mFrame + nSelInputFrame) - app.mFrame) == 3)
 	{
-		// DPAD UP / LEFT ANALOG UP
-		if((app.mIsButtPressed[BT_UP] && app.buttPressedNow[BT_UP]) || (app.mValLStickY < 50))
+		if(/*(app.mIsButtPressed[BT_UP] && app.buttPressedNow[BT_UP]) || */(app.mValLStickY < 50))
 		{
 			switch(nSection)
 			{
@@ -113,7 +249,7 @@ void c_fbaRL::InputFrame()
 		}
 
 		// DPAD DOWN / LEFT ANALOG DOWN
-		if	( (app.mIsButtPressed[BT_DOWN] && app.buttPressedNow[BT_DOWN]) || (app.mValLStickY > 200) )
+		if	( /*(app.mIsButtPressed[BT_DOWN] && app.buttPressedNow[BT_DOWN]) || */(app.mValLStickY > 200) )
 		{
 			switch(nSection)
 			{
@@ -362,6 +498,14 @@ void c_fbaRL::InputFrame()
                 FBA_GAMES *fba_games;
                 hashmap_position = fgames[nSelectedGame]->nSize;
                 fba_games = (FBA_GAMES *)gamesmap->data[hashmap_position].data;
+
+				if (strstr(fgames[nSelectedGame]->sysmask, "MASKGB")) {
+					sprintf(fba_core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/mgba.SELF");
+					if (!fileExist(fba_core_path)) {
+						nStatus = STATUS_MISSING_CORE_6;
+						break;
+					}
+				}
 				if (strcmp(fgames[nSelectedGame]->sysmask, "MASKSNES") == 0){
                             sprintf(fba_core_path, "/dev_hdd0/game/FBNE00123/USRDIR/cores/snes9x.SELF");
                             if (!fileExist(fba_core_path)) {

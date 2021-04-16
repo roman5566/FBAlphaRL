@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <map>
 #include <pngdec/pngdec.h>
 
 
@@ -25,29 +26,7 @@
 #define PITCH		(MAX_WIDTH * 4)
 #define MAXQUADXTEX 9
 
-
-/*struct FBA_DRV
-{
-	uint32_t nDrv;
-	char szName[128];
-	char szParent[32];
-	char szBoardROM[32];
-	char szTitle[256];
-	char szYear[8];
-	char szCompany[256];
-	char szSystem[256];
-	uint32_t nMaxPlayers;
-	uint32_t nWidth;
-	uint32_t nHeight;
-	uint32_t nAspectX;
-	uint32_t nAspectY;
-	char szSystemFilter[32];
-	bool isClone;
-};*/
-
-//extern FBA_DRV fba_drv[3183];
-
-extern unsigned char	example_cfg[20570];		// For creating basic input presets
+extern unsigned char	example_cfg[24000];		// For creating basic input presets
 void _ScanROMs(uint64_t);
 
 #define STATUS_NORMAL			0
@@ -72,6 +51,7 @@ void _ScanROMs(uint64_t);
 #define STATUS_MISSING_CORE_2   40
 #define STATUS_MISSING_CORE_4   41
 #define STATUS_MISSING_CORE_5   42
+#define STATUS_MISSING_CORE_6   43
 
 #define SECTION_MAIN			TEX_MAIN_MENU		
 #define SECTION_GAMELIST		TEX_GAME_LIST		
@@ -119,11 +99,14 @@ void _ScanROMs(uint64_t);
 #define MASKTG16		27
 #define MASKPCE			28
 #define MASKSGX			29
-#define MASKFAVORITE	30
+#define MASKGB			30
+#define MASKGBC			31
+#define MASKGBA			32
+#define MASKFAVORITE	33
 
 
-#define MASKALL			31
-#define MASKCUSTOM		32
+#define MASKALL			34
+#define MASKCUSTOM		35
 
 
 #define MENU_OPT_AUTO_CFG		0
@@ -148,8 +131,10 @@ void _ScanROMs(uint64_t);
 #define SAFE_FREE(x)	if(x) {	free(x); *&x = NULL; }
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
-#define MAX_GAMES	20000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 16919
+#define MAX_GAMES	25000 // <-- should be enough xD
+#define TOTAL_DRV_GAMES 23121
+
+using namespace std;
 
 class c_game
 {
@@ -499,6 +484,19 @@ public:
 	void        DrawIMG(int x, int y, pngData *png);
 	void        ScaleLine(u32 *Target, u32 *Source, u32 SrcWidth, u32 TgtWidth);
 	int         ResizeImage(pngData *png_in, void *TgtTexture, u32 TgtWidth, u32 TgtHeight);
+	
+	map<string, int> systemMasks{ 
+				{"MASKSNES",MASKSNES},
+				{"MASKMEGADRIVE",MASKMEGADRIVE},
+				{"MASKAMIGA",MASKAMIGA},
+				{"MASKCOLECO",MASKCOLECO},
+				{"MASKTG16",MASKTG16},
+				{"MASKPCE",MASKPCE},
+				{"MASKSGX",MASKSGX},
+				{"MASKGB",MASKGB},
+				{"MASKGBC",MASKGBC},
+				{"MASKGBA",MASKGBA}
+	};
 
 
 private:

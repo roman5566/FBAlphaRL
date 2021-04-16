@@ -794,10 +794,53 @@ void c_fbaRL::UpdatePreviewImage()
 {
 	if(nSection == SECTION_GAMELIST || nSection == SECTION_MAIN)
 	{
-		//printf("UpdatePreviewImage enter SECTION_GAMELIST %s\n", g_opt_szTextures[TEX_PREVIEW]);
+        //printf("UpdatePreviewImage enter SECTION_GAMELIST %s\n", g_opt_szTextures[TEX_PREVIEW]);
 		char szPreviewPath[512] = { 0 };
 
-		if (strcmp(games[nBurnSelected]-> sysmask, "MASKSNES") == 0) {
+        if (strcmp(games[nBurnSelected]->subsystem, "megacd") == 0) {
+            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGACD/%s.png", games[nBurnSelected]->name);
+        }
+        else 
+        {
+            switch (systemMasks[games[nBurnSelected]->sysmask]) 
+            {
+                case MASKSNES:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKMEGADRIVE:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGADRIVE/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKAMIGA:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/AMIGA/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKCOLECO:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/COLECO/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKTG16:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/TG16/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKPCE:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/PCE/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKSGX:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SGX/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKGB:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GAMEBOY/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKGBC:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GBCOLOR/%s.png", games[nBurnSelected]->name);
+                    break;
+                case MASKGBA:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GBADVANCE/%s.png", games[nBurnSelected]->name);
+                    break;
+                default:
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->name);
+                    break;
+            }
+        }
+        
+/*       if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png",games[nBurnSelected]->name);
 		}
 		else
@@ -830,6 +873,7 @@ void c_fbaRL::UpdatePreviewImage()
                                      }
                                      else
                                          sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->name);
+ */
         //printf("szPreviewPath: %s\n", szPreviewPath);
 		// try main romset name...
 		if(fileExist(szPreviewPath)) {
@@ -847,7 +891,51 @@ void c_fbaRL::UpdatePreviewImage()
                     app.textures[TEX_PREVIEW]->BindTexture(g_opt_szTextures[TEX_PREVIEW]);
             else {
 //                uint32_t parent = games[fgames[nSelectedGame]->GameID]->parent_id;
-                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                
+                if (strcmp(games[nBurnSelected]->subsystem, "megacd") == 0) {
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGACD/%s.png", games[nBurnSelected]->parent_name);
+                }
+                else 
+                {
+                    switch (systemMasks[games[nBurnSelected]->sysmask])
+                    {
+                    case MASKSNES:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKMEGADRIVE:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/MEGADRIVE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKAMIGA:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/AMIGA/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKCOLECO:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/COLECO/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKTG16:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/TG16/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKPCE:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/PCE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKSGX:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SGX/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGB:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GAMEBOY/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGBC:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GBCOLOR/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGBA:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/GBADVANCE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    default:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    }
+                }
+ 
+/*                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/SNES/%s.png",games[nBurnSelected]->parent_name);
                 }
                 else
@@ -881,7 +969,7 @@ void c_fbaRL::UpdatePreviewImage()
                                             else
                                                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/previews/%s.png", games[nBurnSelected]->parent_name);
 
-
+*/
 
                 if(fileExist(szPreviewPath))
                         //app.textures[TEX_PREVIEW] = new c_tex(TEX_PREVIEW, szPreviewPath);
@@ -897,7 +985,50 @@ void c_fbaRL::UpdatePreviewImage()
 
 		//Boxart
 		//printf("Update title\n");
-		if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+        if (strcmp(games[nBurnSelected]->subsystem, "megacd") == 0) {
+            sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGACD/%s.png", games[nBurnSelected]->name);
+        }
+        else
+        {
+            switch (systemMasks[games[nBurnSelected]->sysmask])
+            {
+            case MASKSNES:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKMEGADRIVE:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKAMIGA:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/AMIGA/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKCOLECO:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/COLECO/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKTG16:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/TG16/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKPCE:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/PCE/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKSGX:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SGX/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKGB:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GAMEBOY/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKGBC:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GBCOLOR/%s.png", games[nBurnSelected]->name);
+                break;
+            case MASKGBA:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GBADVANCE/%s.png", games[nBurnSelected]->name);
+                break;
+            default:
+                sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->name);
+                break;
+            }
+        }
+
+/*        if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png",games[nBurnSelected]->name);
 		}
 		else
@@ -929,7 +1060,7 @@ void c_fbaRL::UpdatePreviewImage()
                                     }
                                     else
                                         sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->name);
-
+*/
 
 
 		// try main romset name...
@@ -945,7 +1076,50 @@ void c_fbaRL::UpdatePreviewImage()
             else {
 //                uint32_t parent = games[fgames[nSelectedGame]->GameID]->parent_id;
 
-                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
+                if (strcmp(games[nBurnSelected]->subsystem, "megacd") == 0) {
+                    sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGACD/%s.png", games[nBurnSelected]->parent_name);
+                }
+                else
+                {
+                    switch (systemMasks[games[nBurnSelected]->sysmask])
+                    {
+                    case MASKSNES:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKMEGADRIVE:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/MEGADRIVE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKAMIGA:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/AMIGA/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKCOLECO:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/COLECO/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKTG16:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/TG16/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKPCE:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/PCE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKSGX:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SGX/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGB:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GAMEBOY/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGBC:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GBCOLOR/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    case MASKGBA:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/GBADVANCE/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    default:
+                        sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->parent_name);
+                        break;
+                    }
+                }
+
+/*                if (strcmp(games[nBurnSelected]->sysmask, "MASKSNES") == 0) {
                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/SNES/%s.png",games[nBurnSelected]->parent_name);
                 }
                 else
@@ -978,7 +1152,7 @@ void c_fbaRL::UpdatePreviewImage()
                                             }
                                             else
                                                 sprintf(szPreviewPath, "/dev_hdd0/game/FBNE00123/USRDIR/cores/titles/%s.png", games[nBurnSelected]->parent_name);
-
+*/
                 if(fileExist(szPreviewPath))
                         app.textures[TEX_PREVIEW]->BindSecTexture(szPreviewPath);
                 //app.textures[TEX_PREVIEW]->BindTexture(szPreviewPath);

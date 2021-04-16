@@ -10,7 +10,7 @@
 #include <sys/systime.h>
 
 
-CoreOptions resolveCoreOption(string lower) {
+CoreOptions resolveCoreOption(string lower) {  // folders name
     if (strstr(lower.c_str(), "mame125")) return mame125;
     if (strstr(lower.c_str(), "snes")) return snes;
     if (strstr(lower.c_str(), "megadriv")) return megadriv;
@@ -20,6 +20,9 @@ CoreOptions resolveCoreOption(string lower) {
     if (strstr(lower.c_str(), "tg16")) return turbografx16;
     if (strstr(lower.c_str(), "pce")) return pcengine;
     if (strstr(lower.c_str(), "sgx")) return supergrafx;
+    if (strstr(lower.c_str(), "gbcolor")) return gbcolor;
+    if (strstr(lower.c_str(), "gbadvance")) return gbadvance;
+    if (strstr(lower.c_str(), "gameboy")) return gameboy;
     //...
     return CoreOptionsInvalid;
 }
@@ -191,7 +194,22 @@ static void RomScan2(void* arg) {
                                 snprintf(system, sizeof(system), "supergrafx");
                                 break;
                             }
-                                        // handles Option_Invalid and any other missing/unmapped cases
+                            case gbadvance: {
+                                coreid = 6;
+                                snprintf(system, sizeof(system), "gbadvance");
+                                break;
+                            }
+                            case gbcolor: {
+                                coreid = 6;
+                                snprintf(system, sizeof(system), "gbcolor");
+                                break;
+                            }
+                            case gameboy: {
+                                coreid = 6;
+                                snprintf(system, sizeof(system), "gameboy");
+                                break;
+                            }
+                            // handles Option_Invalid and any other missing/unmapped cases
                             default: {
                                 coreid = 1;
                                 snprintf(system, sizeof(system), "mame");
@@ -235,8 +253,8 @@ static void RomScan2(void* arg) {
                         lower = toLowerCase((char*)(*it).substr(0, found).c_str(), (*it).substr(0, found).length());
                         snprintf(key, KEY_MAX_LENGTH, "%s%s", system, lower);
                         free(lower);
-
                         if (((*it).substr((*it).find_last_of(".") + 1) != "bin" && (*it).substr((*it).find_last_of(".") + 1) != "BIN") || strcmp(system, "neocd") != 0)
+                        {
                             if (hashmap_get(drvmap, key, (void**)(&fba_drv)) >= 0) {
                                 fba_games = (FBA_GAMES*)malloc(sizeof(FBA_GAMES));
                                 if (fba_games == NULL) {
@@ -258,7 +276,7 @@ static void RomScan2(void* arg) {
                                 rc = sqlite3_exec(mdb, sql, NULL, NULL, &errmsg);
 
                             }
-
+                        }
 
                         if (barDown % step == 0) {
                             sysGetCurrentTime(&tsec2, &tnsec2);
@@ -289,7 +307,7 @@ static void RomScan2(void* arg) {
             dir.pop_back();
             deltadir++;
         }
-        
+        printf("Exit\n");
         snprintf(sql, sizeof(sql), "select count(g.id) from games g left join games_available ga on g.id = ga.game_id");
         rc = sqlite3_prepare_v2(mdb, sql, -1, &stmt, 0);
         if (rc != SQLITE_OK) {
@@ -567,28 +585,13 @@ void c_fbaRL::DlgDisplayFrame()
                   "Do you want to Rescan all configured paths for ROM(s) ?",
                   dialog_handler,(void *)&dialog,NULL);
 
-            /*dialog_action = 0;
-            while(dialog_action == 0) {
-                    sysUtilCheckCallback();
-                    waitFlip();
-                    app.Flip();
-            }
-            msgDialogAbort();*/
-//            ::cellMsgDialogOpen2(
-//				CELL_MSGDIALOG_TYPE_BUTTON_TYPE_YESNO|
-//				CELL_MSGDIALOG_TYPE_DEFAULT_CURSOR_NO,
-//				"Do you want to Rescan all configured paths for ROM(s) ?",
-//				ExitDlgCallbackFunction, (void*)STATUS_ROMSCAN_DLG, NULL
-//			);
-            //printf("Post dialod %d\n",nStatus);
 			break;
 		}
 
         case STATUS_MISSING_CORE_2:
         {
             dialog = STATUS_MISSING_CORE_2;
-            msgDialogOpen2((msgType)((MSG_DIALOG_BTN_TYPE_OK
-                                |MSG_DIALOG_DISABLE_CANCEL_ON)),
+            msgDialogOpen2((msgType)((MSG_DIALOG_ERROR)),
                                 "Core SNES9X is missing. Install correct upgrade pack.",dialog_handler,(void *)&dialog,NULL);
             break;
         }
@@ -596,8 +599,7 @@ void c_fbaRL::DlgDisplayFrame()
         case STATUS_MISSING_CORE_4:
         {
             dialog = STATUS_MISSING_CORE_4;
-            msgDialogOpen2((msgType)((MSG_DIALOG_BTN_TYPE_OK
-                                |MSG_DIALOG_DISABLE_CANCEL_ON)),
+            msgDialogOpen2((msgType)((MSG_DIALOG_ERROR)),
                                 "Core GENESIS PLUS GX is missing. Install correct upgrade pack.",dialog_handler,(void *)&dialog,NULL);
             break;
         }
@@ -605,9 +607,16 @@ void c_fbaRL::DlgDisplayFrame()
         case STATUS_MISSING_CORE_5:
         {
             dialog = STATUS_MISSING_CORE_5;
-            msgDialogOpen2((msgType)((MSG_DIALOG_BTN_TYPE_OK
-                                |MSG_DIALOG_DISABLE_CANCEL_ON)),
+            msgDialogOpen2((msgType)((MSG_DIALOG_ERROR)),
                                 "Core E-UAE is missing. Install correct upgrade pack.",dialog_handler,(void *)&dialog,NULL);
+            break;
+        }
+
+        case STATUS_MISSING_CORE_6:
+        {
+            dialog = STATUS_MISSING_CORE_6;
+            msgDialogOpen2((msgType)((MSG_DIALOG_ERROR)),
+                "Core MGBA is missing. Install correct upgrade pack.", dialog_handler, (void*)&dialog, NULL);
             break;
         }
 
@@ -621,21 +630,6 @@ void c_fbaRL::DlgDisplayFrame()
 				"Do you want to Re-Scan all configured paths for ROM(s) ?",
                 dialog_handler,(void *)&dialog,NULL);
 
-            /*dialog_action = 0;
-            while(dialog_action == 0) {
-                    sysUtilCheckCallback();
-                    //waitFlip();
-                    app.Flip();
-            }
-            msgDialogAbort();*/
-//            ::cellMsgDialogOpen2(
-//				CELL_MSGDIALOG_TYPE_BUTTON_TYPE_YESNO|
-//				CELL_MSGDIALOG_TYPE_DEFAULT_CURSOR_NO,
-//				"Error: There was a problem locating the specified game, if you had it on a USB Storage Device, \n"
-//				"make sure it is properly connected.\n\n"
-//				"Do you want to Re-Scan all configured paths for ROM(s) ?",
-//				ExitDlgCallbackFunction, (void*)STATUS_ROMSCAN_DLG, NULL
-//			);
 			break;
 		}
 

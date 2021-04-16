@@ -1,6 +1,6 @@
 --- menu/menu_displaylist.c
 +++ menu/menu_displaylist.c
-@@ -7633,12 +7633,12 @@
+@@ -8178,12 +8178,12 @@
           }
           break;
        case DISPLAYLIST_CONFIGURATIONS_LIST:

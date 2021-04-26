@@ -34,7 +34,7 @@ PKGFILES	:=	$(CURDIR)/../pkg
 TITLE		:=	FB NEO RL Plus
 APPID		:=	FBNE00123
 CONTENTID	:=	UP0001-$(APPID)_00-0000000000000000
-APP_VER		:=	2.20
+APP_VER		:=	2.30
 TO_DAY		:=	$(shell date +%F)
 
 #---------------------------------------------------------------------------------

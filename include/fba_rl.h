@@ -26,7 +26,7 @@
 #define PITCH		(MAX_WIDTH * 4)
 #define MAXQUADXTEX 9
 
-extern unsigned char	example_cfg[24000];		// For creating basic input presets
+extern unsigned char	example_cfg[25000];		// For creating basic input presets
 void _ScanROMs(uint64_t);
 
 #define STATUS_NORMAL			0
@@ -132,7 +132,7 @@ void _ScanROMs(uint64_t);
 #define SAFE_DELETE(x)	if(x) { delete x; *&x = NULL; }
 
 #define MAX_GAMES	25000 // <-- should be enough xD
-#define TOTAL_DRV_GAMES 23121
+#define TOTAL_DRV_GAMES 23645
 
 using namespace std;
 

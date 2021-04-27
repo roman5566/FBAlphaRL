@@ -145,6 +145,14 @@ pkg4:
 	@mv $(OUTPUT).pkg $(OUTPUT)_v$(APP_VER)_$(TO_DAY).pkg
 pkg:	pkg2 pkg3 pkg1 pkg4
 
+pkgdir:
+	@echo $@
+	@echo $(BUILDDIR)
+	@echo $(CURDIR)
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(BUILDDIR)/ test.pkg
+	$(VERB) cp test.pkg test.gnpdrm.pkg
+	$(VERB) $(PACKAGE_FINALIZE) test.gnpdrm.pkg
+
 #---------------------------------------------------------------------------------
 else
 

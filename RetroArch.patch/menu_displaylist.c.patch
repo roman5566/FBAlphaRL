@@ -1,0 +1,17 @@
+--- menu/menu_displaylist.c
++++ menu/menu_displaylist.c
+@@ -8178,12 +8178,12 @@
+          }
+          break;
+       case DISPLAYLIST_CONFIGURATIONS_LIST:
+-         if (menu_entries_append_enum(list,
++         /*if (menu_entries_append_enum(list,
+                   msg_hash_to_str(MENU_ENUM_LABEL_VALUE_CONFIGURATIONS),
+                   msg_hash_to_str(MENU_ENUM_LABEL_CONFIGURATIONS),
+                   MENU_ENUM_LABEL_CONFIGURATIONS,
+                   MENU_SETTING_ACTION, 0, 0))
+-            count++;
++            count++;*/
+          if (menu_entries_append_enum(list,
+                   msg_hash_to_str(MENU_ENUM_LABEL_VALUE_RESET_TO_DEFAULT_CONFIG),
+                   msg_hash_to_str(MENU_ENUM_LABEL_RESET_TO_DEFAULT_CONFIG),

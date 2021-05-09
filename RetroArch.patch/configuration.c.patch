@@ -1,0 +1,46 @@
+
+#ifdef __CELLOS_LV2__
+#define DEFAULT_CONFIG_FILE "/dev_hdd0/game/FBNE00123/USRDIR/retroarch.cfg.orig"
+void config_set_defaults_PS3(void)
+{
+	char msg[256];
+
+	msg[0] = '\0';
+	snprintf(msg,  sizeof(msg), "Resetting config file: %s", path_get(RARCH_PATH_CONFIG));
+	//strlcpy(msg, path_get(RARCH_PATH_CONFIG),
+    //              sizeof(msg));
+	if (!string_is_empty(msg))
+      runloop_msg_queue_push(msg, 1, 220, true, NULL, MESSAGE_QUEUE_ICON_DEFAULT, MESSAGE_QUEUE_CATEGORY_INFO);
+	
+    FILE *fptr1, *fptr2; 
+    char c; 
+  
+    
+    fptr1 = fopen(DEFAULT_CONFIG_FILE, "r"); 
+    if (fptr1 == NULL) 
+    { 
+        printf("Cannot open file %s \n", DEFAULT_CONFIG_FILE); 
+        exit(0); 
+    } 
+  
+    fptr2 = fopen(path_get(RARCH_PATH_CONFIG), "w"); 
+    if (fptr2 == NULL) 
+    { 
+        printf("Cannot open file %s \n", path_get(RARCH_PATH_CONFIG)); 
+        exit(0); 
+    } 
+  
+    // Read contents from file 
+    c = fgetc(fptr1); 
+    while (c != EOF) 
+    { 
+        fputc(c, fptr2); 
+        c = fgetc(fptr1); 
+    } 
+  
+    fclose(fptr1); 
+    fclose(fptr2); 
+	
+	
+}
+#endif
